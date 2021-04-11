@@ -86,6 +86,7 @@ Definition c : string := "c".
 Definition k : string := "k".
 Definition l : string := "l".
 Definition l' : string := "l'".
+Definition l'' : string := "l''".
 Definition l1 : string := "l1".
 Definition l1' : string := "l1'".
 Definition l2 : string := "l2".
@@ -95,6 +96,10 @@ Definition g : string := "g".
 Definition h : string := "h".
 Definition n : string := "n".
 Definition n' : string := "n'".
+Definition n1 : string := "n1".
+Definition n1' : string := "n1'".
+Definition n2 : string := "n2".
+Definition n2' : string := "n2'".
 Definition t : string := "t".
 Definition t' : string := "t'".
 Definition t1 : string := "t1".
@@ -114,12 +119,12 @@ Definition tail : string := "tail".
 Definition tail' : string := "tail'".
 Definition tail1 : string := "tail1".
 Definition tail2 : string := "tail2".
-Definition hole : string := "hole".
-Definition hole1 : string := "hole1".
-Definition hole2 : string := "hole2".
-Definition hole3 : string := "hole3".
-Definition hole4 : string := "hole4".
-Definition hole5 : string := "hole5".
+Definition res : string := "res".
+Definition res1 : string := "res1".
+Definition res2 : string := "res2".
+Definition res3 : string := "res3".
+Definition res4 : string := "res4".
+Definition res5 : string := "res5".
 
 Hint Unfold a : core.
 Hint Unfold b : core.
@@ -127,6 +132,7 @@ Hint Unfold c : core.
 Hint Unfold k : core.
 Hint Unfold l : core.
 Hint Unfold l' : core.
+Hint Unfold l'' : core.
 Hint Unfold l1 : core.
 Hint Unfold l1' : core.
 Hint Unfold l2 : core.
@@ -136,6 +142,10 @@ Hint Unfold g : core.
 Hint Unfold h : core.
 Hint Unfold n : core.
 Hint Unfold n' : core.
+Hint Unfold n1 : core.
+Hint Unfold n1' : core.
+Hint Unfold n2 : core.
+Hint Unfold n2' : core.
 Hint Unfold t : core.
 Hint Unfold t' : core.
 Hint Unfold t1 : core.
@@ -155,12 +165,12 @@ Hint Unfold tail : core.
 Hint Unfold tail' : core.
 Hint Unfold tail1 : core.
 Hint Unfold tail2 : core.
-Hint Unfold hole : core.
-Hint Unfold hole1 : core.
-Hint Unfold hole2 : core.
-Hint Unfold hole3 : core.
-Hint Unfold hole4 : core.
-Hint Unfold hole5 : core.
+Hint Unfold res : core.
+Hint Unfold res1 : core.
+Hint Unfold res2 : core.
+Hint Unfold res3 : core.
+Hint Unfold res4 : core.
+Hint Unfold res5 : core.
 
 Notation "<{ e }>" := e (e custom stlc at level 99).
 Notation "<{{ e }}>" := e (e custom stlc_ty at level 99).
@@ -483,7 +493,7 @@ Tactic Notation "print_goal" :=
 
 Tactic Notation "normalize" :=
   repeat (print_goal; eapply mult_step ;
-            [ (eauto 10; fail) | (instantiate; simpl)]);
+            [ (eauto 25; fail) | (instantiate; simpl)]);
   apply mult_refl. 
 
 Tactic Notation "solve_CPS" := simpl; normalize.
@@ -626,6 +636,7 @@ Proof.
         [M1 M2] = [M1] (fun hole1 => [M2] (fun hole2 => k (hole1 hole2)))
 *)
 
+(*Some helper functions*)
 Fixpoint get_output_type (type : ty) : ty :=
   match type with
   | Arrow ty1 ty2 => get_output_type ty2
@@ -638,11 +649,18 @@ Fixpoint type_insert (original_type insert_type : ty) : ty :=
   | _ => Arrow insert_type original_type
   end.
 
-Fixpoint para_insert (func_body : tm) (para_name : string) (para_type : ty) : tm :=
+Fixpoint para_insert (para_name : string) (para_type : ty) (func_body : tm) : tm :=
   match func_body with
-  | abs x1 T t1 => abs x1 T (para_insert t1 para_name para_type)
+  | abs x1 T t1 => abs x1 T (para_insert para_name para_type t1)
   | _ => abs para_name para_type func_body
   end.
+
+Module initial_version.
+
+(*
+  An initial version of CPS conversion which can not deal with complicated
+  pattern matching and requires a parameter [fuel] to get accepted by Coq.
+*)
 
 Fixpoint find_func (func_name : string) (func_body : tm) : nat :=
   match func_body with
@@ -820,39 +838,6 @@ Fixpoint extract_and_substitute (func_name : string) (func_body : tm) (substitut
        (func_body, func_body)
   end.
 
-(*
-Fixpoint CPS (func_name : string) (continuation_type : ty) (func_body : tm) (naming : nat) {struct func_body} : tm :=
-  match func_body with
-  | abs x1 T t1 =>
-       abs x1 T (CPS func_name continuation_type func_body naming)
-  
-  | tif0 t1 t2 t3 =>
-       tif0 t1 (CPS func_name continuation_type t2 naming) (CPS func_name continuation_type t3 naming)
-  
-  | tlcase t1 t2 x1 x2 t3 =>
-       tlcase t1 (CPS func_name continuation_type t2 naming) x1 x2 (CPS func_name continuation_type t3 naming)
-  
-  | tbcase t1 x1 t2 x2 x3 x4 t3 =>
-       tbcase t1 x1 (CPS func_name continuation_type t2 naming) x2 x3 x4 (CPS func_name continuation_type t3 naming)
-  
-  | tlet x1 t1 t2 =>
-       tlet x1 (CPS func_name continuation_type t1 naming) (CPS func_name continuation_type t2 naming)
-  
-  | tfix t1 =>
-       tfix (CPS func_name continuation_type t1 naming)
-  
-  | _ =>
-       match find_func func_name func_body with
-       | 0 => app k func_body
-       | S _ => let continuation_name := append hole (nat2string naming) in
-                let (parameterized_func, substituted_func_body) :=
-                extract_and_substitute func_name func_body continuation_name in
-                app parameterized_func (abs continuation_name continuation_type
-                (CPS func_name continuation_type substituted_func_body (naming + 1)))
-       end
-  end.
-*)
-
 Fixpoint CPS (func_name : string) (output_type : ty) (func_body : tm) (naming : nat) (fuel : nat) : tm :=
   match fuel with | O => func_body | S fuel' =>
     match func_body with
@@ -877,7 +862,7 @@ Fixpoint CPS (func_name : string) (output_type : ty) (func_body : tm) (naming : 
     | _ =>
          match find_func func_name func_body with
          | 0 => app k func_body
-         | S _ => let continuation_name := append hole (nat2string naming) in
+         | S _ => let continuation_name := append "hole" (nat2string naming) in
                   let (parameterized_func, substituted_func_body) := extract_and_substitute func_name func_body continuation_name in
                     app parameterized_func (abs continuation_name output_type
                       (CPS func_name output_type substituted_func_body (naming + 1) fuel'))
@@ -891,23 +876,11 @@ Definition CPS_conversion (func : tm) : tm :=
       let func_output_type := get_output_type func_type in
       let continuation_type := Arrow func_output_type func_output_type in
       let func_new_type := type_insert func_type continuation_type in
-      let func_paraed_body := para_insert func_body k continuation_type in
+      let func_paraed_body := para_insert k continuation_type func_body in
       let func_new_body := CPS func_name func_output_type func_paraed_body 1 999 in
         tfix (abs func_name func_new_type func_new_body)
   | _ => func
   end.
-
-(*(*proof*)
-Inductive tail (f : string) : tm -> Prop :=
-  | tail_var :
-       tail f (var f)
-  | tail_abs : forall x1 T t1,
-       tail f t1 ->
-       tail f (abs x1 T t1)
-  | tail_app : forall t1 t2,
-       tail f t1 ->
-       tail f (app t1 t2)
-  | tail_*)
 
 (*verification by examples*)
 Module examples.
@@ -966,47 +939,254 @@ Definition multi_match_simple :=
 
 Compute (CPS_conversion multi_match_simple).
 
-Theorem foo :
-  (app (app (CPS_conversion multi_match_simple) (tcons 0 (tcons 7 (tcons 1 (tnil Nat))))) idNat ) -->* 1.
-Proof. simpl. normalize.
+End examples.
 
-Definition multi_match :=
-  tfix (abs "f" (Arrow (List Nat) Nat)
-    (abs "l" (List Nat)
-      (tlcase (var "l") 1 "n1" "l1"
-        (tmult 3 ((tlcase (var "l1") (var "n1") "n2" "l2"
-          (tlcase (var "l2") (tplus 2 (app (var "f") (var "l2"))) "n3" "l3"
-            (app (var "f") (var "l3"))))))))).
+End initial_version.
 
-Compute (CPS_conversion multi_match).
+Module new_version.
 
-Theorem multi_match_correct :
-  let originfun := multi_match in
-  let exfun := CPS_conversion multi_match in
-  let input1 := (tcons 0 (tcons 7 (tcons 1 (tnil Nat)))) in
-  let output1 := 3 in
-  let input2 := (tcons 1 (tcons 2 (tcons 1 (tcons 4 (tcons 3 (tcons 1 (tnil Nat))))))) in
-  let output2 := 9 in
-  let input3 := (tcons 10 (tcons 10 (tcons 10 (tcons 10 (tcons 10 (tcons 10 (tcons 10 (tnil Nat)))))))) in
-  let output3 := 270 in
-  ((<{originfun input1}> -->* output1) /\ (<{exfun input1 idNat}> -->* output1)) /\
-  ((<{originfun input2}> -->* output2) /\ (<{exfun input2 idNat}> -->* output2)) /\
-  ((<{originfun input3}> -->* output3) /\ (<{exfun input3 idNat}> -->* output3)).
-Proof. simpl. unfold multi_match. unfold idNat. split. split. normalize. normalize.
+(*
+  A new version of CPS conversion which can deal with complicated pattern matching.
+*)
 
-Print multi_match.
+Fixpoint find_func (func_name : string) (func_body : tm) : bool :=
+  match func_body with
+  | var x1 =>
+       if eqb x1 func_name then true else false
+  | abs x1 _ t1 =>
+       if eqb x1 func_name then false else find_func func_name t1
+  | app t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  
+  | tconst _ =>
+       false
+  | tplus t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tminus t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tmult t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tif0 t1 t2 t3 =>
+       orb (orb (find_func func_name t1) (find_func func_name t2)) (find_func func_name t3)
+  
+  | tnil _ =>
+       false
+  | tcons t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tlcase t1 t2 x1 x2 t3 =>
+       orb (orb (find_func func_name t1) (find_func func_name t2)) (if orb (eqb x1 func_name) (eqb x2 func_name) then false else (find_func func_name t3))
+  
+  | tleaf t1 =>
+       find_func func_name t1
+  | tnode t1 t2 t3 =>
+       orb (orb (find_func func_name t1) (find_func func_name t2)) (find_func func_name t3)
+  | tbcase t1 x1 t2 x2 x3 x4 t3 =>
+       orb (orb (find_func func_name t1) (if eqb x1 func_name then false else (find_func func_name t2))) (if orb (orb (eqb x2 func_name) (eqb x3 func_name)) (eqb x4 func_name) then false else (find_func func_name t3))
+  
+  | tlet x1 t1 t2 =>
+       if eqb x1 func_name then find_func func_name t1 else orb (find_func func_name t1) (find_func func_name t2)
+  
+  | tfix t1 =>
+       find_func func_name t1
+  end.
+
+Fixpoint is_recu (func_name : string) (func_body : tm) :=
+  match func_body with
+  | var x1 => eqb x1 func_name
+  | app t1 t2 => andb (andb (find_func func_name t1) (negb (find_func func_name t2)) ) (is_recu func_name t1)
+  | _ => false
+  end.
+
+Fixpoint CPS (continuation_name : string) (output_type: ty) (func_name : string) (func_body : tm) (naming : nat) (k : tm -> tm) (fuel : nat) : tm :=
+match fuel with | O => func_body | S fuel' =>
+  if is_recu func_name func_body then
+  let para_name := append "res" (nat2string naming) in
+  let result := k (var para_name) in
+  app func_body (abs para_name output_type
+  (if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
+  else app continuation_name result))
+  else match func_body with
+  | var _ =>
+       let result := k func_body in
+       if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
+       else app continuation_name result
+  | abs x1 T t1 =>
+       abs x1 T (CPS continuation_name output_type func_name t1 naming k fuel')
+  | app t1 t2 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (app res t2)) fuel'
+       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (app t1 res)) fuel'
+       else app continuation_name (k func_body)
+  
+  | tconst n =>
+       let result := k func_body in
+       if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
+       else app continuation_name result
+  | tplus t1 t2 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tplus res t2)) fuel'
+       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tplus t1 res)) fuel'
+       else app continuation_name (k func_body)
+  | tminus t1 t2 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tminus res t2)) fuel'
+       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tminus t1 res)) fuel'
+       else app continuation_name (k func_body)
+  | tmult t1 t2 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tmult res t2)) fuel'
+       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tmult t1 res)) fuel'
+       else app continuation_name (k func_body)
+  | tif0 t1 t2 t3 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tif0 res t2 t3)) fuel'
+       else tif0 t1 (CPS continuation_name output_type func_name t2 naming k fuel') (CPS continuation_name output_type func_name t3 naming k fuel')
+  
+  | tnil _ =>
+       let result := k func_body in
+       if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
+       else app continuation_name result
+  | tcons t1 t2 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tcons res t2)) fuel'
+       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tcons t1 res)) fuel'
+       else app continuation_name (k func_body)
+  | tlcase t1 t2 x1 x2 t3 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tlcase res t2 x1 x2 t3)) fuel'
+       else tlcase t1 (CPS continuation_name output_type func_name t2 naming k fuel') x1 x2 (CPS continuation_name output_type func_name t3 naming k fuel')
+  
+  | tleaf t1 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tleaf res)) fuel'
+       else app continuation_name (k func_body)
+  | tnode t1 t2 t3 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tnode res t2 t3)) fuel'
+       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tnode t1 res t3)) fuel'
+       else if find_func func_name t3 then CPS continuation_name output_type func_name t3 naming (fun res : tm => k (tnode t1 t2 res)) fuel'
+       else app continuation_name (k func_body)
+  | tbcase t1 x1 t2 x2 x3 x4 t3 =>
+       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tbcase res x1 t2 x2 x3 x4 t3)) fuel'
+       else tbcase t1 x1 (CPS continuation_name output_type func_name t2 naming k fuel') x2 x3 x4 (CPS continuation_name output_type func_name t3 naming k fuel')
+  
+  | tlet x1 t1 t2 =>
+       tlet x1 (CPS continuation_name output_type func_name t1 naming k fuel') (CPS continuation_name output_type func_name t2 naming k fuel')
+  
+  | tfix t1 =>
+       tfix (CPS continuation_name output_type func_name t1 naming k fuel')
+end
+  end.
+
+Definition CPS_conversion (func : tm) : tm :=
+  match func with
+  | tfix (abs func_name func_type func_body) =>
+       let output_type := get_output_type func_type in
+       let continuation_name := k in
+       let continuation_type := Arrow output_type output_type in
+       let func_new_type := type_insert func_type continuation_type in
+       let func_paraed_body := para_insert continuation_name continuation_type func_body in
+       tfix (abs func_name func_type (CPS continuation_name output_type func_name func_paraed_body 1 (fun res : tm => res) 999))
+  | _ => func
+  end.
+
+(*verification by examples*)
+
+Module examples.
+
+Definition match_case1 :=
+  tfix (abs f (Arrow (List Nat) Nat)
+    (abs l (List Nat)
+      (tlcase l 0 n1 l1
+        (tlcase l1 n1 n2 l2
+          (tplus n1 (tplus n2 (app f l2))))))).
+
+Compute (CPS_conversion match_case1).
+
+Definition match_case1_CPS :=
+  tfix (abs f (Arrow (List Nat) (Arrow (Arrow Nat Nat) Nat))
+    (abs l (List Nat)
+      (abs k (Arrow Nat Nat)
+        (tlcase l (app k 0) n1 l1
+          (tlcase l1 (app k n1) n2 l2
+            (app (app f l2) (abs res Nat (app k (tplus n1 (tplus n2 res)))))))))).
+
+Theorem case1_correct :
+  let origin_fun := match_case1 in
+  let CPS_fun := CPS_conversion match_case1 in
+  let input := tcons 4 (tcons 3 (tcons 1 (tcons 2 (tnil Nat)))) in
+  let output := 10 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. unfold match_case1. simpl. split. normalize. normalize. Qed.
+
+Definition match_case2 :=
+  tfix (abs f (Arrow (List Nat) Nat)
+    (abs l (List Nat)
+      (tplus 1 (tlcase l 0 n1 l1
+        (tplus n1 (app f l1)))))).
+
+Compute (CPS_conversion match_case2).
+
+Definition match_case2_CPS :=
+  tfix (abs f (Arrow (List Nat) (Arrow (Arrow Nat Nat) Nat))
+    (abs l (List Nat)
+      (abs k (Arrow Nat Nat)
+        (tlcase l (app k (tplus 1 0)) n1 l1
+          (app (app f l1) (abs res Nat (app k (tplus (tplus 1 n1) res)))))))).
+
+Theorem case2_correct :
+  let origin_fun := match_case2 in
+  let CPS_fun := CPS_conversion match_case2 in
+  let input := tcons 4 (tcons 3 (tcons 1 (tcons 2 (tnil Nat)))) in
+  let output := 15 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. unfold match_case2. simpl. split. normalize. normalize. Qed.
+
+Definition match_case3 :=
+  tfix (abs f (Arrow (List Nat) Nat)
+    (abs l (List Nat)
+      (tlcase l 0 n1 l1
+        (tif0 (app f l1) n1 (tmult 2 n1))))).
+
+Compute (CPS_conversion match_case3).
+
+Definition match_case3_CPS :=
+  tfix (abs f (Arrow (List Nat) (Arrow (Arrow Nat Nat) Nat))
+    (abs l (List Nat)
+      (abs k (Arrow Nat Nat)
+        (tlcase l (app k 0) n1 l1
+          (app (app f l1) (abs res Nat (app k (tif0 res n1 (tmult 2 n1))))))))).
+
+Theorem case3_correct :
+  let origin_fun := match_case3 in
+  let CPS_fun := CPS_conversion match_case3 in
+  let input := tcons 2 (tcons 2 (tnil Nat)) in
+  let output := 4 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. unfold match_case3. simpl. split. normalize. normalize. Qed.
+
+Definition match_case4 :=
+  tfix (abs f (Arrow (List Nat) Nat)
+    (abs l1 (List Nat)
+       (abs l2 (List Nat)
+         (tplus (tlcase l1 0 n1 l'
+           (tplus n1 (app (app f l') l2)))
+             (tlcase l2 0 n2 l''
+               (tplus n2 (app (app f l1) l''))))))).
+
+Compute (CPS_conversion match_case4).
+
+Definition match_case4_CPS :=
+  tfix (abs f (Arrow (Arrow (List Nat) (List Nat)) (Arrow (Arrow Nat Nat) Nat))
+    (abs l1 (List Nat)
+      (abs l2 (List Nat)
+        (abs k (Arrow Nat Nat)
+          (tlcase l2 (tlcase l1 (app k (tplus 0 0)) n1 l'
+            (app (app (app f l') l2) (abs res Nat (app k (tplus (tplus n1 res) 0))))) n2 l''
+              (tlcase l1 (app (app (app f l1) l'') (abs res Nat (app k (tplus (tplus 0 n2) res)))) n1 l'
+                (app (app (app f l') l2) (abs res1 Nat (app (app (app f l1) l'') (abs res2 Nat
+                  (app k (tplus (tplus n1 res1) (tplus n2 res2))))))))))))).
+
+Theorem case4_correct :
+  let origin_fun := match_case4 in
+  let CPS_fun := CPS_conversion match_case4 in
+  let input1 := tcons 2 (tcons 3 (tcons 5 (tnil Nat))) in
+  let input2 := tcons 4 (tcons 2 (tnil Nat)) in
+  let output := 110 in
+  (<{origin_fun input1 input2}> -->* output) /\ (<{CPS_fun input1 input2 idNat}> -->* output).
+Proof. unfold match_case4. simpl. split. normalize. normalize. Qed.
 
 End examples.
 
-
-
-
-
-
-
-
-
-
-
-
-
+End new_version.
