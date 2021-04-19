@@ -949,6 +949,7 @@ Module new_version.
   A new version of CPS conversion which can deal with complicated pattern matching.
 *)
 
+(*
 Fixpoint find_func (func_name : string) (func_body : tm) : bool :=
   match func_body with
   | var x1 =>
@@ -989,84 +990,208 @@ Fixpoint find_func (func_name : string) (func_body : tm) : bool :=
   | tfix t1 =>
        find_func func_name t1
   end.
+*)
+
+Fixpoint find_func (func_name : string) (func_body : tm) : nat :=
+  match func_body with
+  | var x1 =>
+       if eqb x1 func_name then 1 else 0
+  | abs x1 _ t1 =>
+       if eqb x1 func_name then 0 else find_func func_name t1
+  | app t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  
+  | tconst _ =>
+       0
+  | tplus t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tminus t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tmult t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tif0 t1 t2 t3 =>
+       (find_func func_name t1) + (find_func func_name t2) + (find_func func_name t3)
+  
+  | tnil _ =>
+       0
+  | tcons t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tlcase t1 t2 x1 x2 t3 =>
+       (find_func func_name t1) + (find_func func_name t2) + (if eqb x1 func_name then 0 else if eqb x2 func_name then 0 else find_func func_name t3)
+  
+  | tleaf t1 =>
+       find_func func_name t1
+  | tnode t1 t2 t3 =>
+       (find_func func_name t1) + (find_func func_name t2) + (find_func func_name t3)
+  | tbcase t1 x1 t2 x2 x3 x4 t3 =>
+       (find_func func_name t1) + (if eqb x1 func_name then 0 else find_func func_name t2) + (if eqb x2 func_name then 0 else if eqb x3 func_name then 0 else if eqb x4 func_name then 0 else find_func func_name t3)
+  
+  | tlet x1 t1 t2 =>
+       (find_func func_name t1) + (if eqb x1 func_name then 0 else find_func func_name t2)
+  
+  | tfix t1 =>
+       find_func func_name t1
+  end.
 
 Fixpoint is_recu (func_name : string) (func_body : tm) :=
   match func_body with
   | var x1 => eqb x1 func_name
-  | app t1 t2 => andb (andb (find_func func_name t1) (negb (find_func func_name t2)) ) (is_recu func_name t1)
+  | app t1 t2 => andb (andb (find_func func_name t1 =? 1) (find_func func_name t2 =? 0) ) (is_recu func_name t1)
   | _ => false
   end.
 
-Fixpoint CPS (continuation_name : string) (output_type: ty) (func_name : string) (func_body : tm) (naming : nat) (k : tm -> tm) (fuel : nat) : tm :=
-match fuel with | O => func_body | S fuel' =>
+Fixpoint CPS (continuation_name : string) (output_type: ty) (func_name : string) (func_body : tm) (naming : nat) (k : tm -> tm) {struct func_body} : tm :=
   if is_recu func_name func_body then
   let para_name := append "res" (nat2string naming) in
   let result := k (var para_name) in
   app func_body (abs para_name output_type
-  (if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
-  else app continuation_name result))
+  match find_func func_name result with
+       | O => app (var continuation_name) result
+       | S n1 => result
+       end)
   else match func_body with
   | var _ =>
        let result := k func_body in
-       if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
-       else app continuation_name result
+       match find_func func_name result with
+       | O => app (var continuation_name) result
+       | S n1 => result
+       end
   | abs x1 T t1 =>
-       abs x1 T (CPS continuation_name output_type func_name t1 naming k fuel')
+       abs x1 T (CPS continuation_name output_type func_name t1 naming k) (*TODO*)
   | app t1 t2 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (app res t2)) fuel'
-       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (app t1 res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1, find_func func_name t2 with
+       | O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O =>
+            CPS continuation_name output_type func_name t1 naming (fun res : tm => k (app res t2))
+       | O, S n2 =>
+            CPS continuation_name output_type func_name t2 naming (fun res : tm => k (app t1 res))
+       | S n1, S n2 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (app res1 res2)))
+       end
   
   | tconst n =>
        let result := k func_body in
-       if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
-       else app continuation_name result
+       match find_func func_name result with
+       | O => app (var continuation_name) result
+       | S n1 => result
+       end
   | tplus t1 t2 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tplus res t2)) fuel'
-       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tplus t1 res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1, find_func func_name t2 with
+       | O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O =>
+            CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tplus res t2))
+       | O, S n2 =>
+            CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tplus t1 res))
+       | S n1, S n2 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (tplus res1 res2)))
+       end
   | tminus t1 t2 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tminus res t2)) fuel'
-       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tminus t1 res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1, find_func func_name t2 with
+       | O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O =>
+            CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tminus res t2))
+       | O, S n2 =>
+            CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tminus t1 res))
+       | S n1, S n2 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (tminus res1 res2)))
+       end
   | tmult t1 t2 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tmult res t2)) fuel'
-       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tmult t1 res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1, find_func func_name t2 with
+       | O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O =>
+            CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tmult res t2))
+       | O, S n2 =>
+            CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tmult t1 res))
+       | S n1, S n2 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (tmult res1 res2)))
+       end
   | tif0 t1 t2 t3 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tif0 res t2 t3)) fuel'
-       else tif0 t1 (CPS continuation_name output_type func_name t2 naming k fuel') (CPS continuation_name output_type func_name t3 naming k fuel')
+       match find_func func_name t1 with
+       | O => tif0 t1 (CPS continuation_name output_type func_name t2 naming k) (CPS continuation_name output_type func_name t3 naming k)
+       | S n1 => CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tif0 res t2 t3))
+       end
   
   | tnil _ =>
        let result := k func_body in
-       if find_func func_name result then CPS continuation_name output_type func_name result (naming + 1) (fun res : tm => res) fuel'
-       else app continuation_name result
+       match find_func func_name result with
+       | O => app (var continuation_name) result
+       | S n1 => result
+       end
   | tcons t1 t2 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tcons res t2)) fuel'
-       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tcons t1 res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1, find_func func_name t2 with
+       | O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O =>
+            CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tcons res t2))
+       | O, S n2 =>
+            CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tcons t1 res))
+       | S n1, S n2 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (tcons res1 res2)))
+       end
   | tlcase t1 t2 x1 x2 t3 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tlcase res t2 x1 x2 t3)) fuel'
-       else tlcase t1 (CPS continuation_name output_type func_name t2 naming k fuel') x1 x2 (CPS continuation_name output_type func_name t3 naming k fuel')
+       match find_func func_name t1 with
+       | O => tlcase t1 (CPS continuation_name output_type func_name t2 naming k) x1 x2 (CPS continuation_name output_type func_name t3 naming k)
+       | S n1 => CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tlcase res t2 x1 x2 t3))
+       end
   
   | tleaf t1 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tleaf res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1 with
+       | O => app (var continuation_name) (k func_body)
+       | S n1 => CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tleaf res))
+       end
   | tnode t1 t2 t3 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tnode res t2 t3)) fuel'
-       else if find_func func_name t2 then CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tnode t1 res t3)) fuel'
-       else if find_func func_name t3 then CPS continuation_name output_type func_name t3 naming (fun res : tm => k (tnode t1 t2 res)) fuel'
-       else app continuation_name (k func_body)
+       match find_func func_name t1, find_func func_name t2, find_func func_name t3 with
+       | O, O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O, O =>
+            CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tnode res t2 t3))
+       | O, S n2, O =>
+            CPS continuation_name output_type func_name t2 naming (fun res : tm => k (tnode t1 res t3))
+       | O, O, S n3 =>
+            CPS continuation_name output_type func_name t3 naming (fun res : tm => k (tnode t1 t2 res))
+       | S n1, S n2, O =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (tnode res1 res2 t3)))
+       | S n1, O, S n3 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t3 (naming + (S n1))
+            (fun res2 : tm => k (tnode res1 t2 res2)))
+       | O, S n2, S n3 =>
+            CPS continuation_name output_type func_name t2 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t3 (naming + (S n2))
+            (fun res2 : tm => k (tnode t1 res1 res2)))
+       | S n1, S n2, S n3 =>
+            CPS continuation_name output_type func_name t1 naming
+            (fun res1 : tm => CPS continuation_name output_type func_name t2 (naming + (S n1))
+            (fun res2 : tm => CPS continuation_name output_type func_name t3 (naming + (S n1)+ (S n2))
+            (fun res3 : tm => k (tnode res1 res2 res3))))
+       end
   | tbcase t1 x1 t2 x2 x3 x4 t3 =>
-       if find_func func_name t1 then CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tbcase res x1 t2 x2 x3 x4 t3)) fuel'
-       else tbcase t1 x1 (CPS continuation_name output_type func_name t2 naming k fuel') x2 x3 x4 (CPS continuation_name output_type func_name t3 naming k fuel')
+       match find_func func_name t1 with
+       | O => tbcase t1 x1 (CPS continuation_name output_type func_name t2 naming k) x2 x3 x4 (CPS continuation_name output_type func_name t3 naming k)
+       | S n1 => CPS continuation_name output_type func_name t1 naming (fun res : tm => k (tbcase res x1 t2 x2 x3 x4 t3))
+       end
   
   | tlet x1 t1 t2 =>
-       tlet x1 (CPS continuation_name output_type func_name t1 naming k fuel') (CPS continuation_name output_type func_name t2 naming k fuel')
+       tlet x1 (CPS continuation_name output_type func_name t1 naming k) (CPS continuation_name output_type func_name t2 naming k)
   
   | tfix t1 =>
-       tfix (CPS continuation_name output_type func_name t1 naming k fuel')
-end
+       tfix (CPS continuation_name output_type func_name t1 naming k)
   end.
 
 Definition CPS_conversion (func : tm) : tm :=
@@ -1077,7 +1202,7 @@ Definition CPS_conversion (func : tm) : tm :=
        let continuation_type := Arrow output_type output_type in
        let func_new_type := type_insert func_type continuation_type in
        let func_paraed_body := para_insert continuation_name continuation_type func_body in
-       tfix (abs func_name func_type (CPS continuation_name output_type func_name func_paraed_body 1 (fun res : tm => res) 999))
+       tfix (abs func_name func_new_type (CPS continuation_name output_type func_name func_paraed_body 1 (fun res : tm => res)))
   | _ => func
   end.
 
@@ -1157,7 +1282,7 @@ Theorem case3_correct :
 Proof. unfold match_case3. simpl. split. normalize. normalize. Qed.
 
 Definition match_case4 :=
-  tfix (abs f (Arrow (List Nat) Nat)
+  tfix (abs f (Arrow (List Nat) (Arrow (List Nat) Nat))
     (abs l1 (List Nat)
        (abs l2 (List Nat)
          (tplus (tlcase l1 0 n1 l'
@@ -1186,6 +1311,67 @@ Theorem case4_correct :
   let output := 110 in
   (<{origin_fun input1 input2}> -->* output) /\ (<{CPS_fun input1 input2 idNat}> -->* output).
 Proof. unfold match_case4. simpl. split. normalize. normalize. Qed.
+
+Definition match_case5 :=
+  tfix (abs f (Arrow (List Nat) Nat)
+    (abs l (List Nat)
+      (tplus 3 (tmult (tlcase l (tminus 2 1) n1 l'
+        (tplus n1 (tplus 1 (tplus (app f l') 1)))) 5)))).
+
+Compute (CPS_conversion match_case5).
+
+Theorem case5_correct :
+  let origin_fun := match_case5 in
+  let CPS_fun := CPS_conversion match_case5 in
+  let input := tcons 2 (tcons 3 (tcons 5 (tnil Nat))) in
+  let output := 2113 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. unfold match_case5. simpl. split. normalize. normalize. Qed.
+
+Definition factorial :=
+  tfix (abs f (Arrow Nat Nat)
+    (abs n Nat
+      (tif0 (var n) (tconst 1)
+        (tmult (app (var f) (tminus (var n) (tconst 1))) (var n))))).
+
+Compute (CPS_conversion factorial).
+
+Theorem factorial_correct :
+  let exfun := CPS_conversion factorial in
+  let input := 5 in
+  let output := 120 in
+  <{exfun input idNat}> -->* output.
+Proof. solve_CPS. Qed.
+
+Definition power_of_four :=
+  tfix (abs f (Arrow Nat Nat)
+    (abs n Nat
+      (tif0 n 1
+        (tplus (tplus (app f (tminus n 1)) (app f (tminus n 1))) (tplus (app f (tminus n 1)) (app f (tminus n 1))))))).
+
+Compute (CPS_conversion power_of_four).
+
+Theorem power_of_four_correct :
+  let exfun := CPS_conversion power_of_four in
+  let input := 2 in
+  let output := 16 in
+  <{exfun input idNat}> -->* output.
+Proof. solve_CPS. Qed.
+
+Definition sum_of_tree :=
+  tfix (abs f (Arrow (BinaryTree Nat) Nat)
+    (abs t (BinaryTree Nat)
+      (tbcase t n n l tl tr
+        (tplus (tplus l (app f tl)) (app f tr))))).
+
+Compute (CPS_conversion sum_of_tree).
+
+Theorem sum_of_tree_correct :
+  let exfun := CPS_conversion sum_of_tree in
+  let input := tnode 2 (tnode 2 (tleaf 1) (tnode 1 (tleaf 3) (tleaf 1))) (tleaf 1) in
+  let output := 11 in
+  <{exfun input idNat}> -->* output.
+Proof. solve_CPS. Qed.
 
 End examples.
 
