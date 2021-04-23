@@ -1,0 +1,1646 @@
+DIGEST b9d9ab89a021170c54619713137a4de4
+FSTLC.Definitions
+R24:37 Coq.Strings.String <> <> lib
+R64:77 Coq.Arith.PeanoNat <> <> lib
+R104:112 Coq.Init.Datatypes <> <> lib
+def 136:145 <> nat2string
+R152:154 Coq.Init.Datatypes <> nat ind
+binder 148:148 <> n:1
+R159:164 Coq.Strings.String <> string ind
+R177:177 STLC.Definitions <> n:1 var
+R300:300 Coq.Init.Datatypes <> S constr
+R303:303 Coq.Init.Datatypes <> S constr
+R306:306 Coq.Init.Datatypes <> S constr
+R309:309 Coq.Init.Datatypes <> S constr
+R312:312 Coq.Init.Datatypes <> S constr
+R315:315 Coq.Init.Datatypes <> S constr
+R318:318 Coq.Init.Datatypes <> S constr
+R321:321 Coq.Init.Datatypes <> S constr
+R324:324 Coq.Init.Datatypes <> S constr
+R327:327 Coq.Init.Datatypes <> S constr
+R347:350 Coq.Strings.String <> ::string_scope:x_'++'_x not
+R351:360 STLC.Definitions <> nat2string:2 def
+def 390:399 <> eqb_string
+R408:413 Coq.Strings.String <> string ind
+binder 402:402 <> x:4
+binder 404:404 <> y:5
+R418:421 Coq.Init.Datatypes <> bool ind
+R431:440 Coq.Strings.String <> string_dec def
+R444:444 STLC.Definitions <> y:5 var
+R442:442 STLC.Definitions <> x:4 var
+R461:465 Coq.Init.Datatypes <> false constr
+R451:454 Coq.Init.Datatypes <> true constr
+def 480:488 <> total_map
+binder 491:491 <> X:6
+R510:513 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R514:514 STLC.Definitions <> X:6 var
+R504:509 Coq.Strings.String <> string ind
+def 529:535 <> t_empty
+binder 538:538 <> X:7
+R559:559 STLC.Definitions <> X:7 var
+binder 549:555 <> default:8
+R564:572 STLC.Definitions <> total_map def
+R574:574 STLC.Definitions <> X:7 var
+R591:597 STLC.Definitions <> default:8 var
+def 613:620 <> t_update
+binder 623:623 <> X:9
+R638:646 STLC.Definitions <> total_map def
+R648:648 STLC.Definitions <> X:9 var
+binder 634:634 <> m:10
+R678:683 Coq.Strings.String <> string ind
+binder 672:674 <> key:11
+R695:695 STLC.Definitions <> X:9 var
+binder 687:691 <> value:12
+R711:716 Coq.Strings.String <> string ind
+binder 707:707 <> x:13
+R724:733 STLC.Definitions <> eqb_string def
+R739:739 STLC.Definitions <> x:13 var
+R735:737 STLC.Definitions <> key:11 var
+R757:757 STLC.Definitions <> m:10 var
+R759:759 STLC.Definitions <> x:13 var
+R746:750 STLC.Definitions <> value:12 var
+R798:804 STLC.Definitions <> t_empty def
+not 772:772 <> :::'''_'''_'!->'_x
+R894:901 STLC.Definitions <> t_update def
+not 864:864 <> :::x_'!->'_x_';'_x
+def 1016:1026 <> partial_map
+binder 1029:1029 <> X:14
+R1042:1050 STLC.Definitions <> total_map def
+R1053:1058 Coq.Init.Datatypes <> option ind
+R1060:1060 STLC.Definitions <> X:14 var
+def 1076:1080 <> empty
+binder 1083:1083 <> X:15
+R1095:1105 STLC.Definitions <> partial_map def
+R1107:1107 STLC.Definitions <> X:15 var
+R1114:1120 STLC.Definitions <> t_empty def
+R1122:1125 Coq.Init.Datatypes <> None constr
+def 1140:1145 <> update
+binder 1148:1148 <> X:16
+R1163:1173 STLC.Definitions <> partial_map def
+R1175:1175 STLC.Definitions <> X:16 var
+binder 1159:1159 <> m:17
+R1196:1201 Coq.Strings.String <> string ind
+binder 1190:1192 <> key:18
+R1213:1213 STLC.Definitions <> X:16 var
+binder 1205:1209 <> value:19
+R1225:1229 STLC.Definitions <> :::x_'!->'_x_';'_x not
+R1240:1242 STLC.Definitions <> :::x_'!->'_x_';'_x not
+R1243:1243 STLC.Definitions <> m:17 var
+R1222:1224 STLC.Definitions <> key:18 var
+R1230:1233 Coq.Init.Datatypes <> Some constr
+R1235:1239 STLC.Definitions <> value:19 var
+R1285:1290 STLC.Definitions <> update def
+not 1257:1257 <> :::x_'|->'_x_';'_x
+R1397:1402 STLC.Definitions <> update def
+R1404:1408 STLC.Definitions <> empty def
+not 1375:1375 <> :::x_'|->'_x
+ind 1459:1460 <> ty
+constr 1476:1478 <> Nat
+constr 1490:1493 <> List
+constr 1510:1519 <> BinaryTree
+constr 1536:1540 <> Arrow
+R1483:1484 STLC.Definitions <> ty:20 ind
+R1499:1502 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1503:1504 STLC.Definitions <> ty:20 ind
+R1497:1498 STLC.Definitions <> ty:20 ind
+R1525:1528 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1529:1530 STLC.Definitions <> ty:20 ind
+R1523:1524 STLC.Definitions <> ty:20 ind
+R1546:1549 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1552:1555 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1556:1557 STLC.Definitions <> ty:20 ind
+R1550:1551 STLC.Definitions <> ty:20 ind
+R1544:1545 STLC.Definitions <> ty:20 ind
+ind 1580:1581 <> tm
+constr 1597:1599 <> var
+constr 1620:1622 <> app
+constr 1645:1647 <> abs
+constr 1683:1688 <> tconst
+constr 1706:1710 <> tplus
+constr 1733:1738 <> tminus
+constr 1761:1765 <> tmult
+constr 1788:1791 <> tif0
+constr 1824:1827 <> tnil
+constr 1844:1848 <> tcons
+constr 1871:1876 <> tlcase
+constr 1928:1932 <> tleaf
+constr 1949:1953 <> tnode
+constr 1982:1987 <> tbcase
+constr 2059:2062 <> tlet
+constr 2098:2101 <> tfix
+R1609:1612 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1613:1614 STLC.Definitions <> tm:22 ind
+R1603:1608 Coq.Strings.String <> string ind
+R1628:1631 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1634:1637 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1638:1639 STLC.Definitions <> tm:22 ind
+R1632:1633 STLC.Definitions <> tm:22 ind
+R1626:1627 STLC.Definitions <> tm:22 ind
+R1657:1660 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1663:1666 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1669:1672 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1673:1674 STLC.Definitions <> tm:22 ind
+R1667:1668 STLC.Definitions <> tm:22 ind
+R1661:1662 STLC.Definitions <> ty ind
+R1651:1656 Coq.Strings.String <> string ind
+R1695:1698 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1699:1700 STLC.Definitions <> tm:22 ind
+R1692:1694 Coq.Init.Datatypes <> nat ind
+R1716:1719 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1722:1725 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1726:1727 STLC.Definitions <> tm:22 ind
+R1720:1721 STLC.Definitions <> tm:22 ind
+R1714:1715 STLC.Definitions <> tm:22 ind
+R1744:1747 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1750:1753 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1754:1755 STLC.Definitions <> tm:22 ind
+R1748:1749 STLC.Definitions <> tm:22 ind
+R1742:1743 STLC.Definitions <> tm:22 ind
+R1771:1774 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1777:1780 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1781:1782 STLC.Definitions <> tm:22 ind
+R1775:1776 STLC.Definitions <> tm:22 ind
+R1769:1770 STLC.Definitions <> tm:22 ind
+R1798:1801 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1804:1807 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1810:1813 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1814:1815 STLC.Definitions <> tm:22 ind
+R1808:1809 STLC.Definitions <> tm:22 ind
+R1802:1803 STLC.Definitions <> tm:22 ind
+R1796:1797 STLC.Definitions <> tm:22 ind
+R1833:1836 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1837:1838 STLC.Definitions <> tm:22 ind
+R1831:1832 STLC.Definitions <> ty ind
+R1854:1857 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1860:1863 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1864:1865 STLC.Definitions <> tm:22 ind
+R1858:1859 STLC.Definitions <> tm:22 ind
+R1852:1853 STLC.Definitions <> tm:22 ind
+R1882:1885 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1888:1891 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1898:1901 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1908:1911 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1914:1917 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1918:1919 STLC.Definitions <> tm:22 ind
+R1912:1913 STLC.Definitions <> tm:22 ind
+R1902:1907 Coq.Strings.String <> string ind
+R1892:1897 Coq.Strings.String <> string ind
+R1886:1887 STLC.Definitions <> tm:22 ind
+R1880:1881 STLC.Definitions <> tm:22 ind
+R1938:1941 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1942:1943 STLC.Definitions <> tm:22 ind
+R1936:1937 STLC.Definitions <> tm:22 ind
+R1959:1962 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1965:1968 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1971:1974 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1975:1976 STLC.Definitions <> tm:22 ind
+R1969:1970 STLC.Definitions <> tm:22 ind
+R1963:1964 STLC.Definitions <> tm:22 ind
+R1957:1958 STLC.Definitions <> tm:22 ind
+R1993:1996 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2003:2006 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2009:2012 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2019:2022 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2029:2032 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2039:2042 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2045:2048 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2049:2050 STLC.Definitions <> tm:22 ind
+R2043:2044 STLC.Definitions <> tm:22 ind
+R2033:2038 Coq.Strings.String <> string ind
+R2023:2028 Coq.Strings.String <> string ind
+R2013:2018 Coq.Strings.String <> string ind
+R2007:2008 STLC.Definitions <> tm:22 ind
+R1997:2002 Coq.Strings.String <> string ind
+R1991:1992 STLC.Definitions <> tm:22 ind
+R2072:2075 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2078:2081 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2084:2087 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2088:2089 STLC.Definitions <> tm:22 ind
+R2082:2083 STLC.Definitions <> tm:22 ind
+R2076:2077 STLC.Definitions <> tm:22 ind
+R2066:2071 Coq.Strings.String <> string ind
+R2108:2111 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2112:2113 STLC.Definitions <> tm:22 ind
+R2106:2107 STLC.Definitions <> tm:22 ind
+R2143:2170 STLC.Definitions <> var constr
+R2173:2200 STLC.Definitions <> tconst constr
+def 2273:2273 <> a
+R2277:2282 Coq.Strings.String <> string ind
+def 2303:2303 <> b
+R2307:2312 Coq.Strings.String <> string ind
+def 2333:2333 <> c
+R2337:2342 Coq.Strings.String <> string ind
+def 2363:2363 <> k
+R2367:2372 Coq.Strings.String <> string ind
+def 2393:2393 <> l
+R2397:2402 Coq.Strings.String <> string ind
+def 2423:2424 <> l'
+R2428:2433 Coq.Strings.String <> string ind
+def 2455:2457 <> l''
+R2461:2466 Coq.Strings.String <> string ind
+def 2489:2490 <> l1
+R2494:2499 Coq.Strings.String <> string ind
+def 2521:2523 <> l1'
+R2527:2532 Coq.Strings.String <> string ind
+def 2555:2556 <> l2
+R2560:2565 Coq.Strings.String <> string ind
+def 2587:2589 <> l2'
+R2593:2598 Coq.Strings.String <> string ind
+def 2621:2621 <> F
+R2625:2630 Coq.Strings.String <> string ind
+def 2651:2651 <> f
+R2655:2660 Coq.Strings.String <> string ind
+def 2681:2682 <> f'
+R2686:2691 Coq.Strings.String <> string ind
+def 2713:2713 <> g
+R2717:2722 Coq.Strings.String <> string ind
+def 2743:2744 <> g'
+R2748:2753 Coq.Strings.String <> string ind
+def 2775:2775 <> h
+R2779:2784 Coq.Strings.String <> string ind
+def 2805:2806 <> h'
+R2810:2815 Coq.Strings.String <> string ind
+def 2837:2837 <> n
+R2841:2846 Coq.Strings.String <> string ind
+def 2867:2868 <> n'
+R2872:2877 Coq.Strings.String <> string ind
+def 2899:2900 <> n1
+R2904:2909 Coq.Strings.String <> string ind
+def 2931:2933 <> n1'
+R2937:2942 Coq.Strings.String <> string ind
+def 2965:2966 <> n2
+R2970:2975 Coq.Strings.String <> string ind
+def 2997:2999 <> n2'
+R3003:3008 Coq.Strings.String <> string ind
+def 3031:3031 <> t
+R3035:3040 Coq.Strings.String <> string ind
+def 3061:3062 <> t'
+R3066:3071 Coq.Strings.String <> string ind
+def 3093:3094 <> t1
+R3098:3103 Coq.Strings.String <> string ind
+def 3125:3127 <> t1'
+R3131:3136 Coq.Strings.String <> string ind
+def 3159:3160 <> t2
+R3164:3169 Coq.Strings.String <> string ind
+def 3191:3193 <> t2'
+R3197:3202 Coq.Strings.String <> string ind
+def 3225:3226 <> tl
+R3230:3235 Coq.Strings.String <> string ind
+def 3257:3258 <> tr
+R3262:3267 Coq.Strings.String <> string ind
+def 3289:3289 <> x
+R3293:3298 Coq.Strings.String <> string ind
+def 3319:3319 <> y
+R3323:3328 Coq.Strings.String <> string ind
+def 3349:3349 <> z
+R3353:3358 Coq.Strings.String <> string ind
+def 3379:3380 <> hd
+R3384:3389 Coq.Strings.String <> string ind
+def 3411:3413 <> hd'
+R3417:3422 Coq.Strings.String <> string ind
+def 3445:3447 <> hd1
+R3451:3456 Coq.Strings.String <> string ind
+def 3479:3481 <> hd2
+R3485:3490 Coq.Strings.String <> string ind
+def 3513:3516 <> tail
+R3520:3525 Coq.Strings.String <> string ind
+def 3549:3553 <> tail'
+R3557:3562 Coq.Strings.String <> string ind
+def 3587:3591 <> tail1
+R3595:3600 Coq.Strings.String <> string ind
+def 3625:3629 <> tail2
+R3633:3638 Coq.Strings.String <> string ind
+def 3663:3665 <> res
+R3669:3674 Coq.Strings.String <> string ind
+def 3697:3700 <> res1
+R3704:3709 Coq.Strings.String <> string ind
+def 3733:3736 <> res2
+R3740:3745 Coq.Strings.String <> string ind
+def 3769:3772 <> res3
+R3776:3781 Coq.Strings.String <> string ind
+def 3805:3808 <> res4
+R3812:3817 Coq.Strings.String <> string ind
+def 3841:3844 <> res5
+R3848:3853 Coq.Strings.String <> string ind
+def 3877:3881 <> count
+R3885:3890 Coq.Strings.String <> string ind
+def 3915:3920 <> count'
+R3924:3929 Coq.Strings.String <> string ind
+R3957:3957 STLC.Definitions <> a def
+R3979:3979 STLC.Definitions <> b def
+R4001:4001 STLC.Definitions <> c def
+R4023:4023 STLC.Definitions <> k def
+R4045:4045 STLC.Definitions <> l def
+R4067:4068 STLC.Definitions <> l' def
+R4090:4092 STLC.Definitions <> l'' def
+R4114:4115 STLC.Definitions <> l1 def
+R4137:4139 STLC.Definitions <> l1' def
+R4161:4162 STLC.Definitions <> l2 def
+R4184:4186 STLC.Definitions <> l2' def
+R4208:4208 STLC.Definitions <> F def
+R4230:4230 STLC.Definitions <> f def
+R4252:4253 STLC.Definitions <> f' def
+R4275:4275 STLC.Definitions <> g def
+R4297:4298 STLC.Definitions <> g' def
+R4320:4320 STLC.Definitions <> h def
+R4342:4343 STLC.Definitions <> h' def
+R4365:4365 STLC.Definitions <> n def
+R4387:4388 STLC.Definitions <> n' def
+R4410:4411 STLC.Definitions <> n1 def
+R4433:4435 STLC.Definitions <> n1' def
+R4457:4458 STLC.Definitions <> n2 def
+R4480:4482 STLC.Definitions <> n2' def
+R4504:4504 STLC.Definitions <> t def
+R4526:4527 STLC.Definitions <> t' def
+R4549:4550 STLC.Definitions <> t1 def
+R4572:4574 STLC.Definitions <> t1' def
+R4596:4597 STLC.Definitions <> t2 def
+R4619:4621 STLC.Definitions <> t2' def
+R4643:4644 STLC.Definitions <> tl def
+R4666:4667 STLC.Definitions <> tr def
+R4689:4689 STLC.Definitions <> x def
+R4711:4711 STLC.Definitions <> y def
+R4733:4733 STLC.Definitions <> z def
+R4755:4756 STLC.Definitions <> hd def
+R4778:4780 STLC.Definitions <> hd' def
+R4802:4804 STLC.Definitions <> hd1 def
+R4826:4828 STLC.Definitions <> hd2 def
+R4850:4853 STLC.Definitions <> tail def
+R4875:4879 STLC.Definitions <> tail' def
+R4901:4905 STLC.Definitions <> tail1 def
+R4927:4931 STLC.Definitions <> tail2 def
+R4953:4955 STLC.Definitions <> res def
+R4977:4980 STLC.Definitions <> res1 def
+R5002:5005 STLC.Definitions <> res2 def
+R5027:5030 STLC.Definitions <> res3 def
+R5052:5055 STLC.Definitions <> res4 def
+R5077:5080 STLC.Definitions <> res5 def
+R5102:5106 STLC.Definitions <> count def
+R5128:5133 STLC.Definitions <> count' def
+not 5153:5153 <> :::'<{'_x_'}>'
+not 5206:5206 <> :::'<{{'_x_'}}>'
+not 5264:5264 <> :stlc::'('_x_')'
+not 5319:5319 <> :stlc_ty::'('_x_')'
+not 5377:5377 <> :stlc::x
+not 5445:5445 <> :stlc_ty::x
+R5529:5533 STLC.Definitions <> Arrow constr
+not 5516:5516 <> :stlc_ty::x_'->'_x
+R5613:5615 STLC.Definitions <> app constr
+not 5603:5603 <> :stlc::x_x
+R5700:5702 STLC.Definitions <> abs constr
+not 5680:5680 <> :stlc::'\'_x_':'_x_','_x
+not 5906:5906 <> :stlc::'{'_x_'}'
+R5980:5984 STLC.Definitions <> tplus constr
+not 5968:5968 <> :stlc::x_'+'_x
+R6099:6104 STLC.Definitions <> tminus constr
+not 6087:6087 <> :stlc::x_'-'_x
+R6219:6223 STLC.Definitions <> tmult constr
+not 6207:6207 <> :stlc::x_'*'_x
+R6360:6363 STLC.Definitions <> tif0 constr
+not 6326:6326 <> :stlc::'if0'_x_'then'_x_'else'_x
+R6607:6610 STLC.Definitions <> tnil constr
+not 6593:6593 <> :stlc::'nil'_x
+R6697:6701 STLC.Definitions <> tcons constr
+not 6682:6682 <> :stlc::x_'::'_x
+R6829:6834 STLC.Definitions <> tlcase constr
+not 6767:6767 <> :stlc::'case'_x_'of'_'|'_'nil'_'=>'_x_'|'_x_'::'_x_'=>'_x
+R7247:7250 STLC.Definitions <> tlet constr
+not 7216:7216 <> :stlc::'let'_x_'='_x_'in'_x
+R7314:7317 STLC.Definitions <> tfix constr
+not 7300:7300 <> :stlc::'fix'_x
+syndef 7361:7365 <> idNat
+R7370:7371 STLC.Definitions <> :::'<{'_x_'}>' not
+R7384:7385 STLC.Definitions <> :::'<{'_x_'}>' not
+R7372:7373 STLC.Definitions <> :stlc::'\'_x_':'_x_','_x not
+R7375:7377 STLC.Definitions <> :stlc::'\'_x_':'_x_','_x not
+R7381:7382 STLC.Definitions <> :stlc::'\'_x_':'_x_','_x not
+R7374:7374 STLC.Definitions <> x def
+R7378:7380 STLC.Definitions <> Nat constr
+R7383:7383 STLC.Definitions <> x def
+def 7495:7499 <> subst
+R7506:7511 Coq.Strings.String <> string ind
+binder 7502:7502 <> x:24
+R7519:7520 STLC.Definitions <> tm ind
+binder 7515:7515 <> s:25
+R7528:7529 STLC.Definitions <> tm ind
+binder 7524:7524 <> t:26
+R7534:7535 STLC.Definitions <> tm ind
+R8762:8766 STLC.Definitions <> subst:27 def
+R7548:7548 STLC.Definitions <> t:26 var
+R7559:7561 STLC.Definitions <> var constr
+R7578:7580 Coq.Strings.String <> eqb def
+R7582:7582 STLC.Definitions <> x:24 var
+R7598:7598 STLC.Definitions <> t:26 var
+R7591:7591 STLC.Definitions <> s:25 var
+R7604:7606 STLC.Definitions <> abs constr
+R7628:7630 Coq.Strings.String <> eqb def
+R7632:7632 STLC.Definitions <> x:24 var
+R7648:7650 STLC.Definitions <> abs constr
+R7657:7661 STLC.Definitions <> subst:27 def
+R7665:7665 STLC.Definitions <> s:25 var
+R7663:7663 STLC.Definitions <> x:24 var
+R7641:7641 STLC.Definitions <> t:26 var
+R7675:7677 STLC.Definitions <> app constr
+R7695:7697 STLC.Definitions <> app constr
+R7715:7719 STLC.Definitions <> subst:27 def
+R7723:7723 STLC.Definitions <> s:25 var
+R7721:7721 STLC.Definitions <> x:24 var
+R7700:7704 STLC.Definitions <> subst:27 def
+R7708:7708 STLC.Definitions <> s:25 var
+R7706:7706 STLC.Definitions <> x:24 var
+R7736:7741 STLC.Definitions <> tconst constr
+R7755:7755 STLC.Definitions <> t:26 var
+R7761:7765 STLC.Definitions <> tplus constr
+R7783:7787 STLC.Definitions <> tplus constr
+R7805:7809 STLC.Definitions <> subst:27 def
+R7813:7813 STLC.Definitions <> s:25 var
+R7811:7811 STLC.Definitions <> x:24 var
+R7790:7794 STLC.Definitions <> subst:27 def
+R7798:7798 STLC.Definitions <> s:25 var
+R7796:7796 STLC.Definitions <> x:24 var
+R7823:7828 STLC.Definitions <> tminus constr
+R7846:7851 STLC.Definitions <> tminus constr
+R7869:7873 STLC.Definitions <> subst:27 def
+R7877:7877 STLC.Definitions <> s:25 var
+R7875:7875 STLC.Definitions <> x:24 var
+R7854:7858 STLC.Definitions <> subst:27 def
+R7862:7862 STLC.Definitions <> s:25 var
+R7860:7860 STLC.Definitions <> x:24 var
+R7887:7891 STLC.Definitions <> tmult constr
+R7909:7913 STLC.Definitions <> tmult constr
+R7931:7935 STLC.Definitions <> subst:27 def
+R7939:7939 STLC.Definitions <> s:25 var
+R7937:7937 STLC.Definitions <> x:24 var
+R7916:7920 STLC.Definitions <> subst:27 def
+R7924:7924 STLC.Definitions <> s:25 var
+R7922:7922 STLC.Definitions <> x:24 var
+R7949:7952 STLC.Definitions <> tif0 constr
+R7973:7976 STLC.Definitions <> tif0 constr
+R8009:8013 STLC.Definitions <> subst:27 def
+R8017:8017 STLC.Definitions <> s:25 var
+R8015:8015 STLC.Definitions <> x:24 var
+R7994:7998 STLC.Definitions <> subst:27 def
+R8002:8002 STLC.Definitions <> s:25 var
+R8000:8000 STLC.Definitions <> x:24 var
+R7979:7983 STLC.Definitions <> subst:27 def
+R7987:7987 STLC.Definitions <> s:25 var
+R7985:7985 STLC.Definitions <> x:24 var
+R8030:8033 STLC.Definitions <> tnil constr
+R8047:8047 STLC.Definitions <> t:26 var
+R8053:8057 STLC.Definitions <> tcons constr
+R8075:8079 STLC.Definitions <> tcons constr
+R8097:8101 STLC.Definitions <> subst:27 def
+R8105:8105 STLC.Definitions <> s:25 var
+R8103:8103 STLC.Definitions <> x:24 var
+R8082:8086 STLC.Definitions <> subst:27 def
+R8090:8090 STLC.Definitions <> s:25 var
+R8088:8088 STLC.Definitions <> x:24 var
+R8115:8120 STLC.Definitions <> tlcase constr
+R8147:8152 STLC.Definitions <> tlcase constr
+R8194:8196 Coq.Strings.String <> eqb def
+R8198:8198 STLC.Definitions <> x:24 var
+R8219:8221 Coq.Strings.String <> eqb def
+R8223:8223 STLC.Definitions <> x:24 var
+R8241:8245 STLC.Definitions <> subst:27 def
+R8249:8249 STLC.Definitions <> s:25 var
+R8247:8247 STLC.Definitions <> x:24 var
+R8170:8174 STLC.Definitions <> subst:27 def
+R8178:8178 STLC.Definitions <> s:25 var
+R8176:8176 STLC.Definitions <> x:24 var
+R8155:8159 STLC.Definitions <> subst:27 def
+R8163:8163 STLC.Definitions <> s:25 var
+R8161:8161 STLC.Definitions <> x:24 var
+R8262:8266 STLC.Definitions <> tleaf constr
+R8281:8285 STLC.Definitions <> tleaf constr
+R8288:8292 STLC.Definitions <> subst:27 def
+R8296:8296 STLC.Definitions <> s:25 var
+R8294:8294 STLC.Definitions <> x:24 var
+R8306:8310 STLC.Definitions <> tnode constr
+R8331:8335 STLC.Definitions <> tnode constr
+R8368:8372 STLC.Definitions <> subst:27 def
+R8376:8376 STLC.Definitions <> s:25 var
+R8374:8374 STLC.Definitions <> x:24 var
+R8353:8357 STLC.Definitions <> subst:27 def
+R8361:8361 STLC.Definitions <> s:25 var
+R8359:8359 STLC.Definitions <> x:24 var
+R8338:8342 STLC.Definitions <> subst:27 def
+R8346:8346 STLC.Definitions <> s:25 var
+R8344:8344 STLC.Definitions <> x:24 var
+R8386:8391 STLC.Definitions <> tbcase constr
+R8424:8429 STLC.Definitions <> tbcase constr
+R8502:8504 Coq.Strings.String <> eqb def
+R8506:8506 STLC.Definitions <> x:24 var
+R8527:8529 Coq.Strings.String <> eqb def
+R8531:8531 STLC.Definitions <> x:24 var
+R8552:8554 Coq.Strings.String <> eqb def
+R8556:8556 STLC.Definitions <> x:24 var
+R8574:8578 STLC.Definitions <> subst:27 def
+R8582:8582 STLC.Definitions <> s:25 var
+R8580:8580 STLC.Definitions <> x:24 var
+R8453:8455 Coq.Strings.String <> eqb def
+R8457:8457 STLC.Definitions <> x:24 var
+R8475:8479 STLC.Definitions <> subst:27 def
+R8483:8483 STLC.Definitions <> s:25 var
+R8481:8481 STLC.Definitions <> x:24 var
+R8432:8436 STLC.Definitions <> subst:27 def
+R8440:8440 STLC.Definitions <> s:25 var
+R8438:8438 STLC.Definitions <> x:24 var
+R8595:8598 STLC.Definitions <> tlet constr
+R8618:8621 STLC.Definitions <> tlet constr
+R8644:8646 Coq.Strings.String <> eqb def
+R8648:8648 STLC.Definitions <> x:24 var
+R8665:8669 STLC.Definitions <> subst:27 def
+R8673:8673 STLC.Definitions <> s:25 var
+R8671:8671 STLC.Definitions <> x:24 var
+R8626:8630 STLC.Definitions <> subst:27 def
+R8634:8634 STLC.Definitions <> s:25 var
+R8632:8632 STLC.Definitions <> x:24 var
+R8686:8689 STLC.Definitions <> tfix constr
+R8704:8707 STLC.Definitions <> tfix constr
+R8710:8714 STLC.Definitions <> subst:27 def
+R8718:8718 STLC.Definitions <> s:25 var
+R8716:8716 STLC.Definitions <> x:24 var
+R8762:8766 STLC.Definitions <> subst def
+not 8737:8737 <> :stlc::'['_x_':='_x_']'_x
+ind 8814:8818 <> value
+constr 8840:8844 <> V_Abs
+constr 8894:8898 <> V_Nat
+constr 8949:8953 <> V_Nil
+constr 8993:8998 <> V_Cons
+constr 9088:9093 <> V_Leaf
+constr 9155:9160 <> V_Node
+R8824:8827 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8822:8823 STLC.Definitions <> tm ind
+binder 8855:8855 <> x:31
+binder 8857:8857 <> T:32
+binder 8859:8859 <> t:33
+R8869:8873 STLC.Definitions <> value:29 ind
+R8876:8878 STLC.Definitions <> abs constr
+R8884:8884 STLC.Definitions <> t:33 var
+R8882:8882 STLC.Definitions <> T:32 var
+R8880:8880 STLC.Definitions <> x:31 var
+R8913:8915 Coq.Init.Datatypes <> nat ind
+binder 8909:8909 <> n:34
+R8925:8929 STLC.Definitions <> value:29 ind
+R8932:8937 STLC.Definitions <> tconst constr
+R8939:8939 STLC.Definitions <> n:34 var
+binder 8964:8964 <> T:35
+R8974:8978 STLC.Definitions <> value:29 ind
+R8981:8984 STLC.Definitions <> tnil constr
+R8986:8986 STLC.Definitions <> T:35 var
+binder 9009:9010 <> v1:36
+binder 9012:9013 <> v2:37
+R9031:9041 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9050:9060 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9061:9065 STLC.Definitions <> value:29 ind
+R9068:9072 STLC.Definitions <> tcons constr
+R9077:9078 STLC.Definitions <> v2:37 var
+R9074:9075 STLC.Definitions <> v1:36 var
+R9042:9046 STLC.Definitions <> value:29 ind
+R9048:9049 STLC.Definitions <> v2:37 var
+R9023:9027 STLC.Definitions <> value:29 ind
+R9029:9030 STLC.Definitions <> v1:36 var
+binder 9104:9105 <> v1:38
+R9123:9133 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9134:9138 STLC.Definitions <> value:29 ind
+R9141:9145 STLC.Definitions <> tleaf constr
+R9147:9148 STLC.Definitions <> v1:38 var
+R9115:9119 STLC.Definitions <> value:29 ind
+R9121:9122 STLC.Definitions <> v1:38 var
+binder 9171:9172 <> v1:39
+binder 9174:9175 <> v2:40
+binder 9177:9178 <> v3:41
+R9196:9206 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9215:9225 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9234:9244 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9245:9249 STLC.Definitions <> value:29 ind
+R9252:9256 STLC.Definitions <> tnode constr
+R9264:9265 STLC.Definitions <> v3:41 var
+R9261:9262 STLC.Definitions <> v2:40 var
+R9258:9259 STLC.Definitions <> v1:39 var
+R9226:9230 STLC.Definitions <> value:29 ind
+R9232:9233 STLC.Definitions <> v3:41 var
+R9207:9211 STLC.Definitions <> value:29 ind
+R9213:9214 STLC.Definitions <> v2:40 var
+R9188:9192 STLC.Definitions <> value:29 ind
+R9194:9195 STLC.Definitions <> v1:39 var
+R9288:9292 STLC.Definitions <> value ind
+def 9328:9335 <> relation
+binder 9338:9338 <> X:42
+R9352:9355 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9357:9360 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9356:9356 STLC.Definitions <> X:42 var
+R9351:9351 STLC.Definitions <> X:42 var
+ind 9378:9382 <> multi
+constr 9432:9440 <> mult_refl
+constr 9474:9482 <> mult_step
+binder 9385:9385 <> X:43
+R9400:9407 STLC.Definitions <> relation def
+R9409:9409 STLC.Definitions <> X:43 var
+binder 9396:9396 <> R:44
+R9414:9421 STLC.Definitions <> relation def
+R9455:9455 STLC.Definitions <> X:43 var
+binder 9451:9451 <> x:47
+R9458:9462 STLC.Definitions <> multi:45 ind
+R9468:9468 STLC.Definitions <> x:47 var
+R9466:9466 STLC.Definitions <> x:47 var
+R9464:9464 STLC.Definitions <> R:44 var
+R9501:9501 STLC.Definitions <> X:43 var
+binder 9493:9493 <> x:48
+binder 9495:9495 <> y:49
+binder 9497:9497 <> z:50
+R9509:9512 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9524:9527 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9528:9532 STLC.Definitions <> multi:45 ind
+R9538:9538 STLC.Definitions <> z:50 var
+R9536:9536 STLC.Definitions <> x:48 var
+R9534:9534 STLC.Definitions <> R:44 var
+R9513:9517 STLC.Definitions <> multi:45 ind
+R9523:9523 STLC.Definitions <> z:50 var
+R9521:9521 STLC.Definitions <> y:49 var
+R9519:9519 STLC.Definitions <> R:44 var
+R9504:9504 STLC.Definitions <> R:44 var
+R9508:9508 STLC.Definitions <> y:49 var
+R9506:9506 STLC.Definitions <> x:48 var
+ind 9599:9602 <> step
+constr 9630:9638 <> ST_AppAbs
+constr 9726:9732 <> ST_App1
+constr 9817:9823 <> ST_App2
+constr 9930:9942 <> ST_PlusConsts
+constr 10033:10040 <> ST_Plus1
+constr 10129:10136 <> ST_Plus2
+constr 10244:10257 <> ST_MinusConsts
+constr 10349:10357 <> ST_Minus1
+constr 10448:10456 <> ST_Minus2
+constr 10566:10578 <> ST_MultConsts
+constr 10669:10676 <> ST_Mult1
+constr 10765:10772 <> ST_Mult2
+constr 10880:10885 <> ST_If0
+constr 10981:10990 <> ST_If0Zero
+constr 11051:11063 <> ST_If0Nonzero
+constr 11133:11140 <> ST_Cons1
+constr 11229:11236 <> ST_Cons2
+constr 11344:11351 <> ST_LCase
+constr 11469:11479 <> ST_LCaseNil
+constr 11554:11565 <> ST_LCaseCons
+constr 11718:11724 <> ST_Leaf
+constr 11804:11811 <> ST_Node1
+constr 11909:11916 <> ST_Node2
+constr 12033:12040 <> ST_Node3
+constr 12176:12183 <> ST_BCase
+constr 12319:12330 <> ST_BCaseLeaf
+constr 12453:12464 <> ST_BCaseNode
+constr 12668:12673 <> ST_Let
+constr 12766:12776 <> ST_LetValue
+constr 12865:12870 <> ST_Fix
+constr 12948:12956 <> ST_FixAbs
+R9608:9611 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9614:9617 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9612:9613 STLC.Definitions <> tm ind
+R9606:9607 STLC.Definitions <> tm ind
+R13065:13068 STLC.Definitions <> step:52 ind
+binder 9649:9649 <> x:53
+binder 9651:9651 <> T:54
+binder 9653:9653 <> t:55
+binder 9655:9655 <> v:56
+R9672:9682 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9683:9686 STLC.Definitions <> step:51 ind
+R9709:9713 STLC.Definitions <> subst def
+R9719:9719 STLC.Definitions <> t:55 var
+R9717:9717 STLC.Definitions <> v:56 var
+R9715:9715 STLC.Definitions <> x:53 var
+R9689:9691 STLC.Definitions <> app constr
+R9705:9705 STLC.Definitions <> v:56 var
+R9694:9696 STLC.Definitions <> abs constr
+R9702:9702 STLC.Definitions <> t:55 var
+R9700:9700 STLC.Definitions <> T:54 var
+R9698:9698 STLC.Definitions <> x:53 var
+R9665:9669 STLC.Definitions <> value ind
+R9671:9671 STLC.Definitions <> v:56 var
+binder 9743:9744 <> t1:57
+binder 9746:9748 <> t1':58
+binder 9750:9751 <> t2:59
+R9772:9782 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9783:9786 STLC.Definitions <> step:51 ind
+R9801:9803 STLC.Definitions <> app constr
+R9809:9810 STLC.Definitions <> t2:59 var
+R9805:9807 STLC.Definitions <> t1':58 var
+R9789:9791 STLC.Definitions <> app constr
+R9796:9797 STLC.Definitions <> t2:59 var
+R9793:9794 STLC.Definitions <> t1:57 var
+R9761:9764 STLC.Definitions <> step:51 ind
+R9769:9771 STLC.Definitions <> t1':58 var
+R9766:9767 STLC.Definitions <> t1:57 var
+binder 9834:9835 <> v1:60
+binder 9837:9838 <> t2:61
+binder 9840:9842 <> t2':62
+R9860:9870 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9882:9892 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9893:9896 STLC.Definitions <> step:51 ind
+R9911:9913 STLC.Definitions <> app constr
+R9918:9920 STLC.Definitions <> t2':62 var
+R9915:9916 STLC.Definitions <> v1:60 var
+R9899:9901 STLC.Definitions <> app constr
+R9906:9907 STLC.Definitions <> t2:61 var
+R9903:9904 STLC.Definitions <> v1:60 var
+R9871:9874 STLC.Definitions <> step:51 ind
+R9879:9881 STLC.Definitions <> t2':62 var
+R9876:9877 STLC.Definitions <> t2:61 var
+R9852:9856 STLC.Definitions <> value ind
+R9858:9859 STLC.Definitions <> v1:60 var
+R9961:9963 Coq.Init.Datatypes <> nat ind
+binder 9953:9954 <> n1:63
+binder 9956:9957 <> n2:64
+R9973:9976 STLC.Definitions <> step:51 ind
+R10011:10016 STLC.Definitions <> tconst constr
+R10021:10023 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R10019:10020 STLC.Definitions <> n1:63 var
+R10024:10025 STLC.Definitions <> n2:64 var
+R9979:9983 STLC.Definitions <> tplus constr
+R9998:10003 STLC.Definitions <> tconst constr
+R10005:10006 STLC.Definitions <> n2:64 var
+R9986:9991 STLC.Definitions <> tconst constr
+R9993:9994 STLC.Definitions <> n1:63 var
+binder 10051:10052 <> t1:65
+binder 10054:10056 <> t1':66
+binder 10058:10059 <> t2:67
+R10080:10090 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10091:10094 STLC.Definitions <> step:51 ind
+R10111:10115 STLC.Definitions <> tplus constr
+R10121:10122 STLC.Definitions <> t2:67 var
+R10117:10119 STLC.Definitions <> t1':66 var
+R10097:10101 STLC.Definitions <> tplus constr
+R10106:10107 STLC.Definitions <> t2:67 var
+R10103:10104 STLC.Definitions <> t1:65 var
+R10069:10072 STLC.Definitions <> step:51 ind
+R10077:10079 STLC.Definitions <> t1':66 var
+R10074:10075 STLC.Definitions <> t1:65 var
+binder 10147:10148 <> v1:68
+binder 10150:10151 <> t2:69
+binder 10153:10155 <> t2':70
+R10173:10183 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10195:10205 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10206:10209 STLC.Definitions <> step:51 ind
+R10226:10230 STLC.Definitions <> tplus constr
+R10235:10237 STLC.Definitions <> t2':70 var
+R10232:10233 STLC.Definitions <> v1:68 var
+R10212:10216 STLC.Definitions <> tplus constr
+R10221:10222 STLC.Definitions <> t2:69 var
+R10218:10219 STLC.Definitions <> v1:68 var
+R10184:10187 STLC.Definitions <> step:51 ind
+R10192:10194 STLC.Definitions <> t2':70 var
+R10189:10190 STLC.Definitions <> t2:69 var
+R10165:10169 STLC.Definitions <> value ind
+R10171:10172 STLC.Definitions <> v1:68 var
+R10276:10278 Coq.Init.Datatypes <> nat ind
+binder 10268:10269 <> n1:71
+binder 10271:10272 <> n2:72
+R10288:10291 STLC.Definitions <> step:51 ind
+R10327:10332 STLC.Definitions <> tconst constr
+R10337:10339 Coq.Init.Peano <> ::nat_scope:x_'-'_x not
+R10335:10336 STLC.Definitions <> n1:71 var
+R10340:10341 STLC.Definitions <> n2:72 var
+R10294:10299 STLC.Definitions <> tminus constr
+R10314:10319 STLC.Definitions <> tconst constr
+R10321:10322 STLC.Definitions <> n2:72 var
+R10302:10307 STLC.Definitions <> tconst constr
+R10309:10310 STLC.Definitions <> n1:71 var
+binder 10368:10369 <> t1:73
+binder 10371:10373 <> t1':74
+binder 10375:10376 <> t2:75
+R10397:10407 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10408:10411 STLC.Definitions <> step:51 ind
+R10429:10434 STLC.Definitions <> tminus constr
+R10440:10441 STLC.Definitions <> t2:75 var
+R10436:10438 STLC.Definitions <> t1':74 var
+R10414:10419 STLC.Definitions <> tminus constr
+R10424:10425 STLC.Definitions <> t2:75 var
+R10421:10422 STLC.Definitions <> t1:73 var
+R10386:10389 STLC.Definitions <> step:51 ind
+R10394:10396 STLC.Definitions <> t1':74 var
+R10391:10392 STLC.Definitions <> t1:73 var
+binder 10467:10468 <> v1:76
+binder 10470:10471 <> t2:77
+binder 10473:10475 <> t2':78
+R10493:10503 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10515:10525 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10526:10529 STLC.Definitions <> step:51 ind
+R10547:10552 STLC.Definitions <> tminus constr
+R10557:10559 STLC.Definitions <> t2':78 var
+R10554:10555 STLC.Definitions <> v1:76 var
+R10532:10537 STLC.Definitions <> tminus constr
+R10542:10543 STLC.Definitions <> t2:77 var
+R10539:10540 STLC.Definitions <> v1:76 var
+R10504:10507 STLC.Definitions <> step:51 ind
+R10512:10514 STLC.Definitions <> t2':78 var
+R10509:10510 STLC.Definitions <> t2:77 var
+R10485:10489 STLC.Definitions <> value ind
+R10491:10492 STLC.Definitions <> v1:76 var
+R10597:10599 Coq.Init.Datatypes <> nat ind
+binder 10589:10590 <> n1:79
+binder 10592:10593 <> n2:80
+R10609:10612 STLC.Definitions <> step:51 ind
+R10647:10652 STLC.Definitions <> tconst constr
+R10657:10659 Coq.Init.Peano <> ::nat_scope:x_'*'_x not
+R10655:10656 STLC.Definitions <> n1:79 var
+R10660:10661 STLC.Definitions <> n2:80 var
+R10615:10619 STLC.Definitions <> tmult constr
+R10634:10639 STLC.Definitions <> tconst constr
+R10641:10642 STLC.Definitions <> n2:80 var
+R10622:10627 STLC.Definitions <> tconst constr
+R10629:10630 STLC.Definitions <> n1:79 var
+binder 10687:10688 <> t1:81
+binder 10690:10692 <> t1':82
+binder 10694:10695 <> t2:83
+R10716:10726 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10727:10730 STLC.Definitions <> step:51 ind
+R10747:10751 STLC.Definitions <> tmult constr
+R10757:10758 STLC.Definitions <> t2:83 var
+R10753:10755 STLC.Definitions <> t1':82 var
+R10733:10737 STLC.Definitions <> tmult constr
+R10742:10743 STLC.Definitions <> t2:83 var
+R10739:10740 STLC.Definitions <> t1:81 var
+R10705:10708 STLC.Definitions <> step:51 ind
+R10713:10715 STLC.Definitions <> t1':82 var
+R10710:10711 STLC.Definitions <> t1:81 var
+binder 10783:10784 <> v1:84
+binder 10786:10787 <> t2:85
+binder 10789:10791 <> t2':86
+R10809:10819 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10831:10841 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10842:10845 STLC.Definitions <> step:51 ind
+R10862:10866 STLC.Definitions <> tmult constr
+R10871:10873 STLC.Definitions <> t2':86 var
+R10868:10869 STLC.Definitions <> v1:84 var
+R10848:10852 STLC.Definitions <> tmult constr
+R10857:10858 STLC.Definitions <> t2:85 var
+R10854:10855 STLC.Definitions <> v1:84 var
+R10820:10823 STLC.Definitions <> step:51 ind
+R10828:10830 STLC.Definitions <> t2':86 var
+R10825:10826 STLC.Definitions <> t2:85 var
+R10801:10805 STLC.Definitions <> value ind
+R10807:10808 STLC.Definitions <> v1:84 var
+binder 10896:10897 <> t1:87
+binder 10899:10901 <> t1':88
+binder 10903:10904 <> t2:89
+binder 10906:10907 <> t3:90
+R10928:10938 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10939:10942 STLC.Definitions <> step:51 ind
+R10961:10964 STLC.Definitions <> tif0 constr
+R10973:10974 STLC.Definitions <> t3:90 var
+R10970:10971 STLC.Definitions <> t2:89 var
+R10966:10968 STLC.Definitions <> t1':88 var
+R10945:10948 STLC.Definitions <> tif0 constr
+R10956:10957 STLC.Definitions <> t3:90 var
+R10953:10954 STLC.Definitions <> t2:89 var
+R10950:10951 STLC.Definitions <> t1:87 var
+R10917:10920 STLC.Definitions <> step:51 ind
+R10925:10927 STLC.Definitions <> t1':88 var
+R10922:10923 STLC.Definitions <> t1:87 var
+binder 11001:11002 <> t2:91
+binder 11004:11005 <> t3:92
+R11015:11018 STLC.Definitions <> step:51 ind
+R11044:11045 STLC.Definitions <> t2:91 var
+R11021:11024 STLC.Definitions <> tif0 constr
+R11040:11041 STLC.Definitions <> t3:92 var
+R11037:11038 STLC.Definitions <> t2:91 var
+R11027:11032 STLC.Definitions <> tconst constr
+binder 11074:11074 <> n:93
+binder 11076:11077 <> t2:94
+binder 11079:11080 <> t3:95
+R11090:11093 STLC.Definitions <> step:51 ind
+R11123:11124 STLC.Definitions <> t3:95 var
+R11096:11099 STLC.Definitions <> tif0 constr
+R11119:11120 STLC.Definitions <> t3:95 var
+R11116:11117 STLC.Definitions <> t2:94 var
+R11102:11107 STLC.Definitions <> tconst constr
+R11110:11110 Coq.Init.Datatypes <> S constr
+R11112:11112 STLC.Definitions <> n:93 var
+binder 11151:11152 <> t1:96
+binder 11154:11156 <> t1':97
+binder 11158:11159 <> t2:98
+R11180:11190 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11191:11194 STLC.Definitions <> step:51 ind
+R11211:11215 STLC.Definitions <> tcons constr
+R11221:11222 STLC.Definitions <> t2:98 var
+R11217:11219 STLC.Definitions <> t1':97 var
+R11197:11201 STLC.Definitions <> tcons constr
+R11206:11207 STLC.Definitions <> t2:98 var
+R11203:11204 STLC.Definitions <> t1:96 var
+R11169:11172 STLC.Definitions <> step:51 ind
+R11177:11179 STLC.Definitions <> t1':97 var
+R11174:11175 STLC.Definitions <> t1:96 var
+binder 11247:11248 <> v1:99
+binder 11250:11251 <> t2:100
+binder 11253:11255 <> t2':101
+R11273:11283 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11295:11305 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11306:11309 STLC.Definitions <> step:51 ind
+R11326:11330 STLC.Definitions <> tcons constr
+R11335:11337 STLC.Definitions <> t2':101 var
+R11332:11333 STLC.Definitions <> v1:99 var
+R11312:11316 STLC.Definitions <> tcons constr
+R11321:11322 STLC.Definitions <> t2:100 var
+R11318:11319 STLC.Definitions <> v1:99 var
+R11284:11287 STLC.Definitions <> step:51 ind
+R11292:11294 STLC.Definitions <> t2':101 var
+R11289:11290 STLC.Definitions <> t2:100 var
+R11265:11269 STLC.Definitions <> value ind
+R11271:11272 STLC.Definitions <> v1:99 var
+binder 11362:11363 <> t1:102
+binder 11365:11367 <> t1':103
+binder 11369:11370 <> t2:104
+binder 11372:11373 <> x1:105
+binder 11375:11376 <> x2:106
+binder 11378:11379 <> t3:107
+R11400:11410 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11411:11414 STLC.Definitions <> step:51 ind
+R11441:11446 STLC.Definitions <> tlcase constr
+R11461:11462 STLC.Definitions <> t3:107 var
+R11458:11459 STLC.Definitions <> x2:106 var
+R11455:11456 STLC.Definitions <> x1:105 var
+R11452:11453 STLC.Definitions <> t2:104 var
+R11448:11450 STLC.Definitions <> t1':103 var
+R11417:11422 STLC.Definitions <> tlcase constr
+R11436:11437 STLC.Definitions <> t3:107 var
+R11433:11434 STLC.Definitions <> x2:106 var
+R11430:11431 STLC.Definitions <> x1:105 var
+R11427:11428 STLC.Definitions <> t2:104 var
+R11424:11425 STLC.Definitions <> t1:102 var
+R11389:11392 STLC.Definitions <> step:51 ind
+R11397:11399 STLC.Definitions <> t1':103 var
+R11394:11395 STLC.Definitions <> t1:102 var
+binder 11490:11490 <> T:108
+binder 11492:11493 <> t2:109
+binder 11495:11496 <> x1:110
+binder 11498:11499 <> x2:111
+binder 11501:11502 <> t3:112
+R11512:11515 STLC.Definitions <> step:51 ind
+R11547:11548 STLC.Definitions <> t2:109 var
+R11518:11523 STLC.Definitions <> tlcase constr
+R11543:11544 STLC.Definitions <> t3:112 var
+R11540:11541 STLC.Definitions <> x2:111 var
+R11537:11538 STLC.Definitions <> x1:110 var
+R11534:11535 STLC.Definitions <> t2:109 var
+R11526:11529 STLC.Definitions <> tnil constr
+R11531:11531 STLC.Definitions <> T:108 var
+binder 11576:11577 <> v1:113
+binder 11579:11580 <> v2:114
+binder 11582:11583 <> t2:115
+binder 11585:11586 <> x1:116
+binder 11588:11589 <> x2:117
+binder 11591:11592 <> t3:118
+R11610:11620 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11629:11639 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11640:11643 STLC.Definitions <> step:51 ind
+R11681:11685 STLC.Definitions <> subst def
+R11694:11698 STLC.Definitions <> subst def
+R11706:11707 STLC.Definitions <> t3:118 var
+R11703:11704 STLC.Definitions <> v1:113 var
+R11700:11701 STLC.Definitions <> x1:116 var
+R11690:11691 STLC.Definitions <> v2:114 var
+R11687:11688 STLC.Definitions <> x2:117 var
+R11646:11651 STLC.Definitions <> tlcase constr
+R11676:11677 STLC.Definitions <> t3:118 var
+R11673:11674 STLC.Definitions <> x2:117 var
+R11670:11671 STLC.Definitions <> x1:116 var
+R11667:11668 STLC.Definitions <> t2:115 var
+R11654:11658 STLC.Definitions <> tcons constr
+R11663:11664 STLC.Definitions <> v2:114 var
+R11660:11661 STLC.Definitions <> v1:113 var
+R11621:11625 STLC.Definitions <> value ind
+R11627:11628 STLC.Definitions <> v2:114 var
+R11602:11606 STLC.Definitions <> value ind
+R11608:11609 STLC.Definitions <> v1:113 var
+binder 11735:11736 <> t1:119
+binder 11738:11740 <> t1':120
+R11761:11771 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11772:11775 STLC.Definitions <> step:51 ind
+R11789:11793 STLC.Definitions <> tleaf constr
+R11795:11797 STLC.Definitions <> t1':120 var
+R11778:11782 STLC.Definitions <> tleaf constr
+R11784:11785 STLC.Definitions <> t1:119 var
+R11750:11753 STLC.Definitions <> step:51 ind
+R11758:11760 STLC.Definitions <> t1':120 var
+R11755:11756 STLC.Definitions <> t1:119 var
+binder 11822:11823 <> t1:121
+binder 11825:11827 <> t1':122
+binder 11829:11830 <> t2:123
+binder 11832:11833 <> t3:124
+R11854:11864 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11865:11868 STLC.Definitions <> step:51 ind
+R11888:11892 STLC.Definitions <> tnode constr
+R11901:11902 STLC.Definitions <> t3:124 var
+R11898:11899 STLC.Definitions <> t2:123 var
+R11894:11896 STLC.Definitions <> t1':122 var
+R11871:11875 STLC.Definitions <> tnode constr
+R11883:11884 STLC.Definitions <> t3:124 var
+R11880:11881 STLC.Definitions <> t2:123 var
+R11877:11878 STLC.Definitions <> t1:121 var
+R11843:11846 STLC.Definitions <> step:51 ind
+R11851:11853 STLC.Definitions <> t1':122 var
+R11848:11849 STLC.Definitions <> t1:121 var
+binder 11927:11928 <> v1:125
+binder 11930:11931 <> t2:126
+binder 11933:11935 <> t2':127
+binder 11937:11938 <> t3:128
+R11956:11966 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11978:11988 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R11989:11992 STLC.Definitions <> step:51 ind
+R12012:12016 STLC.Definitions <> tnode constr
+R12025:12026 STLC.Definitions <> t3:128 var
+R12021:12023 STLC.Definitions <> t2':127 var
+R12018:12019 STLC.Definitions <> v1:125 var
+R11995:11999 STLC.Definitions <> tnode constr
+R12007:12008 STLC.Definitions <> t3:128 var
+R12004:12005 STLC.Definitions <> t2:126 var
+R12001:12002 STLC.Definitions <> v1:125 var
+R11967:11970 STLC.Definitions <> step:51 ind
+R11975:11977 STLC.Definitions <> t2':127 var
+R11972:11973 STLC.Definitions <> t2:126 var
+R11948:11952 STLC.Definitions <> value ind
+R11954:11955 STLC.Definitions <> v1:125 var
+binder 12051:12052 <> v1:129
+binder 12054:12055 <> v2:130
+binder 12057:12058 <> t3:131
+binder 12060:12062 <> t3':132
+R12080:12090 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12099:12109 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12121:12131 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12132:12135 STLC.Definitions <> step:51 ind
+R12155:12159 STLC.Definitions <> tnode constr
+R12167:12169 STLC.Definitions <> t3':132 var
+R12164:12165 STLC.Definitions <> v2:130 var
+R12161:12162 STLC.Definitions <> v1:129 var
+R12138:12142 STLC.Definitions <> tnode constr
+R12150:12151 STLC.Definitions <> t3:131 var
+R12147:12148 STLC.Definitions <> v2:130 var
+R12144:12145 STLC.Definitions <> v1:129 var
+R12110:12113 STLC.Definitions <> step:51 ind
+R12118:12120 STLC.Definitions <> t3':132 var
+R12115:12116 STLC.Definitions <> t3:131 var
+R12091:12095 STLC.Definitions <> value ind
+R12097:12098 STLC.Definitions <> v2:130 var
+R12072:12076 STLC.Definitions <> value ind
+R12078:12079 STLC.Definitions <> v1:129 var
+binder 12194:12195 <> t1:133
+binder 12197:12199 <> t1':134
+binder 12201:12202 <> x1:135
+binder 12204:12205 <> t2:136
+binder 12207:12208 <> x2:137
+binder 12210:12211 <> x3:138
+binder 12213:12214 <> x4:139
+binder 12216:12217 <> t3:140
+R12238:12248 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12249:12252 STLC.Definitions <> step:51 ind
+R12285:12290 STLC.Definitions <> tbcase constr
+R12311:12312 STLC.Definitions <> t3:140 var
+R12308:12309 STLC.Definitions <> x4:139 var
+R12305:12306 STLC.Definitions <> x3:138 var
+R12302:12303 STLC.Definitions <> x2:137 var
+R12299:12300 STLC.Definitions <> t2:136 var
+R12296:12297 STLC.Definitions <> x1:135 var
+R12292:12294 STLC.Definitions <> t1':134 var
+R12255:12260 STLC.Definitions <> tbcase constr
+R12280:12281 STLC.Definitions <> t3:140 var
+R12277:12278 STLC.Definitions <> x4:139 var
+R12274:12275 STLC.Definitions <> x3:138 var
+R12271:12272 STLC.Definitions <> x2:137 var
+R12268:12269 STLC.Definitions <> t2:136 var
+R12265:12266 STLC.Definitions <> x1:135 var
+R12262:12263 STLC.Definitions <> t1:133 var
+R12227:12230 STLC.Definitions <> step:51 ind
+R12235:12237 STLC.Definitions <> t1':134 var
+R12232:12233 STLC.Definitions <> t1:133 var
+binder 12341:12342 <> v1:141
+binder 12344:12345 <> x1:142
+binder 12347:12348 <> t2:143
+binder 12350:12351 <> x2:144
+binder 12353:12354 <> x3:145
+binder 12356:12357 <> x4:146
+binder 12359:12360 <> t3:147
+R12378:12388 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12389:12392 STLC.Definitions <> step:51 ind
+R12433:12437 STLC.Definitions <> subst def
+R12445:12446 STLC.Definitions <> t2:143 var
+R12442:12443 STLC.Definitions <> v1:141 var
+R12439:12440 STLC.Definitions <> x1:142 var
+R12395:12400 STLC.Definitions <> tbcase constr
+R12428:12429 STLC.Definitions <> t3:147 var
+R12425:12426 STLC.Definitions <> x4:146 var
+R12422:12423 STLC.Definitions <> x3:145 var
+R12419:12420 STLC.Definitions <> x2:144 var
+R12416:12417 STLC.Definitions <> t2:143 var
+R12413:12414 STLC.Definitions <> x1:142 var
+R12403:12407 STLC.Definitions <> tleaf constr
+R12409:12410 STLC.Definitions <> v1:141 var
+R12370:12374 STLC.Definitions <> value ind
+R12376:12377 STLC.Definitions <> v1:141 var
+binder 12475:12476 <> v1:148
+binder 12478:12479 <> v2:149
+binder 12481:12482 <> v3:150
+binder 12484:12485 <> x1:151
+binder 12487:12488 <> t2:152
+binder 12490:12491 <> x2:153
+binder 12493:12494 <> x3:154
+binder 12496:12497 <> x4:155
+binder 12499:12500 <> t3:156
+R12518:12528 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12537:12547 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12556:12566 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12567:12570 STLC.Definitions <> step:51 ind
+R12617:12621 STLC.Definitions <> subst def
+R12630:12634 STLC.Definitions <> subst def
+R12643:12647 STLC.Definitions <> subst def
+R12655:12656 STLC.Definitions <> t3:156 var
+R12652:12653 STLC.Definitions <> v1:148 var
+R12649:12650 STLC.Definitions <> x2:153 var
+R12639:12640 STLC.Definitions <> v2:149 var
+R12636:12637 STLC.Definitions <> x3:154 var
+R12626:12627 STLC.Definitions <> v3:150 var
+R12623:12624 STLC.Definitions <> x4:155 var
+R12573:12578 STLC.Definitions <> tbcase constr
+R12612:12613 STLC.Definitions <> t3:156 var
+R12609:12610 STLC.Definitions <> x4:155 var
+R12606:12607 STLC.Definitions <> x3:154 var
+R12603:12604 STLC.Definitions <> x2:153 var
+R12600:12601 STLC.Definitions <> t2:152 var
+R12597:12598 STLC.Definitions <> x1:151 var
+R12581:12585 STLC.Definitions <> tnode constr
+R12593:12594 STLC.Definitions <> v3:150 var
+R12590:12591 STLC.Definitions <> v2:149 var
+R12587:12588 STLC.Definitions <> v1:148 var
+R12548:12552 STLC.Definitions <> value ind
+R12554:12555 STLC.Definitions <> v3:150 var
+R12529:12533 STLC.Definitions <> value ind
+R12535:12536 STLC.Definitions <> v2:149 var
+R12510:12514 STLC.Definitions <> value ind
+R12516:12517 STLC.Definitions <> v1:148 var
+binder 12684:12684 <> x:157
+binder 12686:12687 <> t1:158
+binder 12689:12691 <> t1':159
+binder 12693:12694 <> t2:160
+R12715:12725 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12726:12729 STLC.Definitions <> step:51 ind
+R12747:12750 STLC.Definitions <> tlet constr
+R12758:12759 STLC.Definitions <> t2:160 var
+R12754:12756 STLC.Definitions <> t1':159 var
+R12752:12752 STLC.Definitions <> x:157 var
+R12732:12735 STLC.Definitions <> tlet constr
+R12742:12743 STLC.Definitions <> t2:160 var
+R12739:12740 STLC.Definitions <> t1:158 var
+R12737:12737 STLC.Definitions <> x:157 var
+R12704:12707 STLC.Definitions <> step:51 ind
+R12712:12714 STLC.Definitions <> t1':159 var
+R12709:12710 STLC.Definitions <> t1:158 var
+binder 12787:12787 <> x:161
+binder 12789:12790 <> v1:162
+binder 12792:12793 <> t2:163
+R12811:12821 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12822:12825 STLC.Definitions <> step:51 ind
+R12843:12847 STLC.Definitions <> subst def
+R12854:12855 STLC.Definitions <> t2:163 var
+R12851:12852 STLC.Definitions <> v1:162 var
+R12849:12849 STLC.Definitions <> x:161 var
+R12828:12831 STLC.Definitions <> tlet constr
+R12838:12839 STLC.Definitions <> t2:163 var
+R12835:12836 STLC.Definitions <> v1:162 var
+R12833:12833 STLC.Definitions <> x:161 var
+R12803:12807 STLC.Definitions <> value ind
+R12809:12810 STLC.Definitions <> v1:162 var
+binder 12881:12882 <> t1:164
+binder 12884:12886 <> t1':165
+R12907:12917 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R12918:12921 STLC.Definitions <> step:51 ind
+R12934:12937 STLC.Definitions <> tfix constr
+R12939:12941 STLC.Definitions <> t1':165 var
+R12924:12927 STLC.Definitions <> tfix constr
+R12929:12930 STLC.Definitions <> t1:164 var
+R12896:12899 STLC.Definitions <> step:51 ind
+R12904:12906 STLC.Definitions <> t1':165 var
+R12901:12902 STLC.Definitions <> t1:164 var
+binder 12967:12968 <> xf:166
+binder 12970:12970 <> T:167
+binder 12972:12972 <> t:168
+R12981:12984 STLC.Definitions <> step:51 ind
+R13007:13011 STLC.Definitions <> subst def
+R13036:13036 STLC.Definitions <> t:168 var
+R13017:13020 STLC.Definitions <> tfix constr
+R13023:13025 STLC.Definitions <> abs constr
+R13032:13032 STLC.Definitions <> t:168 var
+R13030:13030 STLC.Definitions <> T:167 var
+R13027:13028 STLC.Definitions <> xf:166 var
+R13013:13014 STLC.Definitions <> xf:166 var
+R12987:12990 STLC.Definitions <> tfix constr
+R12993:12995 STLC.Definitions <> abs constr
+R13002:13002 STLC.Definitions <> t:168 var
+R13000:13000 STLC.Definitions <> T:167 var
+R12997:12998 STLC.Definitions <> xf:166 var
+R13065:13068 STLC.Definitions <> step ind
+not 13048:13048 <> :::x_'-->'_x
+syndef 13087:13095 <> multistep
+R13101:13105 STLC.Definitions <> multi ind
+R13107:13110 STLC.Definitions <> step ind
+R13142:13150 STLC.Definitions <> multistep syndef
+not 13123:13123 <> :::x_'-->*'_x
+R13193:13196 STLC.Definitions <> step ind
+def 13229:13235 <> context
+R13240:13250 STLC.Definitions <> partial_map def
+R13252:13253 STLC.Definitions <> ty ind
+ind 13368:13375 <> has_type
+constr 13414:13418 <> T_Var
+constr 13500:13504 <> T_Abs
+constr 13631:13635 <> T_App
+constr 13782:13786 <> T_Nat
+constr 13846:13851 <> T_Plus
+constr 13983:13989 <> T_Minus
+constr 14122:14127 <> T_Mult
+constr 14259:14263 <> T_If0
+constr 14435:14439 <> T_Nil
+constr 14506:14511 <> T_Cons
+constr 14657:14663 <> T_LCase
+constr 14891:14896 <> T_Leaf
+constr 15004:15009 <> T_Node
+constr 15217:15223 <> T_BCase
+constr 15506:15510 <> T_Let
+constr 15664:15668 <> T_Fix
+R13386:13389 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13392:13395 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13398:13401 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13396:13397 STLC.Definitions <> ty ind
+R13390:13391 STLC.Definitions <> tm ind
+R13379:13385 STLC.Definitions <> context def
+R15803:15810 STLC.Definitions <> has_type:170 ind
+binder 13429:13433 <> Gamma:171
+binder 13435:13435 <> x:172
+binder 13437:13438 <> T1:173
+R13465:13475 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13476:13483 STLC.Definitions <> has_type:169 ind
+R13493:13494 STLC.Definitions <> T1:173 var
+R13491:13491 STLC.Definitions <> x:172 var
+R13485:13489 STLC.Definitions <> Gamma:171 var
+R13455:13457 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R13448:13452 STLC.Definitions <> Gamma:171 var
+R13454:13454 STLC.Definitions <> x:172 var
+R13458:13461 Coq.Init.Datatypes <> Some constr
+R13463:13464 STLC.Definitions <> T1:173 var
+binder 13515:13519 <> Gamma:174
+binder 13521:13521 <> x:175
+binder 13523:13524 <> t1:176
+binder 13526:13527 <> T1:177
+binder 13529:13530 <> T2:178
+R13573:13583 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13584:13591 STLC.Definitions <> has_type:169 ind
+R13614:13618 STLC.Definitions <> Arrow constr
+R13623:13624 STLC.Definitions <> T1:177 var
+R13620:13621 STLC.Definitions <> T2:178 var
+R13600:13602 STLC.Definitions <> abs constr
+R13609:13610 STLC.Definitions <> t1:176 var
+R13606:13607 STLC.Definitions <> T2:178 var
+R13604:13604 STLC.Definitions <> x:175 var
+R13593:13597 STLC.Definitions <> Gamma:174 var
+R13540:13547 STLC.Definitions <> has_type:169 ind
+R13571:13572 STLC.Definitions <> T1:177 var
+R13568:13569 STLC.Definitions <> t1:176 var
+R13551:13555 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R13558:13560 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R13561:13565 STLC.Definitions <> Gamma:174 var
+R13550:13550 STLC.Definitions <> x:175 var
+R13556:13557 STLC.Definitions <> T2:178 var
+binder 13646:13650 <> Gamma:179
+binder 13652:13653 <> t1:180
+binder 13655:13656 <> T1:181
+binder 13658:13659 <> t2:182
+binder 13661:13662 <> T2:183
+R13703:13713 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13734:13744 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13745:13752 STLC.Definitions <> has_type:169 ind
+R13772:13773 STLC.Definitions <> T1:181 var
+R13761:13763 STLC.Definitions <> app constr
+R13768:13769 STLC.Definitions <> t2:182 var
+R13765:13766 STLC.Definitions <> t1:180 var
+R13754:13758 STLC.Definitions <> Gamma:179 var
+R13714:13721 STLC.Definitions <> has_type:169 ind
+R13732:13733 STLC.Definitions <> T2:183 var
+R13729:13730 STLC.Definitions <> t2:182 var
+R13723:13727 STLC.Definitions <> Gamma:179 var
+R13672:13679 STLC.Definitions <> has_type:169 ind
+R13691:13695 STLC.Definitions <> Arrow constr
+R13700:13701 STLC.Definitions <> T1:181 var
+R13697:13698 STLC.Definitions <> T2:183 var
+R13687:13688 STLC.Definitions <> t1:180 var
+R13681:13685 STLC.Definitions <> Gamma:179 var
+binder 13797:13801 <> Gamma:184
+R13808:13810 Coq.Init.Datatypes <> nat ind
+binder 13804:13804 <> n:185
+R13821:13828 STLC.Definitions <> has_type:169 ind
+R13838:13840 STLC.Definitions <> Nat constr
+R13836:13836 STLC.Definitions <> n:185 var
+R13830:13834 STLC.Definitions <> Gamma:184 var
+binder 13862:13866 <> Gamma:186
+binder 13868:13869 <> t1:187
+binder 13871:13872 <> t2:188
+R13903:13913 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13935:13945 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R13946:13953 STLC.Definitions <> has_type:169 ind
+R13975:13977 STLC.Definitions <> Nat constr
+R13962:13966 STLC.Definitions <> tplus constr
+R13971:13972 STLC.Definitions <> t2:188 var
+R13968:13969 STLC.Definitions <> t1:187 var
+R13955:13959 STLC.Definitions <> Gamma:186 var
+R13914:13921 STLC.Definitions <> has_type:169 ind
+R13932:13934 STLC.Definitions <> Nat constr
+R13929:13930 STLC.Definitions <> t2:188 var
+R13923:13927 STLC.Definitions <> Gamma:186 var
+R13882:13889 STLC.Definitions <> has_type:169 ind
+R13900:13902 STLC.Definitions <> Nat constr
+R13897:13898 STLC.Definitions <> t1:187 var
+R13891:13895 STLC.Definitions <> Gamma:186 var
+binder 14000:14004 <> Gamma:189
+binder 14006:14007 <> t1:190
+binder 14009:14010 <> t2:191
+R14041:14051 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14073:14083 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14084:14091 STLC.Definitions <> has_type:169 ind
+R14114:14116 STLC.Definitions <> Nat constr
+R14100:14105 STLC.Definitions <> tminus constr
+R14110:14111 STLC.Definitions <> t2:191 var
+R14107:14108 STLC.Definitions <> t1:190 var
+R14093:14097 STLC.Definitions <> Gamma:189 var
+R14052:14059 STLC.Definitions <> has_type:169 ind
+R14070:14072 STLC.Definitions <> Nat constr
+R14067:14068 STLC.Definitions <> t2:191 var
+R14061:14065 STLC.Definitions <> Gamma:189 var
+R14020:14027 STLC.Definitions <> has_type:169 ind
+R14038:14040 STLC.Definitions <> Nat constr
+R14035:14036 STLC.Definitions <> t1:190 var
+R14029:14033 STLC.Definitions <> Gamma:189 var
+binder 14138:14142 <> Gamma:192
+binder 14144:14145 <> t1:193
+binder 14147:14148 <> t2:194
+R14179:14189 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14211:14221 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14222:14229 STLC.Definitions <> has_type:169 ind
+R14251:14253 STLC.Definitions <> Nat constr
+R14238:14242 STLC.Definitions <> tmult constr
+R14247:14248 STLC.Definitions <> t2:194 var
+R14244:14245 STLC.Definitions <> t1:193 var
+R14231:14235 STLC.Definitions <> Gamma:192 var
+R14190:14197 STLC.Definitions <> has_type:169 ind
+R14208:14210 STLC.Definitions <> Nat constr
+R14205:14206 STLC.Definitions <> t2:194 var
+R14199:14203 STLC.Definitions <> Gamma:192 var
+R14158:14165 STLC.Definitions <> has_type:169 ind
+R14176:14178 STLC.Definitions <> Nat constr
+R14173:14174 STLC.Definitions <> t1:193 var
+R14167:14171 STLC.Definitions <> Gamma:192 var
+binder 14274:14278 <> Gamma:195
+binder 14280:14281 <> t1:196
+binder 14283:14284 <> t2:197
+binder 14286:14287 <> t3:198
+binder 14289:14290 <> T0:199
+R14321:14331 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14352:14362 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14383:14393 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14394:14401 STLC.Definitions <> has_type:169 ind
+R14425:14426 STLC.Definitions <> T0:199 var
+R14410:14413 STLC.Definitions <> tif0 constr
+R14421:14422 STLC.Definitions <> t3:198 var
+R14418:14419 STLC.Definitions <> t2:197 var
+R14415:14416 STLC.Definitions <> t1:196 var
+R14403:14407 STLC.Definitions <> Gamma:195 var
+R14363:14370 STLC.Definitions <> has_type:169 ind
+R14381:14382 STLC.Definitions <> T0:199 var
+R14378:14379 STLC.Definitions <> t3:198 var
+R14372:14376 STLC.Definitions <> Gamma:195 var
+R14332:14339 STLC.Definitions <> has_type:169 ind
+R14350:14351 STLC.Definitions <> T0:199 var
+R14347:14348 STLC.Definitions <> t2:197 var
+R14341:14345 STLC.Definitions <> Gamma:195 var
+R14300:14307 STLC.Definitions <> has_type:169 ind
+R14318:14320 STLC.Definitions <> Nat constr
+R14315:14316 STLC.Definitions <> t1:196 var
+R14309:14313 STLC.Definitions <> Gamma:195 var
+binder 14450:14454 <> Gamma:200
+binder 14456:14457 <> T1:201
+R14467:14474 STLC.Definitions <> has_type:169 ind
+R14493:14496 STLC.Definitions <> List constr
+R14498:14499 STLC.Definitions <> T1:201 var
+R14483:14486 STLC.Definitions <> tnil constr
+R14488:14489 STLC.Definitions <> T1:201 var
+R14476:14480 STLC.Definitions <> Gamma:200 var
+binder 14522:14526 <> Gamma:202
+binder 14528:14529 <> t1:203
+binder 14531:14532 <> t2:204
+binder 14534:14535 <> T1:205
+R14565:14575 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14603:14613 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14614:14621 STLC.Definitions <> has_type:169 ind
+R14644:14647 STLC.Definitions <> List constr
+R14649:14650 STLC.Definitions <> T1:205 var
+R14630:14634 STLC.Definitions <> tcons constr
+R14639:14640 STLC.Definitions <> t2:204 var
+R14636:14637 STLC.Definitions <> t1:203 var
+R14623:14627 STLC.Definitions <> Gamma:202 var
+R14576:14583 STLC.Definitions <> has_type:169 ind
+R14595:14598 STLC.Definitions <> List constr
+R14600:14601 STLC.Definitions <> T1:205 var
+R14591:14592 STLC.Definitions <> t2:204 var
+R14585:14589 STLC.Definitions <> Gamma:202 var
+R14545:14552 STLC.Definitions <> has_type:169 ind
+R14563:14564 STLC.Definitions <> T1:205 var
+R14560:14561 STLC.Definitions <> t1:203 var
+R14554:14558 STLC.Definitions <> Gamma:202 var
+binder 14674:14678 <> Gamma:206
+binder 14680:14681 <> t1:207
+binder 14683:14684 <> T1:208
+binder 14686:14687 <> t2:209
+binder 14689:14690 <> x1:210
+binder 14692:14693 <> x2:211
+binder 14695:14696 <> t3:212
+binder 14698:14699 <> T2:213
+R14736:14746 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14767:14777 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14831:14841 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14842:14849 STLC.Definitions <> has_type:169 ind
+R14881:14882 STLC.Definitions <> T2:213 var
+R14858:14863 STLC.Definitions <> tlcase constr
+R14877:14878 STLC.Definitions <> t3:212 var
+R14874:14875 STLC.Definitions <> x2:211 var
+R14871:14872 STLC.Definitions <> x1:210 var
+R14868:14869 STLC.Definitions <> t2:209 var
+R14865:14866 STLC.Definitions <> t1:207 var
+R14851:14855 STLC.Definitions <> Gamma:206 var
+R14778:14785 STLC.Definitions <> has_type:169 ind
+R14829:14830 STLC.Definitions <> T2:213 var
+R14826:14827 STLC.Definitions <> t3:212 var
+R14790:14794 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R14797:14799 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R14802:14807 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R14815:14818 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R14819:14823 STLC.Definitions <> Gamma:206 var
+R14800:14801 STLC.Definitions <> x2:211 var
+R14808:14811 STLC.Definitions <> List constr
+R14813:14814 STLC.Definitions <> T1:208 var
+R14788:14789 STLC.Definitions <> x1:210 var
+R14795:14796 STLC.Definitions <> T1:208 var
+R14747:14754 STLC.Definitions <> has_type:169 ind
+R14765:14766 STLC.Definitions <> T2:213 var
+R14762:14763 STLC.Definitions <> t2:209 var
+R14756:14760 STLC.Definitions <> Gamma:206 var
+R14709:14716 STLC.Definitions <> has_type:169 ind
+R14728:14731 STLC.Definitions <> List constr
+R14733:14734 STLC.Definitions <> T1:208 var
+R14724:14725 STLC.Definitions <> t1:207 var
+R14718:14722 STLC.Definitions <> Gamma:206 var
+binder 14907:14911 <> Gamma:214
+binder 14913:14914 <> t1:215
+binder 14916:14917 <> T1:216
+R14947:14957 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R14958:14965 STLC.Definitions <> has_type:169 ind
+R14985:14994 STLC.Definitions <> BinaryTree constr
+R14996:14997 STLC.Definitions <> T1:216 var
+R14974:14978 STLC.Definitions <> tleaf constr
+R14980:14981 STLC.Definitions <> t1:215 var
+R14967:14971 STLC.Definitions <> Gamma:214 var
+R14927:14934 STLC.Definitions <> has_type:169 ind
+R14945:14946 STLC.Definitions <> T1:216 var
+R14942:14943 STLC.Definitions <> t1:215 var
+R14936:14940 STLC.Definitions <> Gamma:214 var
+binder 15020:15024 <> Gamma:217
+binder 15026:15027 <> t1:218
+binder 15029:15030 <> t2:219
+binder 15032:15033 <> t3:220
+binder 15035:15036 <> T1:221
+R15066:15076 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15110:15120 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15154:15164 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15165:15172 STLC.Definitions <> has_type:169 ind
+R15198:15207 STLC.Definitions <> BinaryTree constr
+R15209:15210 STLC.Definitions <> T1:221 var
+R15181:15185 STLC.Definitions <> tnode constr
+R15193:15194 STLC.Definitions <> t3:220 var
+R15190:15191 STLC.Definitions <> t2:219 var
+R15187:15188 STLC.Definitions <> t1:218 var
+R15174:15178 STLC.Definitions <> Gamma:217 var
+R15121:15128 STLC.Definitions <> has_type:169 ind
+R15140:15149 STLC.Definitions <> BinaryTree constr
+R15151:15152 STLC.Definitions <> T1:221 var
+R15136:15137 STLC.Definitions <> t3:220 var
+R15130:15134 STLC.Definitions <> Gamma:217 var
+R15077:15084 STLC.Definitions <> has_type:169 ind
+R15096:15105 STLC.Definitions <> BinaryTree constr
+R15107:15108 STLC.Definitions <> T1:221 var
+R15092:15093 STLC.Definitions <> t2:219 var
+R15086:15090 STLC.Definitions <> Gamma:217 var
+R15046:15053 STLC.Definitions <> has_type:169 ind
+R15064:15065 STLC.Definitions <> T1:221 var
+R15061:15062 STLC.Definitions <> t1:218 var
+R15055:15059 STLC.Definitions <> Gamma:217 var
+binder 15234:15238 <> Gamma:222
+binder 15240:15241 <> t1:223
+binder 15243:15244 <> T1:224
+binder 15246:15247 <> x1:225
+binder 15249:15250 <> t2:226
+binder 15252:15253 <> T2:227
+binder 15255:15256 <> x2:228
+binder 15258:15259 <> x3:229
+binder 15261:15262 <> x4:230
+binder 15264:15265 <> t3:231
+R15308:15318 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15345:15355 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15440:15450 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15451:15458 STLC.Definitions <> has_type:169 ind
+R15496:15497 STLC.Definitions <> T2:227 var
+R15467:15472 STLC.Definitions <> tbcase constr
+R15492:15493 STLC.Definitions <> t3:231 var
+R15489:15490 STLC.Definitions <> x4:230 var
+R15486:15487 STLC.Definitions <> x3:229 var
+R15483:15484 STLC.Definitions <> x2:228 var
+R15480:15481 STLC.Definitions <> t2:226 var
+R15477:15478 STLC.Definitions <> x1:225 var
+R15474:15475 STLC.Definitions <> t1:223 var
+R15460:15464 STLC.Definitions <> Gamma:222 var
+R15356:15363 STLC.Definitions <> has_type:169 ind
+R15438:15439 STLC.Definitions <> T2:227 var
+R15435:15436 STLC.Definitions <> t3:231 var
+R15368:15372 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15375:15377 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15380:15385 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15399:15402 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15405:15410 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15424:15427 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15428:15432 STLC.Definitions <> Gamma:222 var
+R15403:15404 STLC.Definitions <> x4:230 var
+R15411:15420 STLC.Definitions <> BinaryTree constr
+R15422:15423 STLC.Definitions <> T1:224 var
+R15378:15379 STLC.Definitions <> x3:229 var
+R15386:15395 STLC.Definitions <> BinaryTree constr
+R15397:15398 STLC.Definitions <> T1:224 var
+R15366:15367 STLC.Definitions <> x2:228 var
+R15373:15374 STLC.Definitions <> T1:224 var
+R15319:15326 STLC.Definitions <> has_type:169 ind
+R15343:15344 STLC.Definitions <> T2:227 var
+R15340:15341 STLC.Definitions <> t2:226 var
+R15331:15335 STLC.Definitions <> :::x_'|->'_x not
+R15329:15330 STLC.Definitions <> x1:225 var
+R15336:15337 STLC.Definitions <> T1:224 var
+R15275:15282 STLC.Definitions <> has_type:169 ind
+R15294:15303 STLC.Definitions <> BinaryTree constr
+R15305:15306 STLC.Definitions <> T1:224 var
+R15290:15291 STLC.Definitions <> t1:223 var
+R15284:15288 STLC.Definitions <> Gamma:222 var
+binder 15521:15525 <> Gamma:232
+binder 15527:15527 <> x:233
+binder 15529:15530 <> t1:234
+binder 15532:15533 <> T1:235
+binder 15535:15536 <> t2:236
+binder 15538:15539 <> T2:237
+R15569:15579 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15613:15623 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15624:15631 STLC.Definitions <> has_type:169 ind
+R15654:15655 STLC.Definitions <> T2:237 var
+R15640:15643 STLC.Definitions <> tlet constr
+R15650:15651 STLC.Definitions <> t2:236 var
+R15647:15648 STLC.Definitions <> t1:234 var
+R15645:15645 STLC.Definitions <> x:233 var
+R15633:15637 STLC.Definitions <> Gamma:232 var
+R15580:15587 STLC.Definitions <> has_type:169 ind
+R15611:15612 STLC.Definitions <> T2:237 var
+R15608:15609 STLC.Definitions <> t2:236 var
+R15591:15595 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15598:15600 STLC.Definitions <> :::x_'|->'_x_';'_x not
+R15601:15605 STLC.Definitions <> Gamma:232 var
+R15590:15590 STLC.Definitions <> x:233 var
+R15596:15597 STLC.Definitions <> T1:235 var
+R15549:15556 STLC.Definitions <> has_type:169 ind
+R15567:15568 STLC.Definitions <> T1:235 var
+R15564:15565 STLC.Definitions <> t1:234 var
+R15558:15562 STLC.Definitions <> Gamma:232 var
+binder 15679:15683 <> Gamma:238
+binder 15685:15686 <> t1:239
+binder 15688:15689 <> T1:240
+R15730:15740 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R15741:15748 STLC.Definitions <> has_type:169 ind
+R15766:15767 STLC.Definitions <> T1:240 var
+R15757:15760 STLC.Definitions <> tfix constr
+R15762:15763 STLC.Definitions <> t1:239 var
+R15750:15754 STLC.Definitions <> Gamma:238 var
+R15699:15706 STLC.Definitions <> has_type:169 ind
+R15718:15722 STLC.Definitions <> Arrow constr
+R15727:15728 STLC.Definitions <> T1:240 var
+R15724:15725 STLC.Definitions <> T1:240 var
+R15714:15715 STLC.Definitions <> t1:239 var
+R15708:15712 STLC.Definitions <> Gamma:238 var
+R15803:15810 STLC.Definitions <> has_type ind
+not 15776:15776 <> :::x_'|-'_x_'\in'_x
+R15843:15850 STLC.Definitions <> has_type ind
+R16006:16014 STLC.Definitions <> mult_step constr
+R16083:16091 STLC.Definitions <> mult_refl constr
+R16171:16178 STLC.Definitions <> has_type ind
+R16183:16185 STLC.Definitions <> app constr
+R16207:16211 STLC.Definitions <> T_App constr
+R16242:16249 STLC.Definitions <> has_type ind
+R16254:16259 STLC.Definitions <> tlcase constr
+R16287:16293 STLC.Definitions <> T_LCase constr
+R16325:16327 Coq.Init.Logic <> ::type_scope:x_'='_x not
