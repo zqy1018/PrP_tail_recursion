@@ -42,18 +42,20 @@ Notation "key '|->' value ';' m" := (update m key value)
 Notation "key '|->' value" := (update empty key value)
   (at level 100).
 
+(*
 (*type*)
 Inductive ty : Type :=
   | Nat  : ty
   | List : ty -> ty
-  | BinaryTree : ty -> ty
   | Arrow : ty -> ty -> ty.
+*)
 
 (*term*)
 Inductive tm : Type :=
   | var : string -> tm
   | app : tm -> tm -> tm
-  | abs : string -> ty -> tm -> tm
+  | abs : string -> tm -> tm
+  (*| abs : string -> ty -> tm -> tm*)
   
   | tconst : nat -> tm
   | tplus : tm -> tm -> tm
@@ -61,24 +63,146 @@ Inductive tm : Type :=
   | tmult : tm -> tm -> tm
   | tif0  : tm -> tm -> tm -> tm
   
-  | tnil : ty -> tm
+  | tnil : tm
+  (*| tnil : ty -> tm*)
   | tcons : tm -> tm -> tm
   | tlcase : tm -> tm -> string -> string -> tm -> tm
-  
-  | tleaf : tm -> tm
-  | tnode : tm -> tm -> tm -> tm
-  | tbcase : tm -> string -> tm -> string -> string -> string -> tm -> tm
   
   | tlet : string -> tm -> tm -> tm
   
   | tfix  : tm -> tm.
+
+(*Some helper functions*)
+
+Fixpoint para_insert (para_name : string) (func_body : tm) : tm :=
+  match func_body with
+  | abs x1 t1 => abs x1 (para_insert para_name t1)
+  | _ => abs para_name func_body
+  end.
+
+Fixpoint find_func (func_name : string) (func_body : tm) : nat :=
+  match func_body with
+  | var x1 =>
+       if eqb x1 func_name then 1 else 0
+  | abs x1 t1 =>
+       if eqb x1 func_name then 0 else find_func func_name t1
+  | app t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  
+  | tconst _ =>
+       0
+  | tplus t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tminus t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tmult t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tif0 t1 t2 t3 =>
+       (find_func func_name t1) + (find_func func_name t2) + (find_func func_name t3)
+  
+  | tnil =>
+       0
+  | tcons t1 t2 =>
+       (find_func func_name t1) + (find_func func_name t2)
+  | tlcase t1 t2 x1 x2 t3 =>
+       (find_func func_name t1) + (find_func func_name t2) + (if eqb x1 func_name then 0 else if eqb x2 func_name then 0 else find_func func_name t3)
+  
+  | tlet x1 t1 t2 =>
+       (find_func func_name t1) + (if eqb x1 func_name then 0 else find_func func_name t2)
+  
+  | tfix t1 =>
+       find_func func_name t1
+  end.
+
+(*
+Fixpoint find_func (func_name : string) (func_body : tm) : bool :=
+  match func_body with
+  | var x1 =>
+       if eqb x1 func_name then true else false
+  | abs x1 _ t1 =>
+       if eqb x1 func_name then false else find_func func_name t1
+  | app t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  
+  | tconst _ =>
+       false
+  | tplus t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tminus t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tmult t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tif0 t1 t2 t3 =>
+       orb (orb (find_func func_name t1) (find_func func_name t2)) (find_func func_name t3)
+  
+  | tnil _ =>
+       false
+  | tcons t1 t2 =>
+       orb (find_func func_name t1) (find_func func_name t2)
+  | tlcase t1 t2 x1 x2 t3 =>
+       orb (orb (find_func func_name t1) (find_func func_name t2)) (if orb (eqb x1 func_name) (eqb x2 func_name) then false else (find_func func_name t3))
+  
+  | tlet x1 t1 t2 =>
+       if eqb x1 func_name then find_func func_name t1 else orb (find_func func_name t1) (find_func func_name t2)
+  
+  | tfix t1 =>
+       find_func func_name t1
+  end.
+*)
+
+Fixpoint is_recu (func_name : string) (func_body : tm) :=
+  match func_body with
+  | var x1 => eqb x1 func_name
+  | app t1 t2 => andb (andb (find_func func_name t1 =? 1) (find_func func_name t2 =? 0)) (is_recu func_name t1)
+  | _ => false
+  end.
+
+Fixpoint is_app_F (func_name : string) (func_body : tm) :=
+  match func_body with
+  | var x1 => eqb x1 func_name
+  | app t1 t2 => is_app_F func_name t1
+  | _ => false
+  end.
+
+Fixpoint list_name (func_body : tm) : list string :=
+  match func_body with
+  | var x1 =>
+       x1 :: nil
+  | abs x1 t1 =>
+       x1 :: (list_name t1)
+  | app t1 t2 =>
+       (list_name t1) ++ (list_name t2)
+  
+  | tconst n =>
+       nil
+  | tplus t1 t2 =>
+       (list_name t1) ++ (list_name t2)
+  | tminus t1 t2 =>
+       (list_name t1) ++ (list_name t2)
+  | tmult t1 t2 =>
+       (list_name t1) ++ (list_name t2)
+  | tif0 t1 t2 t3 =>
+       (list_name t1) ++ (list_name t2) ++ (list_name t3)
+  
+  | tnil =>
+       nil
+  | tcons t1 t2 =>
+       (list_name t1) ++ (list_name t2)
+  | tlcase t1 t2 x1 x2 t3 =>
+       (list_name t1) ++ (list_name t2) ++ (x1 :: x2 :: list_name t3)
+  
+  | tlet x1 t1 t2 =>
+       (x1 :: list_name t1) ++ (list_name t2)
+  
+  | tfix t1 =>
+       list_name t1
+  end.
 
 (*notation and coercion*)
 Coercion var : string >-> tm.
 Coercion tconst : nat >-> tm.
 
 Declare Custom Entry stlc.
-Declare Custom Entry stlc_ty.
 
 Definition a : string := "a".
 Definition b : string := "b".
@@ -106,12 +230,6 @@ Definition n2 : string := "n2".
 Definition n2' : string := "n2'".
 Definition t : string := "t".
 Definition t' : string := "t'".
-Definition t1 : string := "t1".
-Definition t1' : string := "t1'".
-Definition t2 : string := "t2".
-Definition t2' : string := "t2'".
-Definition tl : string := "tl".
-Definition tr : string := "tr".
 Definition x : string := "x".
 Definition y : string := "y".
 Definition z : string := "z".
@@ -158,12 +276,6 @@ Hint Unfold n2 : core.
 Hint Unfold n2' : core.
 Hint Unfold t : core.
 Hint Unfold t' : core.
-Hint Unfold t1 : core.
-Hint Unfold t1' : core.
-Hint Unfold t2 : core.
-Hint Unfold t2' : core.
-Hint Unfold tl : core.
-Hint Unfold tr : core.
 Hint Unfold x : core.
 Hint Unfold y : core.
 Hint Unfold z : core.
@@ -184,19 +296,27 @@ Hint Unfold res5 : core.
 Hint Unfold count : core.
 Hint Unfold count' : core.
 
-Notation "<{ e }>" := e (e custom stlc at level 99).
+(*
+Declare Custom Entry stlc_ty.
 Notation "<{{ e }}>" := e (e custom stlc_ty at level 99).
-Notation "( x )" := x (in custom stlc, x at level 99).
 Notation "( x )" := x (in custom stlc_ty, x at level 99).
-Notation "x" := x (in custom stlc at level 0, x constr at level 0).
 Notation "x" := x (in custom stlc_ty at level 0, x constr at level 0).
 Notation "S -> T" := (Arrow S T) (in custom stlc_ty at level 50, right associativity).
+*)
+
+Notation "<{ e }>" := e (e custom stlc at level 99).
+Notation "( x )" := x (in custom stlc, x at level 99).
+Notation "x" := x (in custom stlc at level 0, x constr at level 0).
 Notation "x y" := (app x y) (in custom stlc at level 1, left associativity).
-Notation "\ x : t , y" :=
+Notation "\ x , y" :=
+  (abs x y) (in custom stlc at level 90, x at level 99,
+                   y custom stlc at level 99,
+                   left associativity).
+(*Notation "\ x : t , y" :=
   (abs x t y) (in custom stlc at level 90, x at level 99,
                      t custom stlc_ty at level 99,
                      y custom stlc at level 99,
-                     left associativity).
+                     left associativity).*)
 
 Notation "{ x }" := x (in custom stlc at level 1, x constr).
 
@@ -213,7 +333,7 @@ Notation "'if0' x 'then' y 'else' z" :=
                     z custom stlc at level 99,
                     left associativity).
 
-Notation "'nil' T" := (tnil T) (in custom stlc at level 0, T custom stlc_ty at level 0).
+Notation "'nil'" := (tnil) (in custom stlc at level 0).
 Notation "h '::' t" := (tcons h t) (in custom stlc at level 2, right associativity).
 Notation "'case' t1 'of' '|' 'nil' '=>' t2 '|' x '::' y '=>' t3" :=
   (tlcase t1 t2 x y t3) (in custom stlc at level 89,
@@ -229,7 +349,7 @@ Notation "'let' x '=' t1 'in' t2" :=
 
 Notation "'fix' t" := (tfix t) (in custom stlc at level 0).
 
-Notation idNat := <{\ x : Nat, x}>.
+Notation idNat := <{\ x, x}>.
 
 (*substitution*)
 Reserved Notation "'[' x ':=' s ']' t" (in custom stlc at level 20, x constr).
@@ -238,8 +358,8 @@ Fixpoint subst (x : string) (s : tm) (t : tm) : tm :=
   match t with
   | var y =>
        if eqb x y then s else t
-  | abs y T t1 =>
-       if eqb x y then t else abs y T (subst x s t1)
+  | abs y t1 =>
+       if eqb x y then t else abs y (subst x s t1)
   | app t1 t2 =>
        app (subst x s t1) (subst x s t2)
   
@@ -254,19 +374,12 @@ Fixpoint subst (x : string) (s : tm) (t : tm) : tm :=
   | tif0 t1 t2 t3 =>
        tif0 (subst x s t1) (subst x s t2) (subst x s t3)
   
-  | tnil _ =>
+  | tnil =>
        t
   | tcons t1 t2 =>
        tcons (subst x s t1) (subst x s t2)
   | tlcase t1 t2 y1 y2 t3 =>
        tlcase (subst x s t1) (subst x s t2) y1 y2 (if eqb x y1 then t3 else if eqb x y2 then t3 else subst x s t3)
-  
-  | tleaf t1 =>
-       tleaf (subst x s t1)
-  | tnode t1 t2 t3 =>
-       tnode (subst x s t1) (subst x s t2) (subst x s t3)
-  | tbcase t1 y1 t2 y2 y3 y4 t3 =>
-       tbcase (subst x s t1) y1 (if eqb x y1 then t2 else subst x s t2) y2 y3 y4 (if eqb x y2 then t3 else if eqb x y3 then t3 else if eqb x y4 then t3 else subst x s t3)
   
   | tlet y t1 t2 =>
        tlet y (subst x s t1) (if eqb x y then t2 else subst x s t2)
@@ -279,27 +392,18 @@ where "'[' x ':=' s ']' t" := (subst x s t) (in custom stlc).
 
 (*value*)
 Inductive value : tm -> Prop :=
-  | V_Abs : forall x T t,
-       value (abs x T t)
+  | V_Abs : forall x t,
+       value (abs x t)
   
   | V_Nat : forall n : nat,
        value (tconst n)
   
-  | V_Nil : forall T,
-       value (tnil T)
+  | V_Nil :
+       value tnil
   | V_Cons : forall v1 v2,
        value v1 ->
        value v2 ->
-       value (tcons v1 v2)
-  
-  | V_Leaf : forall v1,
-       value v1 ->
-       value (tleaf v1)
-  | V_Node : forall v1 v2 v3,
-       value v1 ->
-       value v2 ->
-       value v3 ->
-       value (tnode v1 v2 v3).
+       value (tcons v1 v2).
 
 Hint Constructors value : core.
 
@@ -313,9 +417,9 @@ Inductive multi {X : Type} (R : relation X) : relation X :=
 Reserved Notation "t '-->' t'" (at level 40).
 
 Inductive step : tm -> tm -> Prop :=
-  | ST_AppAbs : forall x T t v,
+  | ST_AppAbs : forall x t v,
        value v ->
-       step (app (abs x T t) v) (subst x v t)
+       step (app (abs x t) v) (subst x v t)
   | ST_App1 : forall t1 t1' t2,
        step t1 t1' ->
        step (app t1 t2) (app t1' t2)
@@ -369,39 +473,12 @@ Inductive step : tm -> tm -> Prop :=
   | ST_LCase : forall t1 t1' t2 x1 x2 t3,
        step t1 t1' ->
        step (tlcase t1 t2 x1 x2 t3) (tlcase t1' t2 x1 x2 t3)
-  | ST_LCaseNil : forall T t2 x1 x2 t3,
-       step (tlcase (tnil T) t2 x1 x2 t3) t2
+  | ST_LCaseNil : forall t2 x1 x2 t3,
+       step (tlcase tnil t2 x1 x2 t3) t2
   | ST_LCaseCons : forall v1 v2 t2 x1 x2 t3,
        value v1 ->
        value v2 ->
        step (tlcase (tcons v1 v2) t2 x1 x2 t3) (subst x2 v2 (subst x1 v1 t3))
-  
-  | ST_Leaf : forall t1 t1',
-       step t1 t1' ->
-       step (tleaf t1) (tleaf t1')
-  | ST_Node1 : forall t1 t1' t2 t3,
-       step t1 t1' ->
-       step (tnode t1 t2 t3) (tnode t1' t2 t3)
-  | ST_Node2 : forall v1 t2 t2' t3,
-       value v1 ->
-       step t2 t2' ->
-       step (tnode v1 t2 t3) (tnode v1 t2' t3)
-  | ST_Node3 : forall v1 v2 t3 t3',
-       value v1 ->
-       value v2 ->
-       step t3 t3' ->
-       step (tnode v1 v2 t3) (tnode v1 v2 t3')
-  | ST_BCase : forall t1 t1' x1 t2 x2 x3 x4 t3,
-       step t1 t1' ->
-       step (tbcase t1 x1 t2 x2 x3 x4 t3) (tbcase t1' x1 t2 x2 x3 x4 t3)
-  | ST_BCaseLeaf : forall v1 x1 t2 x2 x3 x4 t3,
-       value v1 ->
-       step (tbcase (tleaf v1) x1 t2 x2 x3 x4 t3) (subst x1 v1 t2)
-  | ST_BCaseNode : forall v1 v2 v3 x1 t2 x2 x3 x4 t3,
-       value v1 ->
-       value v2 ->
-       value v3 ->
-       step (tbcase (tnode v1 v2 v3) x1 t2 x2 x3 x4 t3) (subst x4 v3 (subst x3 v2 (subst x2 v1 t3)))
   
   | ST_Let : forall x t1 t1' t2,
        step t1 t1' ->
@@ -413,8 +490,8 @@ Inductive step : tm -> tm -> Prop :=
   | ST_Fix : forall t1 t1',
        step t1 t1' ->
        step (tfix t1) (tfix t1')
-  | ST_FixAbs : forall xf T t,
-      step (tfix (abs xf T t)) (subst xf (tfix (abs xf T t)) t)
+  | ST_FixAbs : forall xf t,
+      step (tfix (abs xf t)) (subst xf (tfix (abs xf t)) t)
 
   where "t '-->' t'" := (step t t').
 
@@ -423,6 +500,7 @@ Notation "t1 '-->*' t2" := (multistep t1 t2) (at level 40).
 
 Hint Constructors step : core.
 
+(*
 (*typing*)
 Definition context := partial_map ty.
 
@@ -472,20 +550,6 @@ Inductive has_type : context -> tm -> ty -> Prop :=
        has_type (x1 |-> T1 ; x2 |-> (List T1) ; Gamma) t3 T2 ->
        has_type Gamma (tlcase t1 t2 x1 x2 t3) T2
   
-  | T_Leaf : forall Gamma t1 T1,
-       has_type Gamma t1 T1 ->
-       has_type Gamma (tleaf t1) (BinaryTree T1)
-  | T_Node : forall Gamma t1 t2 t3 T1,
-       has_type Gamma t1 T1 ->
-       has_type Gamma t2 (BinaryTree T1) ->
-       has_type Gamma t3 (BinaryTree T1) ->
-       has_type Gamma (tnode t1 t2 t3) (BinaryTree T1)
-  | T_BCase : forall Gamma t1 T1 x1 t2 T2 x2 x3 x4 t3,
-       has_type Gamma t1 (BinaryTree T1) ->
-       has_type (x1 |-> T1) t2 T2 ->
-       has_type (x2 |-> T1 ; x3 |-> (BinaryTree T1) ; x4 |-> (BinaryTree T1) ; Gamma) t3 T2 ->
-       has_type Gamma (tbcase t1 x1 t2 x2 x3 x4 t3) T2
-  
   | T_Let : forall Gamma x t1 T1 t2 T2,
        has_type Gamma t1 T1 ->
        has_type (x |-> T1 ; Gamma) t2 T2 ->
@@ -498,6 +562,7 @@ Inductive has_type : context -> tm -> ty -> Prop :=
 where "Gamma '|-' t '\in' T" := (has_type Gamma t T).
 
 Hint Constructors has_type : core.
+*)
 
 (*tactics*)
 Tactic Notation "print_goal" :=
@@ -510,10 +575,192 @@ Tactic Notation "normalize" :=
 
 Tactic Notation "solve_CPS" := cbv in *; simpl; normalize.
 
+(*
 Hint Extern 2 (has_type _ (app _ _) _) =>
   eapply T_App; auto : core.
 Hint Extern 2 (has_type _ (tlcase _ _ _ _ _) _) =>
   eapply T_LCase; auto : core.
 Hint Extern 2 (_ = _) => compute; reflexivity : core.
+*)
 (*using the tactic [normalize] to prove multistep relations*)
 (*using the tactic [eauto n : nat] to prove type-related propositions*)
+
+(*examples*)
+Definition stlc_add :=
+  abs x (abs y (tplus x y)).
+
+Definition stlc_square :=
+  abs x (tmult x x).
+
+Definition stlc_do_it_three_times :=
+  abs F
+    (abs x
+      (app F (app F (app F x)))).
+
+Definition stlc_power_of_four :=
+  tfix (abs F
+    (abs n
+      (tif0 n 1
+        (tplus (tplus (app F (tminus n 1)) (app F (tminus n 1))) (tplus (app F (tminus n 1)) (app F (tminus n 1))))))).
+
+Definition stlc_factorial :=
+  tfix (abs F
+    (abs x
+      (tif0 x 1 (tmult x (app F (tminus x 1)))))).
+
+Definition stlc_sum_of_list :=
+  tfix (abs F
+    (abs l
+      (tlcase l 0 n' l' (tplus n' (app F l'))))).
+
+Definition stlc_repeat :=
+  tfix (abs F
+    (abs count
+      (abs n
+        (tif0 count tnil (tcons n (app (app F (tminus count 1)) n)))))).
+
+Definition stlc_app :=
+  tfix (abs F
+    (abs l1
+      (abs l2 
+        (tlcase l1 l2 n' l1'
+          (tcons n' (app (app F l1') l2)))))).
+
+Definition stlc_reverse :=
+  tfix (abs F
+    (abs l
+      (tlcase l tnil n' l'
+        (app (app stlc_app (app F l')) (tcons n' tnil ))))).
+
+Definition stlc_length :=
+  tfix (abs F
+    (abs l 
+      (tlcase l 0 n' l'
+        (tplus 1 (app F l'))))).
+
+Definition stlc_map :=
+  tfix (abs F
+    (abs f 
+      (abs l
+        (tlcase l tnil n' l'
+          (tcons (app f n') (app (app F f) l')))))).
+
+Definition stlc_fold :=
+  tfix (abs F
+    (abs f
+      (abs l
+        (abs b
+          (tlcase l b n' l'
+            (app (app f n') (app (app (app F f) l') b))))))).
+
+Theorem example_stlc_add :
+  let exfun := stlc_add in
+  let input1 := 5 in
+  let input2 := 95 in
+  let output := 100 in
+  <{exfun input1 input2}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_square :
+  let exfun := stlc_square in
+  let input := 5 in
+  let output := 25 in
+  <{exfun input}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_do_it_three_times :
+  let exfun := stlc_do_it_three_times in
+  let input1 := stlc_square in
+  let input2 := 2 in
+  let output := 256 in
+  <{exfun input1 input2}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_power_of_four :
+  let exfun := stlc_power_of_four in
+  let input := 2 in
+  let output := 16 in
+  <{exfun input}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_factorial :
+  let exfun := stlc_factorial in
+  let input := 6 in
+  let output := 720 in
+  <{exfun input}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_sum_of_list :
+  let exfun := stlc_sum_of_list in
+  let input := tcons 4 (tcons 1 (tcons 10 (tcons 2 tnil))) in
+  let output := 17 in
+  <{exfun input}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_repeat :
+  let exfun := stlc_repeat in
+  let input1 := 5 in
+  let input2 := 12 in
+  let output := tcons 12 (tcons 12 (tcons 12 (tcons 12 (tcons 12 tnil)))) in
+  <{exfun input1 input2}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_app :
+  let exfun := stlc_app in
+  let input1 := tcons 10 (tcons 2 tnil) in
+  let input2 := tcons 5 (tcons 0 (tcons 8 tnil)) in
+  let output := tcons 10 (tcons 2 (tcons 5 (tcons 0 (tcons 8 tnil)))) in
+  <{exfun input1 input2}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_reverse :
+  let exfun := stlc_reverse in
+  let input := tcons 1 (tcons 2 (tcons 3 (tcons 4 tnil))) in
+  let output := tcons 4 (tcons 3 (tcons 2 (tcons 1 tnil))) in
+  <{exfun input}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_length :
+  let exfun := stlc_length in
+  let input := tcons 0 (tcons 2 (tcons 3 (tcons 0 (tcons 8 tnil)))) in
+  let output := 5 in
+  <{exfun input}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_map :
+  let exfun := stlc_map in
+  let input1 := stlc_square in
+  let input2 := tcons 4 (tcons 10 (tcons 0 tnil)) in
+  let output := tcons 16 (tcons 100 (tcons 0 tnil)) in
+  <{exfun input1 input2}> -->* output.
+Proof. solve_CPS. Qed.
+
+Theorem example_stlc_fold :
+  let exfun := stlc_fold in
+  let input1 := stlc_add in
+  let input2 := tcons 1 (tcons 2 (tcons 3 (tcons 4 (tcons 5 tnil)))) in
+  let input3 := 0 in
+  let output := 15 in
+  <{exfun input1 input2 input3}> -->* output.
+Proof. solve_CPS. Qed.
+
+(*CPS conversion rule*)
+(*
+  For an application [M1 M2], we can translate it into such a
+  manner:
+
+  if both are not recursive, we apply it to the continuation
+  function k :
+        [M1 M2] = k (M1 M2)
+
+  if only M1 is recursive, that's to say M1 admit another
+  parameter :
+        [M1 M2] = [M1] (fun hole => k (hole M2))
+
+  if only M2 is recursive, that's to say M2 admit another
+  parameter :
+        [M1 M2] = [M2] (fun hole => k (M1 hole))
+
+  if both are recursive :
+        [M1 M2] = [M1] (fun hole1 => [M2] (fun hole2 => k (hole1 hole2)))
+*)
