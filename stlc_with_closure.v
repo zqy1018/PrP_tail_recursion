@@ -37,8 +37,6 @@ Notation "x + y" := (tm_add x y) (in custom mystlc at level 1,
 Coercion tm_const : nat >-> tm.  
 
 Inductive value : tm -> Prop :=
-  | v_abs : forall x t1,
-    value (tm_abs x t1)
   | v_closure : forall x t env,
     value (tm_closure (tm_abs x t) env)
   | v_nat : forall n : nat ,
@@ -61,19 +59,10 @@ Inductive multi {X : Type} (R : relation X) : relation X :=
                     multi R y z ->
                     multi R x z.
 
-(* combine 2 environment *)
-(* Definition combine (m n : ENV) :=
-  fun x => 
-    match (m x) with
-    | tm_invalid => (n x)
-    | t => t
-    end. *)
-
 Inductive step : tm  -> tm -> Prop :=
   (* enter a closure *)
-  | ST_Closure : forall x t v,
-    value v ->
-    <{ (\x, t) v }> --> tm_closure t (t_update empty_env x v)
+  | ST_Closure : forall x t,
+    <{ \x, t }> --> tm_closure <{ \x, t }> empty_env
   | ST_AppAbs_Closure : forall x t1 t2 env,
     value t2 ->
     tm_app (tm_closure (tm_abs x t1) env) t2 -->
@@ -85,6 +74,7 @@ Inductive step : tm  -> tm -> Prop :=
   | ST_Closure_Step_out_help : forall t t' env env', (* the term inside the closure need outside env to help it step*)
     tm_closure t env --> tm_closure t' env ->
     tm_closure (tm_closure t env') env --> tm_closure (tm_closure t' env') env
+  (* in the deepest closure *)
   | ST_Closure_Var : forall x env,
     tm_closure (tm_var x) env --> tm_closure (env x) env
   | ST_Closure_App1 : forall t1 t1' t2 env,
@@ -115,6 +105,15 @@ Inductive step : tm  -> tm -> Prop :=
          value v1 ->
          t2 --> t2' ->
          <{v1 t2}> --> <{v1  t2'}>
+  | ST_Addconsts: forall n1 n2 : nat,
+         <{n1 + n2}> --> <{ {n1 + n2} }>
+  | ST_Add1 : forall t1 t1' t2,
+         t1 --> t1' ->
+         <{t1 + t2}> --> <{t1' + t2}>
+  | ST_Add2 : forall v1 t2 t2',
+         value v1 ->
+         t2 --> t2' ->
+         <{v1 + t2}> --> <{v1 + t2'}>
   where "t '-->' t'" := (step t t').
 
 Hint Constructors value : core.
@@ -125,9 +124,9 @@ Notation "t1 '-->*' t2" := (multistep t1 t2) (at level 40).
 
 Theorem test0: <{(\x, \y, x + y) 3 4}> -->* tm_const 7.
 Proof.
-  eapply multi_step.
-    eapply ST_App1.
-      eapply ST_Closure. eapply v_nat.
+  eapply multi_step. auto.
+  
+  eapply multi_step. eapply ST_App1. eapply ST_AppAbs_Closure. auto.
   
   eapply multi_step.
     eapply ST_AppAbs_Closure. auto.
@@ -155,12 +154,13 @@ Hint Unfold add5 : core.
 Theorem test1: 
   <{ (\add5, (add5 3) + 3) ((\x, (\y, x + y)) 5) }> -->* (tm_const 11).
 Proof.
-  eapply multi_step.
-    eapply ST_App2. auto.
-      eapply ST_Closure. auto.
-  
-  eapply multi_step.
-    eapply ST_Closure. auto.
+  eapply multi_step. auto.
+
+  eapply multi_step. eapply ST_App2. auto. auto.
+
+  eapply multi_step. eapply ST_App2. auto. eapply ST_AppAbs_Closure. auto.
+
+  eapply multi_step. eapply ST_AppAbs_Closure. auto.
 
   eapply multi_step.
     eapply ST_Closure_Add1.
@@ -207,11 +207,13 @@ Qed.
 Theorem test2: 
   <{ (\z, ((\y, y + z) 3)) 5 }> -->* <{8}>.
 Proof.
-  eapply multi_step.
-    eapply ST_Closure. auto.
+  eapply multi_step. auto.
 
-  eapply multi_step.
-    eapply ST_Closure_Step_itself. auto.
+  eapply multi_step. eapply ST_AppAbs_Closure. auto.
+
+  eapply multi_step. eapply ST_Closure_Step_itself. auto.
+
+  eapply multi_step. eapply ST_Closure_Step_itself. eapply ST_AppAbs_Closure. auto.
 
   eapply multi_step.
     eapply ST_Closure_Step_itself.
