@@ -237,3 +237,216 @@ Proof.
 
   eapply multi_refl.
 Qed.
+
+Theorem test3: 
+  <{ (\x, ((\x, (\y, x + y)) 1 2) + x) 5 }> -->* <{8}>.
+Proof.
+  (* becomes a closure *)
+  eapply multi_step.
+    eapply ST_App1.
+      eapply ST_Closure.
+  (* <{ (tm_closure <{ \ x, (\ x, \ y, x + y) 1 2 + x }> empty_env) 5 }> *)
+
+  (* apply the closure to a value *)
+  eapply multi_step.
+    eapply ST_AppAbs_Closure.
+      auto.
+  (* tm_closure <{ (\ x, \ y, x + y) 1 2 + x }> (x !-> 5; empty_env) *)
+
+  (* simplify the function application in the closure: step 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_App1.
+          eapply ST_App1.
+            eapply ST_Closure.
+  (* tm_closure <{ (tm_closure <{ \ x, \ y, x + y }> empty_env) 1 2 + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 2 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_App1.
+          eapply ST_AppAbs_Closure.
+            auto.
+  (* tm_closure <{ (tm_closure <{ \ y, x + y }> (x !-> 1; empty_env)) 2 + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 3 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_AppAbs_Closure.
+            auto.
+  (* tm_closure <{ (tm_closure <{ x + y }> (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* left addition: step 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Add1.
+          eapply ST_Closure_Var.
+            do 2 (unfold t_update at 1; simpl).
+  (* tm_closure <{ (tm_closure <{ 1 + y }> (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 2 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Add2; auto.
+          do 1 (unfold t_update at 1; simpl).
+  (* tm_closure <{ (tm_closure <{ 1 + 2 }> (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 3, attempt 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Step_itself.
+          eapply ST_Addconsts.
+  (* tm_closure <{ (tm_closure (1 + 2) (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 3, attempt 2 *)
+  (*
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Addconst.
+  *)
+  (* tm_closure <{ (tm_closure (1 + 2) (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  simpl.
+  (* tm_closure <{ (tm_closure 3 (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 4 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Val.
+          auto.
+  (* tm_closure <{ 3 + x }> (x !-> 5; empty_env) *)
+
+  (* final addition: step 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Add2; auto.
+      do 1 (unfold t_update at 1; simpl).
+  (* tm_closure <{ 3 + (x !-> 5; empty_env) x }> (x !-> 5; empty_env) *)
+
+  (* OK! *)
+  eapply multi_step.
+    eapply ST_Closure_Addconst.
+  (* tm_closure (3 + 5) (x !-> 5; empty_env) *)
+
+  simpl.
+
+  eapply multi_step.
+    eapply ST_Closure_Val; auto.
+
+  econstructor.
+Qed.
+
+(* But the result may diverge, if we choose to use mappings in different scopes! *)
+Theorem test3': 
+  <{ (\x, ((\x, (\y, x + y)) 1 2) + x) 5 }> -->* <{12}>.
+Proof.
+  (* becomes a closure *)
+  eapply multi_step.
+    eapply ST_App1.
+      eapply ST_Closure.
+  (* <{ (tm_closure <{ \ x, (\ x, \ y, x + y) 1 2 + x }> empty_env) 5 }> *)
+
+  (* apply the closure to a value *)
+  eapply multi_step.
+    eapply ST_AppAbs_Closure.
+      auto.
+  (* tm_closure <{ (\ x, \ y, x + y) 1 2 + x }> (x !-> 5; empty_env) *)
+
+  (* simplify the function application in the closure: step 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_App1.
+          eapply ST_App1.
+            eapply ST_Closure.
+  (* tm_closure <{ (tm_closure <{ \ x, \ y, x + y }> empty_env) 1 2 + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 2 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_App1.
+          eapply ST_AppAbs_Closure.
+            auto.
+  (* tm_closure <{ (tm_closure <{ \ y, x + y }> (x !-> 1; empty_env)) 2 + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 3 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_AppAbs_Closure.
+            auto.
+  (* tm_closure <{ (tm_closure <{ x + y }> (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* left addition: step 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Add1.
+      eapply ST_Closure_Step_out_help.
+        eapply ST_Closure_Add1.
+          eapply ST_Closure_Var.
+            do 1 (unfold t_update at 1; simpl).
+  (* tm_closure <{ (tm_closure <{ 5 + y }> (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (** Note: the following steps are precisely the same as those in the proof of test3. *)
+
+  (* ... step 2 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Add2; auto.
+          do 1 (unfold t_update at 1; simpl).
+  (* tm_closure <{ (tm_closure <{ 1 + 2 }> (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 3, attempt 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Step_itself.
+          eapply ST_Addconsts.
+  (* tm_closure <{ (tm_closure (1 + 2) (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 3, attempt 2 *)
+  (*
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Addconst.
+  *)
+  (* tm_closure <{ (tm_closure (1 + 2) (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  simpl.
+  (* tm_closure <{ (tm_closure 3 (y !-> 2; x !-> 1; empty_env)) + x }> (x !-> 5; empty_env) *)
+
+  (* ... step 4 *)
+  eapply multi_step.
+    eapply ST_Closure_Step_itself.
+      eapply ST_Add1.
+        eapply ST_Closure_Val.
+          auto.
+  (* tm_closure <{ 3 + x }> (x !-> 5; empty_env) *)
+
+  (* final addition: step 1 *)
+  eapply multi_step.
+    eapply ST_Closure_Add2; auto.
+      do 1 (unfold t_update at 1; simpl).
+  (* tm_closure <{ 3 + (x !-> 5; empty_env) x }> (x !-> 5; empty_env) *)
+
+  (* OK! *)
+  eapply multi_step.
+    eapply ST_Closure_Addconst.
+  (* tm_closure (3 + 5) (x !-> 5; empty_env) *)
+
+  simpl.
+
+  eapply multi_step.
+    eapply ST_Closure_Val; auto.
+
+  econstructor.
+Qed.
