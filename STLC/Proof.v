@@ -391,36 +391,17 @@ Proof.
             CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2))
          =s CPS k F (tplus t1 t2) (fun res => res) 1 (1 + depth F t1)
          =s CPS k F t1 (fun res : tm => tplus res t2) 1 (depth F t1)
-         =s tplus (CPS k F t1 (fun res => res) 1 (depth F t1)) t2 (TODO)
+         =s (?)
        Finally,
             subst F f' (CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2)))
-         =s subst F f' (tplus (CPS k F t1 (fun res => res) 1 (depth F t1)) t2)
-         =s tplus (subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1))) (subst F f' t2)
-         =s tplus (app k (subst F f t1)) t2
+         =s subst F f' (CPS k F t1 (fun res : tm => tplus res t2) 1 (depth F t1))
          =s 
          =s app k (tplus (subst F f t1) t2)
          =s app k (subst F f (tplus t1 t2))
          
          
          
-
-  The theorem to be informally proved:
-    subst F f' (CPS F M k 1 (depth F M)) =s k (subst F f M)
-
-  Proof:
-
-  By induction on M.
-
-  4. When M = tplus t1 t2.
-     The induction hypothesis:
-          subst F f' (CPS F t1 k 1 (depth F t1)) =s k (subst F f t1)
-          subst F f' (CPS F t2 k 1 (depth F t2)) =s k (subst F f t2)
-       ▲ If both t1 and t2 are not resursive,
-         We know that
-              CPS F t1 k 1 (depth F t1) = 
-       ▲ If t1 is recursive and t2 not recursive,
-       We know that,
-            
+         
 *)
 
 Compute 1.
