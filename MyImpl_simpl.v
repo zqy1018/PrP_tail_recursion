@@ -151,29 +151,39 @@ Hint Unfold f.
 Hint Unfold c.
 Hint Unfold k.
 
+Definition is_var_F (F:string) (m:tm):=
+  match m with
+  | var f => if eqb f F
+              then true
+              else false
+  | _ => false
+  end.
 
 Fixpoint trans_M (F:string)(k t:tm) :=
     match (have_string F t) with
     | false => app k t
     | true => match t with 
                (* F m => F' m k  *)
-              | app (var f) m => 
+              (* | app (var f) m => 
                       if eqb f F
                       then app (app F m) k
-                      else app k t
-              | app m1 m2 => if have_string F m1 
-                    then if have_string F m2
-                          then
-                            tlet "s1" 
-                              (abs "res1"
-                                (tlet "s2"
-                                  (abs "res2" (app k (app "res1" "res2")))
-                                  (trans_M F "s2" m2)))
-                              (trans_M F "s1" m1)
-                          else
-                              tlet "s1"
-                                (abs "res1" (app k (app "res1" m2)))
-                              (trans_M F "s1" m1)
+                      else app k t *)
+              | app m1 m2 => 
+                    if have_string F m1 
+                    then if is_var_F F m1 
+                      then app (app F m2) k
+                      else if have_string F m2
+                            then
+                              tlet "s1" 
+                                (abs "res1"
+                                  (tlet "s2"
+                                    (abs "res2" (app k (app "res1" "res2")))
+                                    (trans_M F "s2" m2)))
+                                (trans_M F "s1" m1)
+                            else
+                                tlet "s1"
+                                  (abs "res1" (app k (app "res1" m2)))
+                                (trans_M F "s1" m1)
                     else if have_string F m2
                           then
                               tlet "s1"
@@ -227,11 +237,10 @@ Proof.
 (* 符合转化函数分支的形式 *)
 Inductive match_subtm (F:string): tm -> Prop:=
   | match_natconst n: match_subtm F (nat_const n)
-  | match_opconst o:match_subtm F (op_const o)
   | match_string (s:string) (H:eqb F s = false): match_subtm F s 
   | match_appF m(H:have_string F m = false) (H2:match_subtm F m): match_subtm F (app F m) 
-  | match_appOp o m1 m2(H: match_subtm F m1/\ match_subtm F m2) : match_subtm F (app (app (op_const o) m1) m2)
-  | match_appOp1 o m (H:match_subtm F m): match_subtm F (app (op_const o) m)
+  | match_app m1 m2 (H1: have_string F m1 = false) (H2:match_subtm F m2): match_subtm F (app m1 m2) 
+  | match_app2 m1 m2 (H1: have_string F m1 = true) (H2: match_subtm F m1) (H3: match_subtm F m2) : match_subtm F (app m1 m2)
 .
 Hint Constructors match_subtm.
 
@@ -346,6 +355,7 @@ Lemma close_lemma6: forall (t: tm) (F:string),
 Proof.
   intros.
   apply (close_lemma5 t F nil).
+  
   - auto.
   - simpl. unfold not. intros. auto. 
   Qed.
@@ -630,6 +640,30 @@ Proof.
   - inversion H0. subst. apply close_fix. apply IHM;auto.
 Qed.               
 
+Hint Resolve subst_lemma1.
+Ltac find_have_string_f :=
+  match goal with
+    H1: have_string _ (app _ _) = false
+    |- _ => apply have_string_lemma in H1
+  end.
+
+Ltac find_and :=
+  match goal with
+    H1: _ /\ _
+    |- _ => destruct H1
+  end.
+Ltac match_env := try apply close_app;try apply close_abs;try apply close_let;try apply close_lemma13.
+Ltac match_list := repeat(apply List.not_in_cons; split);auto;apply eqb_neq;auto.   
+
+Theorem have_string_lemma2 : forall (f s:string) ,
+  have_string f s = true <-> (f =? s) = true.
+Proof.
+  intros.
+  split.
+  - intros. unfold have_string in H. destruct (f0 =? s);auto.
+  - intros. unfold have_string. rewrite H. auto.
+Qed.  
+
 
 Theorem subst_lemma7 : forall M F t t1 ,
   F = "f" ->
@@ -643,22 +677,18 @@ Proof.
   - simpl. inversion H1. rewrite H4. subst. remember "s1". simpl. destruct (eqb_spec s0 s). 
     + simpl in H2. rewrite e in H2. rewrite eqb_refl in H2. discriminate. 
     + auto.
-  - inversion H1. subst.
-    + simpl. apply beta_rl;auto. apply beta_rl;auto. simpl in H2. apply subst_lemma1;auto.
-    + simpl in H2. destruct (have_string "s1" M1) eqn:E3; try discriminate. destruct H4. subst. simpl. destruct (have_string "f" m1) eqn:E1 ; destruct (have_string "f" M2) eqn:E2.
-      * simpl. apply beta_let1;auto. simpl. apply beta_abs. apply beta_let1;auto. fold subst. apply IHM2;auto.   
-      * simpl. simpl in IHM1. rewrite E1 in IHM1. 
-        simpl. apply beta_let1;auto. apply beta_abs. apply beta_rl;auto.
-        apply beta_rl;auto. 
-        apply subst_lemma1. auto. 
-      * simpl.  apply beta_let1;auto.
-        apply beta_abs. apply beta_rl;auto. apply beta_rl;auto. apply beta_rl;auto. apply subst_lemma1. auto. 
-      * simpl. apply beta_rl;auto. apply beta_rl.
-        ** apply beta_rl;auto. apply subst_lemma1. auto.
-        ** apply subst_lemma1. auto.      
-    + simpl. simpl in H2. destruct (have_string "s1" M1) eqn:E3; try discriminate. destruct (have_string F M2) eqn:E2.
-      * simpl. apply beta_let1;auto. 
-      * simpl. apply beta_rl;auto. apply beta_rl;auto. apply subst_lemma1. auto.
+  - inversion H1;subst;repeat find_have_string_f;repeat find_and. 
+    + simpl. auto.
+    + simpl. simpl in H2. rewrite H5. destruct (have_string "f" M2) eqn:E2. 
+      * simpl. assert (HH: (subst "s1" t M1) =b M1). { auto. } auto.  
+      * simpl. assert (HH: (subst "s1" t M1) =b M1). {auto. }  
+        assert (HH2: (subst "s1" t M2) =b M2). {auto. } 
+        eauto.     
+    + simpl. rewrite H5. destruct (have_string "f" M2) eqn:E2.
+      * assert(HH: subst "s1" t (trans_M "f" "s2" M2) =b (trans_M "f" "s2" M2)). {apply IHM2;auto. }
+        destruct (is_var_F "f" M1) eqn:E1;simpl;auto.
+      * assert(HH:(subst "s1" t M2) =b M2). {auto. }
+        destruct (is_var_F "f" M1) eqn:E1;simpl;auto.
   - inversion H1.
   - simpl. auto.
   - simpl. auto.
@@ -679,32 +709,24 @@ Proof.
   - simpl. inversion H1. rewrite H4. subst. remember "s2". simpl. destruct (eqb_spec s0 s). 
     + simpl in H2. rewrite e in H2. rewrite eqb_refl in H2. discriminate. 
     + auto.
-  - inversion H1. subst.
-    + simpl. apply beta_rl;auto. apply beta_rl;auto. simpl in H2. apply subst_lemma1;auto.
-    + simpl in H2. rewrite <- H3 in IHM1. simpl in IHM1. destruct (have_string "s2" M1) eqn:E3; try discriminate. destruct H4. subst. simpl. destruct (have_string "f" m1) eqn:E1 ; destruct (have_string "f" M2) eqn:E2.
-      * simpl. apply beta_let1;auto. simpl. simpl in IHM1. 
-        assert(HH1: subst "s2" t "s1" = "s1"). {auto. }
-        rewrite <- HH1 at 1. rewrite <- HH1 at 4. apply IHM1;auto.
-      * simpl. apply beta_let1;auto. 
-        ** assert(HH1:(subst "s2" t M2) =b M2). { apply subst_lemma1. auto. }
-          auto.
-        ** simpl in IHM1.
-        assert(HH2: (subst "s2" t "s1") = "s1"). {auto. }
-        rewrite <- HH2 at 1. rewrite <-HH2 at 3. apply IHM1;auto.
-      * simpl. apply beta_let1.
-        ** assert(HH1: (subst "s2" t m1) =b m1). {apply subst_lemma1. simpl in E3. auto. }
-          auto.
-        ** eauto. 
+  - inversion H1; subst;repeat find_have_string_f; repeat find_and.
+    + simpl. auto. 
+    + simpl. rewrite H5. subst. destruct (have_string "f" M2) eqn:E2.
       * simpl. 
-        assert(HH1: (subst "s2" t m1) =b m1). {simpl in E3. apply subst_lemma1. auto. }
-        assert(HH2: (subst "s2" t M2) =b M2). {apply subst_lemma1. auto. }
-        eauto 10.
-    + simpl. simpl in H2. destruct (have_string "s2" M1).
-        * discriminate.
-        * destruct (have_string F M2).
-          ** simpl. apply beta_let1;auto. apply IHM2;auto.  
-          ** simpl. assert(HH1: (subst "s2" t M2) =b M2). { apply subst_lemma1. auto. }
-            auto.
+        assert (HH:  (subst "s2" t M1) =b M1). {auto. } 
+        assert (HH2: subst "s2" t (trans_M "f" "s1" M2) =b (trans_M "f" "s1" M2)). {apply IHM2;auto. }
+        eauto.
+      * simpl.  assert (HH: (subst "s2" t M1) =b M1). {auto. }  
+        assert (HH2: (subst "s2" t M2) =b M2). {auto. }
+        eauto.
+    + simpl. rewrite H5.
+      assert(HH: (subst "s2" t (trans_M "f" "s1" M1)) =b (trans_M "f" "s1" M1)). {apply IHM1;auto. } 
+      destruct (have_string "f" M2) eqn:E2.
+      * simpl. destruct (is_var_F "f" M1);simpl;auto.
+      * simpl. destruct (is_var_F "f" M1);simpl;auto.
+        ** assert(HH2: subst "s2" t (trans_M "f" "s1" M1) =b (trans_M "f" "s1" M1)). {auto. }
+          assert(HH3: (subst "s2" t M2) =b M2). {auto. }
+          auto.
   - inversion H1.
   - auto.
   - auto.
@@ -712,6 +734,28 @@ Proof.
   - inversion H1.
   - inversion H1.
 Qed.  
+
+Hint Unfold List.In.
+Hint Unfold not.
+Hint Resolve subst_lemma5.
+Hint Resolve close_lemma8.
+Hint Resolve close_lemma10.
+Hint Resolve close_lemma6.
+Hint Resolve close_lemma11.
+Hint Resolve close_lemma13.
+Hint Resolve close_lemma4.
+
+Lemma is_var_F_lemma : forall (F:string) (M:tm),
+  is_var_F F M = true -> M = F.
+Proof.
+  intros.
+  unfold is_var_F in H.
+  destruct M eqn:E1; rewrite <- E1;try discriminate.
+  - subst. destruct (eqb_spec s F).
+    + subst. reflexivity.
+    + discriminate.
+Qed.
+Hint Resolve is_var_F_lemma.
 
 Theorem close_lemma14: forall F M G t,
   F = "f"->
@@ -725,50 +769,21 @@ Proof.
   - inversion H2. simpl. rewrite H4. auto.
   - inversion H2. 
     + simpl. rewrite eqb_refl. subst. auto.
-    + destruct H4. inversion H1. simpl. rewrite <- H3 in IHM1. simpl in IHM1.
-      assert(HH1: ("res1" :: G) |-- t). 
-      {
-        apply close_lemma4. auto. 
-      }
-      assert(HH2: ("res1" :: G) |-- M1). 
-      {
-        apply close_lemma4. auto. 
-      }
-      assert(HH3: ("res1"::G) |-- M2).
-      {
-        apply close_lemma4. auto. 
-      }
-     destruct (have_string F m1) eqn:E1;destruct (have_string F M2) eqn:E2.
-      * subst.  apply close_let. 
-        ** apply IHM1;auto.
-          *** apply close_lemma4. auto.
-        ** apply close_abs. apply close_let.
-          *** apply IHM2;auto. apply close_lemma4. apply close_lemma4. auto.
-          *** assert(HH4: ("res2" :: "res1" :: G) |-- t). 
-              {
-               apply close_lemma4. apply close_lemma4. auto. 
-              }
-              auto 10.
-      * subst. apply close_let.
-        ** apply IHM1;auto. apply close_lemma4. auto.
-        **  auto 10.
-      * apply close_let. 
-        ** apply IHM2;auto. apply close_lemma4. auto.
-        ** rewrite H3.  auto 10.
-      * rewrite -> H3. auto 10.
-    + simpl. inversion H1. destruct (have_string F M2) eqn:E1.
-      * apply close_let.
-        ** apply IHM2;auto. apply close_lemma4. auto.
-        ** assert(HH1: ("res1"::G) |-- t). {apply close_lemma4. auto. }
-          auto 10.
-      * auto.
+    + inversion H1. simpl. rewrite H5. subst.
+      destruct (have_string "f" M2) eqn:E2;repeat match_env;auto. 
+    + simpl. inversion H1. rewrite H5. destruct (is_var_F F M1) eqn:E2.
+      * repeat match_env;auto. apply is_var_F_lemma in E2. subst. auto.
+      * destruct (have_string F M2) eqn:E1;subst;repeat match_env;auto.
   - inversion H2.
   - simpl. auto.
   - simpl. auto.
   - inversion H2.
   - inversion H2.
   - inversion H2.
-Qed.        
+Qed. 
+  
+Hint Resolve close_lemma14. 
+
             
 Theorem close_lemma15: forall G M G2,
   G|--M ->
@@ -783,32 +798,6 @@ Proof.
     + apply H0. auto.
 Qed.
 
-
-
-Ltac match_env := try apply close_app;try apply close_abs;try apply close_let;try apply close_lemma13.
-Ltac match_list := repeat(apply List.not_in_cons; split);auto;apply eqb_neq;auto.   
-Ltac find_have_string_f :=
-  match goal with
-    H1: have_string _ (app _ _) = false
-    |- _ => apply have_string_lemma in H1
-  end.
-
-Ltac find_and :=
-  match goal with
-    H1: _ /\ _
-    |- _ => destruct H1
-  end.
-Hint Unfold List.In.
-Hint Unfold not.
-Hint Resolve subst_lemma1.
-Hint Resolve subst_lemma5.
-Hint Resolve close_lemma8.
-Hint Resolve close_lemma10.
-Hint Resolve close_lemma6.
-Hint Resolve close_lemma11.
-Hint Resolve close_lemma13.
-Hint Resolve close_lemma14. 
-Hint Resolve close_lemma4.
 Theorem close_lemma16 :forall x G t,
   G |-- t -> (G++[x]) |-- t.
 Proof.
@@ -819,6 +808,7 @@ Proof.
   Qed.
 
 Hint Resolve close_lemma16.
+
 
 
 Theorem m_k_2 : forall (f f' M k m:tm)(F A:string),
@@ -858,170 +848,114 @@ Theorem m_k_2 : forall (f f' M k m:tm)(F A:string),
       apply H2.
       apply beta_rl;eauto.
       * apply beta_rl;eauto.
-  - inversion H7. simpl. repeat find_and. destruct (have_string F m1) eqn:E1;destruct (have_string F M2) eqn:E2.
-    + subst. inversion H34.  
-      simpl. simpl in IHM1. rewrite E1 in IHM1.
-      eapply beta_trans. apply beta_letl. apply beta_abs. apply beta_letl. apply beta_abs. apply beta_l. 
-      assert(EE1: subst "f" f' (subst "a" m k0) =b k0). { eapply beta_trans. apply subst_lemma1;auto. auto. }
-      apply EE1. 
-      assert(HH1: nil |-- 
-      (abs "res1"
-        (tlet "s2" (abs "res2" (app k0 (app "res1" "res2")))
-          (subst "f" f' (subst "a" m (trans_M "f" "s2" M2)))))).
-      { repeat match_env;auto. apply close_lemma14;auto 10.
-        - apply (close_lemma15 ["f"; "a"]);simpl;iauto.
-      }
-      eapply beta_trans. apply beta_letvalue. auto.   
-      assert(HH2: 
-        [ ] |-- abs "res1"
-          (app
-            (abs "res1"
-                (tlet "s2" (abs "res2" (app k0 (app "res1" "res2")))
-                  (subst "f" f' (subst "a" m (trans_M "f" "s2" M2)))))
-            (app o "res1"))). 
-      { auto 10. }
-      eapply beta_trans. simpl. apply beta_letvalue;auto.
-
-      eapply beta_trans. apply subst_lemma6;auto.
-
-      eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma6;auto. 
-
-      eapply beta_trans. 
-
-      assert(HH3: 
-      (subst "s1"
-        (abs "res1"
-          (app 
-              (abs "res1"
-                (tlet "s2" (abs "res2" (app k0 (app "res1" "res2")))
-                    (subst "f" f' (subst "a" m (trans_M "f" "s2" M2)))))
-              (app o "res1"))) (trans_M "f" "s1" m1)) 
-      =b 
-      tlet "s1" 
-        (abs "res1"
-          (app
-              (abs "res1"
-                (tlet "s2" (abs "res2" (app k0 (app "res1" "res2")))
-                    (subst "f" f' (subst "a" m (trans_M "f" "s2" M2)))))
-              (app o "res1"))) (trans_M "f" "s1" m1)). {auto. }
-      apply subst_lemma2. auto. apply subst_lemma2. auto. apply HH3.  
-      eapply beta_trans. apply IHM1;auto.
-
-      eapply beta_trans. apply beta_appabs. 
-                          repeat match_env;auto. simpl.
-      eapply beta_trans. apply beta_letl. apply beta_abs. 
-                        apply beta_l. apply subst_lemma1. auto.
-
-      eapply beta_trans. apply beta_letr. 
-
-      -- apply subst_lemma1. apply subst_lemma5;auto. 
-          apply subst_lemma5;auto. apply (close_lemma5 _ _ ["s2";"f"; "a"]).
-        --- auto 10. 
-        --- match_list. 
-      --  eapply beta_trans. apply beta_letvalue. 
-                            repeat match_env;auto. 
-                            apply (close_lemma15 ["f"; "a"]);simpl;iauto.
-
-          eapply beta_trans. apply subst_lemma6;auto. 
-                              repeat match_env;auto. 
-                              apply (close_lemma15 ["f"; "a"]);simpl;iauto. 
-
-          assert(HHH: (["a"; "f"]++["res2"])%list |-- m1). { auto. } 
-
-          eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma6;auto. 
-                              repeat match_env;auto. 
-
-          eapply beta_trans. apply subst_lemma2. auto. 
-                              apply subst_lemma2. auto. 
-                              apply subst_lemma8;auto. 
-                              repeat match_env;auto. 
-                              apply (close_lemma5 _ _ ["f"; "a"]);auto. match_list. 
-
-          eapply beta_trans. apply IHM2;auto.
-                              repeat match_env;auto.
-          simpl. 
-
-          eapply beta_trans. apply beta_appabs. 
+  - inversion H7. simpl. repeat find_and. rewrite H31. destruct (have_string F M2) eqn:E2.
+    + subst. inversion H.   
+      * congruence. 
+      * simpl. assert(HHH: (["a"; "f"]++["res1"])%list |-- M1). { auto. } 
+        eapply beta_trans. apply beta_letl. apply beta_abs. apply beta_l. 
+        assert(EE1: subst "f" f' (subst "a" m k0) =b k0). { eapply beta_trans. apply subst_lemma1;auto. auto. }
+        apply EE1. 
+        eapply beta_trans. apply beta_letvalue. repeat match_env; auto.  
+        eapply beta_trans. apply subst_lemma6; auto. repeat match_env;auto.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma6;auto. repeat match_env;auto. 
+        eapply beta_trans. 
+        apply subst_lemma2. auto. apply subst_lemma2. auto. apply subst_lemma7;auto. 
                             repeat match_env;auto.
-          simpl. apply beta_rl;auto 10.
-    + subst. simpl. inversion H34. 
-      assert(HHH: (["a"; "f"]++["res1"])%list |-- M2). {auto. }
-      eapply beta_trans. apply beta_letvalue. 
-                        repeat match_env;auto. 
-      simpl. simpl in IHM1. rewrite E1 in IHM1. simpl in IHM1.
-      
-      eapply beta_trans. apply beta_letl. apply beta_abs. apply beta_l. 
-      assert(HH: 
-      abs "res1"
-        (app (subst "f" f' (subst "a" m k0))
-          (app "res1" (subst "f" f' (subst "a" m M2)))) =b 
-      (subst "f" f' (subst "a" m 
-        (abs "res1"            
-        (app k0
-          (app "res1" (subst "f" f' (subst "a" m M2))))))) ).
-      { 
-        simpl. apply beta_abs. apply beta_rl;auto. 
-        apply beta_rl;auto. apply beta_symm. 
-        eapply beta_trans. apply subst_lemma1;auto 10.
-        auto 10. 
-      }
-      apply HH.
-      eapply beta_trans. apply IHM1;auto.
-                        repeat match_env;auto. 
-      eapply beta_trans. apply beta_appabs.
-                        repeat match_env;auto. 
-      simpl. 
-      apply beta_rl;auto.
-      apply beta_rl;auto. 
-      eapply beta_trans. apply subst_lemma1;auto. 
-      eapply beta_trans. apply subst_lemma1;auto. 
-      auto.
-    + subst. inversion H34. 
-      assert(HHH: (["a"; "f"]++["res1"])%list |-- m1). { auto. }  
-      eapply beta_trans. simpl. apply beta_letvalue.
-                          repeat match_env;auto. 
-      eapply beta_trans. apply subst_lemma6;auto. 
-                        repeat match_env;auto. 
-      eapply beta_trans. apply subst_lemma2. auto. 
-      eapply beta_trans. apply subst_lemma6;auto.
-                        repeat match_env;auto. 
-      apply subst_lemma2. auto. apply subst_lemma7;auto. 
-                        repeat match_env;auto. 
-                        apply (close_lemma5 _ _ ["f"; "a"]);auto.
-                        match_list.
-      eapply beta_trans. apply IHM2;auto.
-                        repeat match_env;auto.
-      simpl. 
-      eapply beta_trans. apply beta_appabs.
-                        repeat match_env;auto. 
-      simpl. apply beta_rl.
-        ** eapply beta_trans. apply subst_lemma1;auto. 
-          eapply beta_trans. apply subst_lemma1;auto.
-          auto.
-        ** apply beta_rl;auto. apply beta_rl;auto. 
-          eapply beta_trans. apply subst_lemma1;auto. 
-          eapply beta_trans. apply subst_lemma1;auto.
-          auto.
-    + subst. simpl. apply beta_rl.
-      ** eapply beta_trans. apply subst_lemma1;auto. auto. 
-      ** apply beta_rl.
-        *** apply beta_rl;auto. eapply beta_trans. apply subst_lemma1;auto. auto.
-        *** eapply beta_trans. apply subst_lemma1;auto. auto.
-  - inversion H7. simpl. destruct (have_string F M2) eqn:E1.
-    + subst. eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma2. auto.
-      eapply beta_trans. 
-      apply beta_letvalue.
-      * repeat match_env;auto.
-      * apply subst_lemma7;auto 10. 
-        ** apply (close_lemma5 _ _ ["f"; "a"]);auto.
-            match_list.
-      * eapply beta_trans. apply IHM2;auto.
-        ** auto 10.
-        ** simpl. eapply beta_trans. apply beta_appabs;auto. 
-            simpl. auto. 
-    + simpl. subst. apply beta_rl. 
-      * eapply beta_trans. apply subst_lemma1;auto. auto.
-      * apply beta_rl;auto. eapply beta_trans. apply subst_lemma1;auto. auto.
-  - simpl. subst. apply beta_rl;auto. eapply beta_trans. apply subst_lemma1;auto. auto.
+                            apply (close_lemma5 _ _ ["f";"a"]);auto.
+                            match_list.
+        eapply beta_trans. apply IHM2;auto. repeat match_env;auto.
+        simpl.
+        eapply beta_trans. apply beta_appabs. 
+                            repeat match_env;auto. 
+        simpl. 
+        assert (HH: subst "res1" (subst "f" f0 (subst "a" m M2)) k0 =b k0). {auto. }
+        assert (HH2: subst "res1" (subst "f" f0 (subst "a" m M2))
+        (subst "f" f' (subst "a" m M1)) =b (subst "a" m M1)). { eapply beta_trans. apply subst_lemma1. auto. auto. }
+        assert (HH3: (subst "f" f0 (subst "a" m M1)) =b (subst "a" m M1)). {auto. }
+        apply beta_rl;auto. apply beta_rl;eauto.
+      * congruence.
+    + simpl.  
+      assert (HH1: (subst F f' (subst A m k0)) =b k0). { eapply beta_trans. apply subst_lemma1;auto. auto. }
+      assert (HH2: subst F f' (subst A m M1) =b subst A m M1). { subst. auto. }
+      assert (HH3: subst F f' (subst A m M2) =b subst A m M2). { subst. auto. }
+      assert (HH4: subst F f0 (subst A m M1) =b subst A m M1). { subst. auto. }
+      assert (HH5: subst F f0 (subst A m M2) =b subst A m M2). { subst. auto. }
+      subst. apply beta_rl;auto. apply beta_rl;eauto. 
+  - simpl. rewrite H31. destruct (have_string F M2) eqn:E2.
+    + subst. inversion H7. 
+      assert(HH1: (["a"; "f"]++["s2"])%list |-- M2). { auto. }
+      assert(HH2: (["a"; "f";"s2"]++["res1"])%list |-- M2). { auto. }
+      assert(HH3: (["a"; "f"]++["res2"])%list |-- M1). { auto. }
+      assert(HH4: (["a"; "f"]++["res1"])%list |-- M2). { auto. }
+      destruct (is_var_F "f" M1) eqn:E3. 
+      * apply is_var_F_lemma in E3. subst. simpl. inversion H32. simpl in H1. congruence.
+      * 
+        eapply beta_trans. apply beta_letvalue. simpl. repeat match_env;auto 10.
+        fold subst. simpl. 
+        eapply beta_trans. apply subst_lemma6;auto. repeat match_env;auto 10.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma6;auto. repeat match_env;auto 10.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma2. auto.
+                            apply subst_lemma7;auto.
+                            repeat match_env;auto 10.
+                            apply (close_lemma5 _ _ ["f";"a"]);auto.
+                            match_list.
+        eapply beta_trans. apply IHM1;auto. repeat match_env;auto 10.
+        simpl. 
+        eapply beta_trans. apply beta_appabs;auto.
+        simpl.
+        eapply beta_trans. apply beta_letvalue. repeat match_env;auto 10.
+        eapply beta_trans. apply subst_lemma6;auto. repeat match_env;auto 10. 
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma6;auto. repeat match_env;auto 10.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma2. auto. apply subst_lemma6;auto. repeat match_env;auto 10.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma2. auto. apply subst_lemma2. auto.
+                            apply subst_lemma8;auto. 
+                            repeat match_env;auto 10.
+                            apply (close_lemma5 _ _ ["f";"a"]);auto.
+                            match_list.
+        simpl.
+        eapply beta_trans. apply subst_lemma2. auto. apply IHM2;auto. repeat match_env;auto.
+        simpl. 
+        eapply beta_trans. apply beta_appabs. repeat match_env;auto.
+        simpl.
+        apply beta_rl.
+        ** eapply beta_trans. 
+            assert(HHH: have_string "res2" M1 = false). {apply (close_lemma5 _ _ ["f";"a"]);auto. match_list.  } 
+            apply subst_lemma1. repeat apply subst_lemma5;auto. 
+            eapply beta_trans. apply subst_lemma2. auto. 
+                              apply subst_lemma1. repeat apply subst_lemma5;auto.
+            eapply beta_trans. apply subst_lemma2. auto. 
+                              apply subst_lemma1. repeat apply subst_lemma5;auto. 
+            eapply beta_trans. apply subst_lemma1;auto. auto.
+        ** apply beta_rl;auto 10.
+            eapply beta_trans. assert(HHH: have_string "res2" M1 = false). {apply (close_lemma5 _ _ ["f";"a"]);auto. match_list.  } 
+            apply subst_lemma1. repeat apply subst_lemma5;auto.
+            auto 10.
+    + subst. inversion H7. 
+      assert(HHH: (["a"; "f"]++["res1"])%list |-- M2). { auto. } 
+      assert(EE1: subst "f" f' (subst "a" m k0) =b k0). { eapply beta_trans. apply     subst_lemma1;auto. auto. }
+      destruct (is_var_F "f" M1) eqn:E3. 
+      * apply is_var_F_lemma in E3. subst. simpl. inversion H32. simpl in H1. congruence.
+      *  eapply beta_trans. apply beta_letl. simpl. apply beta_abs. 
+                          apply beta_l. apply EE1.
+        eapply beta_trans. apply beta_letvalue. repeat match_env;auto.
+        eapply beta_trans. apply subst_lemma6;auto. repeat match_env;auto.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma6;auto. repeat match_env;auto.
+        eapply beta_trans. apply subst_lemma2. auto. apply subst_lemma2. auto. 
+                          apply subst_lemma7;auto. 
+                          repeat match_env;auto.
+                          apply (close_lemma5 _ _ ["f";"a"]);auto.
+                          match_list.
+        simpl. 
+        eapply beta_trans. apply IHM1;auto.
+                          repeat match_env;auto.
+        eapply beta_trans. apply beta_appabs. repeat match_env;auto.
+        simpl. 
+        apply beta_rl;auto.
+        apply beta_rl;auto.
+        assert(HH2: 
+          subst "res1" (subst "f" f0 (subst "a" m M1)) (subst "f" f' (subst "a" m M2)) 
+            =b subst "a" m M2). 
+        {eapply beta_trans. apply subst_lemma1;auto. auto. }
+        eauto.
   - simpl. subst. apply beta_rl;auto. eapply beta_trans. apply subst_lemma1;auto. auto.
 Qed.
