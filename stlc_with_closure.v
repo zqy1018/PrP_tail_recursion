@@ -3,7 +3,6 @@ From TRO Require Import Maps.
 (* From TRO Require Import Smallstep. *)
 From TRO Require Import Variables.
 
-
 Inductive tm : Type :=
   | tm_invalid : tm
   (* pure mystlc *)
@@ -59,6 +58,14 @@ Inductive multi {X : Type} (R : relation X) : relation X :=
                     multi R y z ->
                     multi R x z.
 
+(* env1 first *)
+Definition combine (env1 env2 : ENV) :=
+  fun x => 
+    match (env1 x) with
+    | tm_invalid => (env2 x)
+    | t => t
+    end.
+
 Inductive step : tm  -> tm -> Prop :=
   (* enter a closure *)
   | ST_Closure : forall x t,
@@ -67,14 +74,16 @@ Inductive step : tm  -> tm -> Prop :=
     value t2 ->
     tm_app (tm_closure (tm_abs x t1) env) t2 -->
       tm_closure t1 (t_update env x t2)
-  (* inside a closure *)
-  | ST_Closure_Step_itself : forall t t' env, (* the term inside the closure can step without outside env*)
-    t --> t' ->
-    tm_closure t env --> tm_closure t' env
-  | ST_Closure_Step_out_help : forall t t' env env', (* the term inside the closure need outside env to help it step*)
-    tm_closure t env --> tm_closure t' env ->
-    tm_closure (tm_closure t env') env --> tm_closure (tm_closure t' env') env
-  (* in the deepest closure *)
+  (* nested closure *)
+  | ST_Closure_Nested : forall t t' env1 env2,
+    tm_closure t (combine env1 env2)  --> tm_closure t' (combine env1 env2) ->
+    tm_closure (tm_closure t env1) env2 --> tm_closure (tm_closure t' env1) env2
+  (* de-nest closure if inner closure is a value*)
+  | ST_Closure_Denested_Const : forall n env1 env2,
+    tm_closure (tm_closure (tm_const n) env1) env2 --> tm_closure (tm_const n) env2
+  | ST_Closure_Denested_Abs : forall x t env1 env2,
+    tm_closure (tm_closure <{ \x, t }> env1) env2 --> tm_closure <{ \x, t }> (combine env1 env2) 
+  (* in the innermost closure *)
   | ST_Closure_Var : forall x env,
     tm_closure (tm_var x) env --> tm_closure (env x) env
   | ST_Closure_App1 : forall t1 t1' t2 env,
@@ -84,6 +93,12 @@ Inductive step : tm  -> tm -> Prop :=
     value t1 ->
     tm_closure t2 env --> tm_closure t2' env ->
     tm_closure <{ t1 t2 }> env --> tm_closure <{ t1 t2' }> env
+  | ST_Closure_AppAbs: forall x t1 t2 env,
+    value t2 ->
+    tm_closure <{ (\x, t1) t2 }> env --> tm_closure (tm_closure t1 (t_update empty_env x t2)) env
+  | ST_Closure_Closure_AppAbs: forall x t1 t2 env1 env2,
+    value t2 ->
+    tm_closure <{ {tm_closure <{ \x, t1 }> env1} t2 }> env2 --> tm_closure (tm_closure t1 (t_update env1 x t2)) env2
   | ST_Closure_Addconst : forall (n1 n2 : nat) env,
     tm_closure <{ n1 + n2 }> env --> tm_closure (tm_const (n1+n2)) env
   | ST_Closure_Add1 : forall t1 t1' t2 env,
@@ -125,25 +140,18 @@ Notation "t1 '-->*' t2" := (multistep t1 t2) (at level 40).
 Theorem test0: <{(\x, \y, x + y) 3 4}> -->* tm_const 7.
 Proof.
   eapply multi_step. auto.
-  
-  eapply multi_step. eapply ST_App1. eapply ST_AppAbs_Closure. auto.
-  
-  eapply multi_step.
-    eapply ST_AppAbs_Closure. auto.
 
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_Var. unfold t_update at 1. simpl. unfold t_update at 1. simpl.
-
-  eapply multi_step.
-    eapply ST_Closure_Add2. auto.
-      eapply ST_Closure_Var. unfold t_update at 1. simpl.
+  eapply multi_step. auto.
   
-  eapply multi_step.
-    eapply ST_Closure_Addconst. simpl.
+  eapply multi_step. auto.
 
-  eapply multi_step.
-    eapply ST_Closure_Val. auto.
+  eapply multi_step. auto. unfold t_update at 1. simpl. unfold t_update at 1. simpl.
+
+  eapply multi_step. auto. unfold t_update at 1. simpl.
+  
+  eapply multi_step. auto. simpl.
+
+  eapply multi_step. eapply ST_Closure_Val. auto.
 
   eapply multi_refl.
 Qed.
@@ -156,50 +164,28 @@ Theorem test1:
 Proof.
   eapply multi_step. auto.
 
-  eapply multi_step. eapply ST_App2. auto. auto.
+  eapply multi_step. auto.
 
-  eapply multi_step. eapply ST_App2. auto. eapply ST_AppAbs_Closure. auto.
+  eapply multi_step. auto.
 
-  eapply multi_step. eapply ST_AppAbs_Closure. auto.
+  eapply multi_step. auto.
 
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_App1.
-        eapply ST_Closure_Var. unfold t_update at 1. simpl.
+  eapply multi_step. auto. unfold t_update at 1. simpl.
 
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_Step_itself.
-        eapply ST_AppAbs_Closure. auto.
+  eapply multi_step. auto.
 
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_Step_itself.
-        eapply ST_Closure_Add1.
-          eapply ST_Closure_Var. unfold t_update at 1. unfold t_update at 1. simpl.
+  eapply multi_step. auto. unfold combine. simpl.
 
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_Step_itself.
-        eapply ST_Closure_Add2. auto.
-          eapply ST_Closure_Var. unfold t_update at 1. simpl.
+  eapply multi_step. auto. unfold combine. simpl.
+
+  eapply multi_step. auto. simpl.
+
+  eapply multi_step. auto. 
+
+  eapply multi_step. auto. simpl.
   
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_Step_itself.
-        eapply ST_Closure_Addconst. simpl.
-
-  eapply multi_step.
-    eapply ST_Closure_Add1.
-      eapply ST_Closure_Step_itself.
-        eapply ST_Closure_Val. auto.
-
-  eapply multi_step.
-    eapply ST_Closure_Addconst. simpl.
+  eapply multi_step. auto.
   
-  eapply multi_step.
-    eapply ST_Closure_Val. auto.
-
   eapply multi_refl.
 Qed.
 
@@ -209,31 +195,40 @@ Theorem test2:
 Proof.
   eapply multi_step. auto.
 
-  eapply multi_step. eapply ST_AppAbs_Closure. auto.
-
-  eapply multi_step. eapply ST_Closure_Step_itself. auto.
-
-  eapply multi_step. eapply ST_Closure_Step_itself. eapply ST_AppAbs_Closure. auto.
-
-  eapply multi_step.
-    eapply ST_Closure_Step_itself.
-      eapply ST_Closure_Add1.
-        eapply ST_Closure_Var. unfold t_update at 1. simpl.
+  eapply multi_step. auto.
   
-  eapply multi_step.
-    eapply ST_Closure_Step_out_help.
-      eapply ST_Closure_Add2. auto.
-        eapply ST_Closure_Var. unfold t_update at 1. simpl.
-  
-  eapply multi_step.
-    eapply ST_Closure_Step_itself.
-      eapply ST_Closure_Addconst. simpl.
-  
-  eapply multi_step.
-    eapply ST_Closure_Step_itself. auto.
+  eapply multi_step. auto.
 
-  eapply multi_step.
-    auto.
+  eapply multi_step. auto. unfold combine at 1. simpl.
 
+  eapply multi_step. auto. unfold combine at 1. simpl. unfold t_update at 1. simpl.
+
+  eapply multi_step. auto.
+
+  eapply multi_step. auto. simpl.
+
+  eapply multi_step. auto.
+
+  apply multi_refl.
+Qed.
+
+Theorem test3: 
+  <{ (\x, ((\x, (\y, x + y)) 1 2) + x) 5 }> -->* <{8}>.
+Proof.
+  eapply multi_step. auto.
+  eapply multi_step. auto.
+  eapply multi_step. auto.
+  eapply multi_step. auto.
+  eapply multi_step. auto. unfold combine at 1. simpl.
+  eapply multi_step. auto. unfold combine at 1. simpl.
+  eapply multi_step. auto. simpl.
+  eapply multi_step. auto.
+  eapply multi_step. auto. unfold t_update at 1. simpl.
+  eapply multi_step. auto. simpl.
+  eapply multi_step. auto.
   eapply multi_refl.
 Qed.
+
+  
+
+
