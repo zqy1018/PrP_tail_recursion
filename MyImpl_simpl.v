@@ -103,6 +103,98 @@ Hint Unfold List.In.
 Notation "t1 '+' t2" := (app(app Oplus t1) t2).
 Notation "t1 '*' t2" := (app(app Omult t1) t2).
 Notation "t1 '-' t2" := (app(app Ominus t1) t2).
+Inductive halt : tm -> Prop :=
+  | h_abs : forall x t,
+      halt (abs x t)
+  | h_natconst : forall n,
+      halt (nat_const n)
+  | h_opconst : forall o,
+      halt (op_const o)
+  | h_plus : forall n,
+      halt (app Oplus (nat_const n))
+  | h_minus : forall n,
+      halt (app Ominus (nat_const n))
+  | h_mult : forall n,  
+      halt (app Omult (nat_const n))
+(*   | h_lnil : forall T, 
+      halt (tnil T)
+  | h_lcons : forall v1 vl,
+      halt v1 ->
+      halt vl ->
+      halt (tcons v1 vl) *)
+.
+Hint Constructors halt. 
+
+
+Inductive multi2 {X : Type} (R : relation X) : relation X :=
+  | multi_refl2 : forall (x : X), multi2 R x x
+  | multi_step2 : forall (x y : X),
+                    R x y ->
+                    multi2 R x y
+  | multi_trans2 : forall (x y z : X),
+                    multi2 R x y ->
+                    multi2 R y z ->
+                    multi2 R x z
+  | multi_symm2 : forall (x y : X),
+                    multi2 R x y ->
+                    multi2 R y x.
+Hint Constructors multi2. 
+(*  *)
+Inductive beta_step : tm -> tm -> Prop :=
+  (* pure STLC *)
+  | ST_AppAbs : forall x t1 h2,
+         (* halt h2 ->  *)
+         nil |-- h2 ->
+         app (abs x t1) h2 --> subst x h2 t1
+  | ST_App1 : forall t1 t1' t2,
+         t1 --> t1' ->
+         app t1 t2 --> app t1' t2
+  | ST_App2 : forall h1 t2 t2',
+         (* halt h1 -> *)
+         t2 --> t2' ->
+         app h1 t2 --> app h1 t2'
+  | ST_AppAb : forall x M1 M2,
+         M1 --> M2 -> abs x M1 --> abs x M2
+  | ST_Fix1 : forall t1 t1',
+              t1 --> t1' ->
+              tfix t1 --> tfix t1'
+  | ST_Fix2 : forall f t1,
+              nil |-- tfix (abs f t1) ->
+              tfix (abs f t1) --> subst f (tfix (abs f t1)) t1 
+  | ST_Test01 : forall t1 t1' t2 t3,
+              t1 --> t1' ->
+              test0 t1 t2 t3 --> test0 t1' t2 t3
+  | ST_Test02 : forall t1 t2 t2' t3,
+              t2 --> t2' ->
+              test0 t1 t2 t3 --> test0 t1 t2' t3
+  | ST_Test03 : forall t1 t2 t3 t3',
+              t3 --> t3' ->
+              test0 t1 t2 t3 --> test0 t1 t2 t3'             
+  | ST_Test0Zro : forall t2 t3,
+              (test0 0 t2 t3) --> t2
+  | ST_Test0NotZro : forall n t2 t3,
+              (test0 (S n) t2 t3) --> t3
+  | ST_Let1 : forall x t1 t2 t1',
+              t1 --> t1' ->
+              (tlet x t1 t2) --> (tlet x t1' t2)
+  | ST_Let2 : forall x t1 t2 t2',
+              t2 --> t2' ->
+              (tlet x t1 t2) --> (tlet x t1 t2')
+  | ST_LetValue : forall x h1 t2,
+              (* halt h1 -> *)
+              nil |-- h1 ->
+              (tlet x h1 t2) --> (subst x h1 t2)
+  | ST_Minconsts : forall n1 n2:nat,
+              (app(app Ominus n1) n2) --> (n1 - n2)
+  | ST_Plusconsts : forall n1 n2:nat,
+              (app(app Oplus n1) n2) --> (n1 + n2)
+  | ST_Multconsts: forall n1 n2:nat,
+              (app(app Omult n1) n2) --> (n1 * n2)
+  where "t '-->' t'" := (beta_step t t').
+Hint Constructors beta_step. 
+
+Notation multi_beta_step := (multi2 beta_step).
+Notation "t1 '-->*' t2" := (multi_beta_step t1 t2) (at level 40).
 
 Reserved Notation "t1 '=b' t2" (at level 40).
 
@@ -122,20 +214,77 @@ Inductive beta_equiv :tm -> tm -> Prop:=
   | beta_fixabs f t2:
               nil |-- tfix(abs f t2) -> 
               tfix (abs f t2) =b subst f (tfix (abs f t2)) t2 
-  | beta_test01: forall t1 t1' t2 t2' t3 t3',
+  | beta_test01: forall t1 t1' t2 t3,
               t1 =b t1' ->
+              (test0 t1 t2 t3) =b (test0 t1' t2 t3)
+  | beta_test02: forall t1 t2 t2' t3,
               t2 =b t2' ->
+              (test0 t1 t2 t3) =b (test0 t1 t2' t3)
+  (* add test0zro and test0nonzro *)
+  | beta_test0Zro: forall t2 t3,
+              test0 0 t2 t3 =b t2
+  | beta_test0NonZro: forall n t2 t3,
+              test0 (S n) t2 t3 =b t3
+
+  | beta_test03: forall t1 t2 t3 t3',
               t3 =b t3' ->
-              (test0 t1 t2 t3) =b (test0 t1' t2' t3')
-  | beta_let1 : forall x t1 t2 t1' t2',
+              (test0 t1 t2 t3) =b (test0 t1 t2 t3')
+  | beta_let1 : forall x t1 t2 t1',
               t1 =b t1' ->
+              (tlet x t1 t2) =b (tlet x t1' t2)
+  | beta_let2 : forall x t1 t2 t2',
               t2 =b t2' ->
-              (tlet x t1 t2) =b (tlet x t1' t2')
+              (tlet x t1 t2) =b (tlet x t1 t2')
   | beta_letvalue : forall x h1 t2,
               nil |-- h1->
               (tlet x h1 t2) =b (subst x h1 t2)
 where "t1 '=b' t2" := (beta_equiv t1 t2).
-Hint Constructors beta_equiv.
+Hint Constructors beta_equiv. 
+
+Lemma beta_rl : forall t1 t1' t2 t2',
+  t1 =b t1' ->
+  t2 =b t2' ->
+  app t1 t2 =b app t1' t2'.
+Proof.
+  intros.
+  eapply beta_trans.
+  - apply beta_l. apply H.
+  - eapply beta_trans. apply beta_r. apply H0.
+  apply beta_refl.
+  Qed.
+
+Lemma beta_let : forall x t1 t1' t2 t2',
+  t1 =b t1' ->
+  t2 =b t2' ->
+  (tlet x t1 t2) =b (tlet x t1' t2').
+Proof.
+  intros.
+  eapply beta_trans.
+  apply beta_let1.
+  apply H.
+  auto.
+Qed.
+
+Lemma beta_test0 : forall t1 t1' t2 t2' t3 t3',
+  t1 =b t1' ->
+  t2 =b t2' ->
+  t3 =b t3' ->
+  (test0 t1 t2 t3) =b (test0 t1' t2' t3').
+Proof.
+  intros.
+  eapply beta_trans.
+  apply beta_test01.
+  apply H.
+  eapply beta_trans.
+  apply beta_test02.
+  apply H0.
+  auto.
+Qed.
+
+Hint Resolve beta_rl. 
+Hint Resolve beta_let. 
+Hint Resolve beta_test0. 
+
 
 Open Scope string_scope.
 Definition x := "x".
@@ -150,6 +299,51 @@ Hint Unfold z.
 Hint Unfold f.
 Hint Unfold c.
 Hint Unfold k.
+
+(* Theorem halt_lemma: forall t,
+  [] |-- t ->
+  exists h, halt h /\ t -->* h.
+Proof.
+  intros.
+  induction t;inversion H.
+  - simpl in H1. destruct H1.
+  - subst. apply IHt1 in H1. apply IHt2 in H3.
+    destruct H1. destruct H3. destruct H0. destruct H1.
+    inversion H0.
+    + subst. admit.
+    +  
+  - subst. exists (abs s t). split;auto.
+  - exists n. split;auto.
+  - exists o. split;auto.
+  - subst. simpl in H0. destruct H0.
+  - exists t. subst. split;auto.
+  - exists t. subst. split;auto.
+
+Qed. *)
+
+
+Theorem one_step_to_beta_eq: forall M1 M2, M1 --> M2 -> M1 =b M2.
+Proof.
+  intros.
+  induction H;auto.
+Qed.
+
+Theorem step_to_beta_eq: forall M1 M2, M1 -->* M2 -> M1 =b M2.
+Proof.
+  intros.
+  induction H;auto.
+  - apply one_step_to_beta_eq in H;eauto.
+  - eauto.
+Qed.
+
+Hint Resolve step_to_beta_eq.
+
+Theorem beta_eq_to_step: forall M1 M2, M1 =b M2 -> M1 -->* M2.
+Proof.
+  intros.
+  induction H;auto;eauto;induction IHbeta_equiv;auto;eauto 8.
+Qed.  
+
 
 Definition is_var_F (F:string) (m:tm):=
   match m with
@@ -211,7 +405,7 @@ Definition trans_to_tail_recursion (F:tm):=
     | _ => F
     end.
 
-Notation multib := (multi beta_equiv).
+(* Notation multib := (multi beta_equiv).
 
 Theorem multib_eq_be : forall (t1 t2:tm),
     multib t1 t2 <-> t1 =b t2.
@@ -232,7 +426,7 @@ Proof.
   intros.
   apply multib_eq_be. apply multib_eq_be in H.
   apply beta_symm. apply H.
-  Qed.
+  Qed. *)
 
 (* 符合转化函数分支的形式 *)
 Inductive match_subtm (F:string): tm -> Prop:=
@@ -368,16 +562,23 @@ Proof.
   - simpl. simpl in H. destruct (F =? s ) eqn:E1. 
     + discriminate.
     + apply beta_refl.
-  - simpl. apply multib_eq_be. eapply multi_step. apply beta_l. apply IHf0_1. simpl in H. destruct (have_string F f0_1) eqn:E1. discriminate. reflexivity.
-    eapply multi_step. apply beta_r. apply IHf0_2. simpl in H. destruct (have_string F f0_1) eqn:E1. discriminate. apply H.  apply multib_eq_be. apply beta_refl.
+  - simpl. eapply beta_trans. apply beta_l. apply IHf0_1. simpl in H. destruct (have_string F f0_1) eqn:E1. discriminate. reflexivity.
+    eapply beta_trans. apply beta_r. apply IHf0_2. simpl in H. destruct (have_string F f0_1) eqn:E1. discriminate. apply H. auto. 
   - simpl. simpl in H. destruct (F =? s) eqn:E1. apply beta_refl. apply beta_abs. apply IHf0. apply H.
   - simpl. apply beta_refl.
   - simpl. apply beta_refl.
-  - simpl. Print beta_equiv. simpl in H. destruct (have_string F f0_1) eqn:E1; destruct (have_string F f0_2) eqn:E2. apply beta_test01. apply IHf0_1. discriminate. discriminate. discriminate. discriminate. discriminate. apply beta_test01. apply IHf0_1. reflexivity. 
-    apply IHf0_2. reflexivity. apply IHf0_3. apply H.
+  - simpl. Print beta_equiv. simpl in H. destruct (have_string F f0_1) eqn:E1; destruct (have_string F f0_2) eqn:E2;try discriminate H.
+    + assert (HH1: false = false). {auto. }
+      apply IHf0_1 in HH1.
+      assert (HH2: false = false). {auto. }
+      apply IHf0_2 in HH2.
+      apply IHf0_3 in H.
+      eapply beta_trans. apply beta_test01. apply HH1. 
+      eapply beta_trans. apply beta_test02. apply HH2.
+      auto.
   - simpl. destruct (F =? s) eqn:E1. 
-    + apply beta_let1. apply IHf0_1. simpl in H. rewrite E1 in H. apply H. apply beta_refl.
-    + simpl in H. rewrite E1 in H. destruct (have_string F f0_1) eqn:E2. discriminate. apply beta_let1.  apply IHf0_1. reflexivity. apply IHf0_2. apply H.  
+    + apply beta_let1. apply IHf0_1. simpl in H. rewrite E1 in H. apply H. 
+    + simpl in H. rewrite E1 in H. destruct (have_string F f0_1) eqn:E2. discriminate. apply beta_let.  apply IHf0_1. reflexivity. apply IHf0_2. apply H.  
   - simpl. Print beta_equiv. apply beta_fix1. apply IHf0. simpl in H. apply H.
   Qed.  
 
@@ -399,35 +600,8 @@ Proof.
   + auto.
 Qed.
 
-Lemma beta_rl : forall t1 t1' t2 t2',
-  t1 =b t1' ->
-  t2 =b t2' ->
-  app t1 t2 =b app t1' t2'.
-Proof.
-  intros.
-  apply multib_eq_be.
-  eapply multi_step.
-  - apply beta_l. apply H.
-  - eapply multi_step. apply beta_r. apply H0.
-  apply multib_eq_be.
-  apply beta_refl.
-  Qed.
 
-Lemma beta_letl : forall x t1 t1' t2,
-  t1 =b t1' ->
-  (tlet x t1 t2) =b (tlet x t1' t2).
-Proof.
-  intros.
-  apply beta_let1;auto.
-Qed.
 
-Lemma beta_letr : forall x t1 t2 t2',
-  t2 =b t2' ->
-  (tlet x t1 t2) =b (tlet x t1 t2').
-Proof.
-  intros.
-  apply beta_let1;auto.
-Qed.
 
 Lemma subst_lemma3:forall t1 f s1 s1',
   s1 =b s1' -> subst f s1 t1 =b subst f s1' t1.
@@ -443,9 +617,9 @@ Proof.
     + apply beta_abs. apply IHt1.
   - simpl. apply beta_refl.
   - simpl. apply beta_refl.
-  - simpl. apply beta_test01.
+  - simpl. apply beta_test0.
     apply IHt1_1. apply IHt1_2. apply IHt1_3.
-  - simpl. apply beta_let1. apply IHt1_1. destruct (eqb_spec f0 s).
+  - simpl. apply beta_let. apply IHt1_1. destruct (eqb_spec f0 s).
     + apply beta_refl.
     + apply IHt1_2.
   - simpl. apply beta_fix1. apply IHt1.
@@ -487,7 +661,6 @@ Proof.
     + simpl. rewrite E1. apply subst_lemma1. apply close_lemma6;auto.
     + simpl. rewrite E2. apply beta_symm. apply subst_lemma1. apply close_lemma6;auto.
     + simpl. rewrite E1. rewrite E2. auto.
-  - simpl. apply beta_rl;auto.
   - simpl. destruct (F2 =? s) eqn:E1; destruct (F1 =? s)eqn:E2;simpl; rewrite E1; rewrite E2;auto.
   - destruct (F2 =? s) eqn:E1; destruct (F1 =? s)eqn:E2;simpl;try rewrite E1;try rewrite E2;auto.
   Qed.
@@ -715,7 +888,7 @@ Proof.
       * simpl. 
         assert (HH:  (subst "s2" t M1) =b M1). {auto. } 
         assert (HH2: subst "s2" t (trans_M "f" "s1" M2) =b (trans_M "f" "s1" M2)). {apply IHM2;auto. }
-        eauto.
+        apply beta_let;auto.
       * simpl.  assert (HH: (subst "s2" t M1) =b M1). {auto. }  
         assert (HH2: (subst "s2" t M2) =b M2). {auto. }
         eauto.
@@ -817,7 +990,7 @@ Theorem m_k_2 : forall (f f' M k m:tm)(F A:string),
   A = "a" ->
   (forall k' m',
   app k' (app f m') =b app (app f' m') k') ->
-  nil |-- f->
+  nil |-- f ->
   nil |-- f'->
   nil |-- m ->
   nil |-- k ->
@@ -852,7 +1025,7 @@ Theorem m_k_2 : forall (f f' M k m:tm)(F A:string),
     + subst. inversion H.   
       * congruence. 
       * simpl. assert(HHH: (["a"; "f"]++["res1"])%list |-- M1). { auto. } 
-        eapply beta_trans. apply beta_letl. apply beta_abs. apply beta_l. 
+        eapply beta_trans. apply beta_let1. apply beta_abs. apply beta_l. 
         assert(EE1: subst "f" f' (subst "a" m k0) =b k0). { eapply beta_trans. apply subst_lemma1;auto. auto. }
         apply EE1. 
         eapply beta_trans. apply beta_letvalue. repeat match_env; auto.  
@@ -935,7 +1108,7 @@ Theorem m_k_2 : forall (f f' M k m:tm)(F A:string),
       assert(EE1: subst "f" f' (subst "a" m k0) =b k0). { eapply beta_trans. apply     subst_lemma1;auto. auto. }
       destruct (is_var_F "f" M1) eqn:E3. 
       * apply is_var_F_lemma in E3. subst. simpl. inversion H32. simpl in H1. congruence.
-      *  eapply beta_trans. apply beta_letl. simpl. apply beta_abs. 
+      *  eapply beta_trans. apply beta_let1. simpl. apply beta_abs. 
                           apply beta_l. apply EE1.
         eapply beta_trans. apply beta_letvalue. repeat match_env;auto.
         eapply beta_trans. apply subst_lemma6;auto. repeat match_env;auto.
@@ -959,3 +1132,5 @@ Theorem m_k_2 : forall (f f' M k m:tm)(F A:string),
         eauto.
   - simpl. subst. apply beta_rl;auto. eapply beta_trans. apply subst_lemma1;auto. auto.
 Qed.
+
+
