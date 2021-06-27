@@ -157,10 +157,10 @@ Fixpoint is_recu (func_name : string) (func_body : tm) :=
   | _ => false
   end.
 
-Fixpoint is_app_F (func_name : string) (func_body : tm) : bool * nat :=
+Fixpoint app_F (func_name : string) (func_body : tm) : bool * nat :=
   match func_body with
   | var x1 => (eqb x1 func_name, 1)
-  | app t1 t2 => (fst (is_app_F func_name t1), 1 + snd (is_app_F func_name t1))
+  | app t1 t2 => (fst (app_F func_name t1), 1 + snd (app_F func_name t1))
   | _ => (false, 0)
   end.
 

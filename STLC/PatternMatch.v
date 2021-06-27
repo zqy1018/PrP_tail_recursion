@@ -133,7 +133,18 @@ Fixpoint CPS (continuation_name : string) (func_name : string) (func_body : tm) 
        end
   
   | tlet x1 t1 t2 =>
-       tlet x1 (CPS continuation_name func_name t1 naming k) (CPS continuation_name func_name t2 naming k)
+       match find_func func_name t1, find_func func_name t2 with
+       | O, O =>
+            app (var continuation_name) (k func_body)
+       | S n1, O =>
+            CPS continuation_name func_name t1 naming (fun res : tm => k (tlet x1 res t2))
+       | O, S n2 =>
+            CPS continuation_name func_name t2 naming (fun res : tm => k (tlet x1 t1 res))
+       | S n1, S n2 =>
+            CPS continuation_name func_name t1 naming
+            (fun res1 : tm => CPS continuation_name func_name t2 (naming + (S n1))
+            (fun res2 : tm => k (tlet x1 res1 res2)))
+       end
   
   | tfix t1 =>
        tfix (CPS continuation_name func_name t1 naming k)
