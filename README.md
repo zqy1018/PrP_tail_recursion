@@ -35,17 +35,3 @@ Inductive tm : Type :=
   | tfix  : tm -> tm.
 ```
 If a function accepts an argument of type [tm], when the argument turns out to be of form [app t1 t2], according to the "decreasing principle" our next recursive call can only be on [t1] or [t2], otherwise it will not be accepted.
-
-When the input involves the case where the recursive function appears in the arguments of the recursive function itself, such as:
-
-<center><{f n1 (1 + f n2 n3)}></center>
-
-The correct result of conversion is:
-<center><{f n2 n3 (\ res1, f n1 (1 + res1) (\ res2, k res2))}></center>
-
-We need to go through intermediate steps:
-<center><{f n1 (1 + f n2 n3)}></center>
-<center>-> <{f n2 n3 (\ res1, f n1 (1 + res1))}></center>
-<center>-> <{f n2 n3 (\ res1, f n1 (1 + res1) (\ res2, k res2))}></center>
-
-Here when we come across the intermediate result [f n1 (1 + res1)] as the argument, we need to make a recursive call on the whole body instead of anyone of its part, so the function will not be accepted if we chose the function body as the decreasing argument.
