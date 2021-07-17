@@ -1,4 +1,4 @@
-DIGEST 33238c7515700b236dcf9e0f5087ebe7
+DIGEST 7b5dad986b75c9a981515e353529ecb8
 FSTLC.PatternMatch
 R25:31 STLC.Initial <> <> lib
 def 702:704 <> CPS
@@ -416,324 +416,367 @@ R5407:5412 STLC.PatternMatch <> naming:4 var
 R5394:5402 STLC.PatternMatch <> func_name:2 var
 R5376:5392 STLC.PatternMatch <> continuation_name:1 var
 R5477:5480 STLC.Definitions <> tlet constr
-R5501:5504 STLC.Definitions <> tlet constr
-R5556:5558 STLC.PatternMatch <> CPS:6 def
-R5598:5598 STLC.PatternMatch <> k:5 var
-R5591:5596 STLC.PatternMatch <> naming:4 var
-R5578:5586 STLC.PatternMatch <> func_name:2 var
-R5560:5576 STLC.PatternMatch <> continuation_name:1 var
-R5510:5512 STLC.PatternMatch <> CPS:6 def
-R5552:5552 STLC.PatternMatch <> k:5 var
-R5545:5550 STLC.PatternMatch <> naming:4 var
-R5532:5540 STLC.PatternMatch <> func_name:2 var
-R5514:5530 STLC.PatternMatch <> continuation_name:1 var
-R5608:5611 STLC.Definitions <> tfix constr
-R5626:5629 STLC.Definitions <> tfix constr
-R5632:5634 STLC.PatternMatch <> CPS:6 def
-R5674:5674 STLC.PatternMatch <> k:5 var
-R5667:5672 STLC.PatternMatch <> naming:4 var
-R5654:5662 STLC.PatternMatch <> func_name:2 var
-R5636:5652 STLC.PatternMatch <> continuation_name:1 var
-def 5696:5709 <> CPS_conversion
-R5719:5720 STLC.Definitions <> tm ind
-binder 5712:5715 <> func:35
-R5725:5726 STLC.Definitions <> tm ind
-R5739:5742 STLC.PatternMatch <> func:35 var
-R5753:5756 STLC.Definitions <> tfix constr
-R5759:5761 STLC.Definitions <> abs constr
-R5819:5819 STLC.Definitions <> k def
-binder 5798:5814 <> continuation_name:37
-R5855:5865 STLC.Definitions <> para_insert def
-R5867:5883 STLC.PatternMatch <> continuation_name:37 var
-binder 5835:5850 <> func_paraed_body:38
-R5905:5908 STLC.Definitions <> tfix constr
-R5911:5913 STLC.Definitions <> abs constr
-R5926:5928 STLC.PatternMatch <> CPS def
-R5988:5989 STLC.Definitions <> tm ind
-binder 5982:5984 <> res:39
-R5994:5996 STLC.PatternMatch <> res:39 var
-R5958:5973 STLC.PatternMatch <> func_paraed_body:38 var
-R5930:5946 STLC.PatternMatch <> continuation_name:37 var
-R6010:6013 STLC.PatternMatch <> func:35 var
-mod 6060:6067 <> examples
-def 6082:6097 examples stlc_match_case1
-R6104:6107 STLC.Definitions <> tfix constr
-R6110:6112 STLC.Definitions <> abs constr
-R6121:6123 STLC.Definitions <> abs constr
-R6134:6139 STLC.Definitions <> tlcase constr
-R6160:6165 STLC.Definitions <> tlcase constr
-R6190:6194 STLC.Definitions <> tplus constr
-R6200:6204 STLC.Definitions <> tplus constr
-R6210:6212 STLC.Definitions <> app constr
-R6216:6217 STLC.Definitions <> l2 def
-R6214:6214 STLC.Definitions <> F def
-R6206:6207 STLC.Definitions <> n2 def
-R6196:6197 STLC.Definitions <> n1 def
-R6176:6177 STLC.Definitions <> l2 def
-R6173:6174 STLC.Definitions <> n2 def
-R6170:6171 STLC.Definitions <> n1 def
-R6167:6168 STLC.Definitions <> l1 def
-R6148:6149 STLC.Definitions <> l1 def
-R6145:6146 STLC.Definitions <> n1 def
-R6141:6141 STLC.Definitions <> l def
-R6125:6125 STLC.Definitions <> l def
-R6114:6114 STLC.Definitions <> F def
-R6237:6250 STLC.PatternMatch <> CPS_conversion def
-R6252:6267 STLC.PatternMatch examples stlc_match_case1 def
-prf 6280:6303 examples stlc_match_case1_correct
-R6327:6342 STLC.PatternMatch examples stlc_match_case1 def
-binder 6313:6322 <> origin_fun:40
-R6364:6377 STLC.PatternMatch <> CPS_conversion def
-R6379:6394 STLC.PatternMatch examples stlc_match_case1 def
-binder 6353:6359 <> CPS_fun:41
-R6414:6418 STLC.Definitions <> tcons constr
-R6423:6427 STLC.Definitions <> tcons constr
-R6432:6436 STLC.Definitions <> tcons constr
-R6441:6445 STLC.Definitions <> tcons constr
-R6449:6452 STLC.Definitions <> tnil constr
-binder 6405:6409 <> input:42
-binder 6466:6471 <> output:43
-R6484:6484 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R6517:6522 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R6558:6558 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R6505:6510 STLC.Definitions <> :::x_'-->*'_x not
-R6485:6486 STLC.Definitions <> :::'<{'_x_'}>' not
-R6503:6504 STLC.Definitions <> :::'<{'_x_'}>' not
-R6497:6497 STLC.Definitions <> :stlc::x_x not
-R6487:6496 STLC.PatternMatch <> origin_fun:40 var
-R6498:6502 STLC.PatternMatch <> input:42 var
-R6511:6516 STLC.PatternMatch <> output:43 var
-R6546:6551 STLC.Definitions <> :::x_'-->*'_x not
-R6523:6524 STLC.Definitions <> :::'<{'_x_'}>' not
-R6544:6545 STLC.Definitions <> :::'<{'_x_'}>' not
-R6538:6538 STLC.Definitions <> :stlc::x_x not
-R6532:6532 STLC.Definitions <> :stlc::x_x not
-R6525:6531 STLC.PatternMatch <> CPS_fun:41 var
-R6533:6537 STLC.PatternMatch <> input:42 var
-R6539:6543 STLC.Definitions <> idNat syndef
-R6552:6557 STLC.PatternMatch <> output:43 var
-def 6614:6629 examples stlc_match_case2
-R6636:6639 STLC.Definitions <> tfix constr
-R6642:6644 STLC.Definitions <> abs constr
-R6653:6655 STLC.Definitions <> abs constr
+R5531:5539 STLC.Definitions <> find_func def
+R5541:5549 STLC.PatternMatch <> func_name:2 var
+R5507:5515 STLC.Definitions <> find_func def
+R5517:5525 STLC.PatternMatch <> func_name:2 var
+R5568:5568 Coq.Init.Datatypes <> O constr
+R5571:5571 Coq.Init.Datatypes <> O constr
+R5588:5590 STLC.Definitions <> app constr
+R5617:5617 STLC.PatternMatch <> k:5 var
+R5619:5627 STLC.PatternMatch <> func_body:3 var
+R5593:5595 STLC.Definitions <> var constr
+R5597:5613 STLC.PatternMatch <> continuation_name:1 var
+R5639:5639 Coq.Init.Datatypes <> S constr
+R5645:5645 Coq.Init.Datatypes <> O constr
+R5662:5664 STLC.PatternMatch <> CPS:6 def
+R5715:5716 STLC.Definitions <> tm ind
+binder 5709:5711 <> res:35
+R5721:5721 STLC.PatternMatch <> k:5 var
+R5724:5727 STLC.Definitions <> tlet constr
+R5732:5734 STLC.PatternMatch <> res:35 var
+R5697:5702 STLC.PatternMatch <> naming:4 var
+R5684:5692 STLC.PatternMatch <> func_name:2 var
+R5666:5682 STLC.PatternMatch <> continuation_name:1 var
+R5750:5750 Coq.Init.Datatypes <> O constr
+R5753:5753 Coq.Init.Datatypes <> S constr
+R5773:5775 STLC.PatternMatch <> CPS:6 def
+R5826:5827 STLC.Definitions <> tm ind
+binder 5820:5822 <> res:36
+R5832:5832 STLC.PatternMatch <> k:5 var
+R5835:5838 STLC.Definitions <> tlet constr
+R5846:5848 STLC.PatternMatch <> res:36 var
+R5808:5813 STLC.PatternMatch <> naming:4 var
+R5795:5803 STLC.PatternMatch <> func_name:2 var
+R5777:5793 STLC.PatternMatch <> continuation_name:1 var
+R5861:5861 Coq.Init.Datatypes <> S constr
+R5867:5867 Coq.Init.Datatypes <> S constr
+R5887:5889 STLC.PatternMatch <> CPS:6 def
+R5953:5954 STLC.Definitions <> tm ind
+binder 5946:5949 <> res1:37
+R5959:5961 STLC.PatternMatch <> CPS:6 def
+R6036:6037 STLC.Definitions <> tm ind
+binder 6029:6032 <> res2:38
+R6042:6042 STLC.PatternMatch <> k:5 var
+R6045:6048 STLC.Definitions <> tlet constr
+R6058:6061 STLC.PatternMatch <> res2:38 var
+R6053:6056 STLC.PatternMatch <> res1:37 var
+R6001:6004 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R6009:6009 Coq.Init.Peano <> ::nat_scope:x_'+'_x not
+R5995:6000 STLC.PatternMatch <> naming:4 var
+R6005:6005 Coq.Init.Datatypes <> S constr
+R5981:5989 STLC.PatternMatch <> func_name:2 var
+R5963:5979 STLC.PatternMatch <> continuation_name:1 var
+R5922:5927 STLC.PatternMatch <> naming:4 var
+R5909:5917 STLC.PatternMatch <> func_name:2 var
+R5891:5907 STLC.PatternMatch <> continuation_name:1 var
+R6084:6087 STLC.Definitions <> tfix constr
+R6102:6105 STLC.Definitions <> tfix constr
+R6108:6110 STLC.PatternMatch <> CPS:6 def
+R6150:6150 STLC.PatternMatch <> k:5 var
+R6143:6148 STLC.PatternMatch <> naming:4 var
+R6130:6138 STLC.PatternMatch <> func_name:2 var
+R6112:6128 STLC.PatternMatch <> continuation_name:1 var
+def 6172:6185 <> CPS_conversion
+R6195:6196 STLC.Definitions <> tm ind
+binder 6188:6191 <> func:39
+R6201:6202 STLC.Definitions <> tm ind
+R6215:6218 STLC.PatternMatch <> func:39 var
+R6229:6232 STLC.Definitions <> tfix constr
+R6235:6237 STLC.Definitions <> abs constr
+R6295:6295 STLC.Definitions <> k def
+binder 6274:6290 <> continuation_name:41
+R6331:6341 STLC.Definitions <> para_insert def
+R6343:6359 STLC.PatternMatch <> continuation_name:41 var
+binder 6311:6326 <> func_paraed_body:42
+R6381:6384 STLC.Definitions <> tfix constr
+R6387:6389 STLC.Definitions <> abs constr
+R6402:6404 STLC.PatternMatch <> CPS def
+R6464:6465 STLC.Definitions <> tm ind
+binder 6458:6460 <> res:43
+R6470:6472 STLC.PatternMatch <> res:43 var
+R6434:6449 STLC.PatternMatch <> func_paraed_body:42 var
+R6406:6422 STLC.PatternMatch <> continuation_name:41 var
+R6486:6489 STLC.PatternMatch <> func:39 var
+mod 6536:6543 <> examples
+def 6558:6573 examples stlc_match_case1
+R6580:6583 STLC.Definitions <> tfix constr
+R6586:6588 STLC.Definitions <> abs constr
+R6597:6599 STLC.Definitions <> abs constr
+R6610:6615 STLC.Definitions <> tlcase constr
+R6636:6641 STLC.Definitions <> tlcase constr
 R6666:6670 STLC.Definitions <> tplus constr
-R6675:6680 STLC.Definitions <> tlcase constr
-R6701:6705 STLC.Definitions <> tplus constr
-R6711:6713 STLC.Definitions <> app constr
-R6717:6718 STLC.Definitions <> l1 def
-R6715:6715 STLC.Definitions <> F def
-R6707:6708 STLC.Definitions <> n1 def
-R6689:6690 STLC.Definitions <> l1 def
-R6686:6687 STLC.Definitions <> n1 def
-R6682:6682 STLC.Definitions <> l def
-R6657:6657 STLC.Definitions <> l def
-R6646:6646 STLC.Definitions <> F def
-R6737:6750 STLC.PatternMatch <> CPS_conversion def
-R6752:6767 STLC.PatternMatch examples stlc_match_case2 def
-prf 6780:6803 examples stlc_match_case2_correct
-R6827:6842 STLC.PatternMatch examples stlc_match_case2 def
-binder 6813:6822 <> origin_fun:44
-R6864:6877 STLC.PatternMatch <> CPS_conversion def
-R6879:6894 STLC.PatternMatch examples stlc_match_case2 def
-binder 6853:6859 <> CPS_fun:45
-R6914:6918 STLC.Definitions <> tcons constr
-R6923:6927 STLC.Definitions <> tcons constr
-R6932:6936 STLC.Definitions <> tcons constr
-R6941:6945 STLC.Definitions <> tcons constr
-R6949:6952 STLC.Definitions <> tnil constr
-binder 6905:6909 <> input:46
-binder 6966:6971 <> output:47
-R6984:6984 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R7017:7022 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R7058:7058 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R7005:7010 STLC.Definitions <> :::x_'-->*'_x not
-R6985:6986 STLC.Definitions <> :::'<{'_x_'}>' not
-R7003:7004 STLC.Definitions <> :::'<{'_x_'}>' not
-R6997:6997 STLC.Definitions <> :stlc::x_x not
-R6987:6996 STLC.PatternMatch <> origin_fun:44 var
-R6998:7002 STLC.PatternMatch <> input:46 var
-R7011:7016 STLC.PatternMatch <> output:47 var
-R7046:7051 STLC.Definitions <> :::x_'-->*'_x not
-R7023:7024 STLC.Definitions <> :::'<{'_x_'}>' not
-R7044:7045 STLC.Definitions <> :::'<{'_x_'}>' not
-R7038:7038 STLC.Definitions <> :stlc::x_x not
-R7032:7032 STLC.Definitions <> :stlc::x_x not
-R7025:7031 STLC.PatternMatch <> CPS_fun:45 var
-R7033:7037 STLC.PatternMatch <> input:46 var
-R7039:7043 STLC.Definitions <> idNat syndef
-R7052:7057 STLC.PatternMatch <> output:47 var
-def 7114:7129 examples stlc_match_case3
-R7136:7139 STLC.Definitions <> tfix constr
-R7142:7144 STLC.Definitions <> abs constr
-R7153:7155 STLC.Definitions <> abs constr
-R7166:7171 STLC.Definitions <> tlcase constr
-R7192:7195 STLC.Definitions <> tif0 constr
-R7212:7216 STLC.Definitions <> tmult constr
-R7220:7221 STLC.Definitions <> n1 def
-R7208:7209 STLC.Definitions <> n1 def
-R7198:7200 STLC.Definitions <> app constr
-R7204:7205 STLC.Definitions <> l1 def
-R7202:7202 STLC.Definitions <> F def
-R7180:7181 STLC.Definitions <> l1 def
-R7177:7178 STLC.Definitions <> n1 def
-R7173:7173 STLC.Definitions <> l def
-R7157:7157 STLC.Definitions <> l def
-R7146:7146 STLC.Definitions <> F def
-R7239:7252 STLC.PatternMatch <> CPS_conversion def
-R7254:7269 STLC.PatternMatch examples stlc_match_case3 def
-prf 7282:7305 examples stlc_match_case3_correct
-R7329:7344 STLC.PatternMatch examples stlc_match_case3 def
-binder 7315:7324 <> origin_fun:48
-R7366:7379 STLC.PatternMatch <> CPS_conversion def
-R7381:7396 STLC.PatternMatch examples stlc_match_case3 def
-binder 7355:7361 <> CPS_fun:49
-R7416:7420 STLC.Definitions <> tcons constr
-R7425:7429 STLC.Definitions <> tcons constr
-R7433:7436 STLC.Definitions <> tnil constr
-binder 7407:7411 <> input:50
-binder 7448:7453 <> output:51
-R7465:7465 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R7498:7503 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R7539:7539 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R7486:7491 STLC.Definitions <> :::x_'-->*'_x not
-R7466:7467 STLC.Definitions <> :::'<{'_x_'}>' not
-R7484:7485 STLC.Definitions <> :::'<{'_x_'}>' not
-R7478:7478 STLC.Definitions <> :stlc::x_x not
-R7468:7477 STLC.PatternMatch <> origin_fun:48 var
-R7479:7483 STLC.PatternMatch <> input:50 var
-R7492:7497 STLC.PatternMatch <> output:51 var
-R7527:7532 STLC.Definitions <> :::x_'-->*'_x not
-R7504:7505 STLC.Definitions <> :::'<{'_x_'}>' not
-R7525:7526 STLC.Definitions <> :::'<{'_x_'}>' not
-R7519:7519 STLC.Definitions <> :stlc::x_x not
-R7513:7513 STLC.Definitions <> :stlc::x_x not
-R7506:7512 STLC.PatternMatch <> CPS_fun:49 var
-R7514:7518 STLC.PatternMatch <> input:50 var
-R7520:7524 STLC.Definitions <> idNat syndef
-R7533:7538 STLC.PatternMatch <> output:51 var
-def 7595:7610 examples stlc_match_case4
-R7617:7620 STLC.Definitions <> tfix constr
-R7623:7625 STLC.Definitions <> abs constr
-R7634:7636 STLC.Definitions <> abs constr
-R7649:7651 STLC.Definitions <> abs constr
-R7666:7670 STLC.Definitions <> tplus constr
-R7748:7753 STLC.Definitions <> tlcase constr
-R7783:7787 STLC.Definitions <> tplus constr
-R7793:7795 STLC.Definitions <> app constr
-R7808:7810 STLC.Definitions <> l'' def
-R7798:7800 STLC.Definitions <> app constr
-R7804:7805 STLC.Definitions <> l1 def
-R7802:7802 STLC.Definitions <> F def
-R7789:7790 STLC.Definitions <> n2 def
-R7763:7765 STLC.Definitions <> l'' def
-R7760:7761 STLC.Definitions <> n2 def
-R7755:7756 STLC.Definitions <> l2 def
-R7673:7678 STLC.Definitions <> tlcase constr
-R7703:7707 STLC.Definitions <> tplus constr
-R7713:7715 STLC.Definitions <> app constr
-R7728:7729 STLC.Definitions <> l2 def
-R7718:7720 STLC.Definitions <> app constr
-R7724:7725 STLC.Definitions <> l' def
-R7722:7722 STLC.Definitions <> F def
-R7709:7710 STLC.Definitions <> n1 def
-R7688:7689 STLC.Definitions <> l' def
-R7685:7686 STLC.Definitions <> n1 def
+R6676:6680 STLC.Definitions <> tplus constr
+R6686:6688 STLC.Definitions <> app constr
+R6692:6693 STLC.Definitions <> l2 def
+R6690:6690 STLC.Definitions <> F def
+R6682:6683 STLC.Definitions <> n2 def
+R6672:6673 STLC.Definitions <> n1 def
+R6652:6653 STLC.Definitions <> l2 def
+R6649:6650 STLC.Definitions <> n2 def
+R6646:6647 STLC.Definitions <> n1 def
+R6643:6644 STLC.Definitions <> l1 def
+R6624:6625 STLC.Definitions <> l1 def
+R6621:6622 STLC.Definitions <> n1 def
+R6617:6617 STLC.Definitions <> l def
+R6601:6601 STLC.Definitions <> l def
+R6590:6590 STLC.Definitions <> F def
+R6713:6726 STLC.PatternMatch <> CPS_conversion def
+R6728:6743 STLC.PatternMatch examples stlc_match_case1 def
+prf 6756:6779 examples stlc_match_case1_correct
+R6803:6818 STLC.PatternMatch examples stlc_match_case1 def
+binder 6789:6798 <> origin_fun:44
+R6840:6853 STLC.PatternMatch <> CPS_conversion def
+R6855:6870 STLC.PatternMatch examples stlc_match_case1 def
+binder 6829:6835 <> CPS_fun:45
+R6890:6894 STLC.Definitions <> tcons constr
+R6899:6903 STLC.Definitions <> tcons constr
+R6908:6912 STLC.Definitions <> tcons constr
+R6917:6921 STLC.Definitions <> tcons constr
+R6925:6928 STLC.Definitions <> tnil constr
+binder 6881:6885 <> input:46
+binder 6942:6947 <> output:47
+R6960:6960 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R6993:6998 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R7034:7034 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R6981:6986 STLC.Definitions <> :::x_'-->*'_x not
+R6961:6962 STLC.Definitions <> :::'<{'_x_'}>' not
+R6979:6980 STLC.Definitions <> :::'<{'_x_'}>' not
+R6973:6973 STLC.Definitions <> :stlc::x_x not
+R6963:6972 STLC.PatternMatch <> origin_fun:44 var
+R6974:6978 STLC.PatternMatch <> input:46 var
+R6987:6992 STLC.PatternMatch <> output:47 var
+R7022:7027 STLC.Definitions <> :::x_'-->*'_x not
+R6999:7000 STLC.Definitions <> :::'<{'_x_'}>' not
+R7020:7021 STLC.Definitions <> :::'<{'_x_'}>' not
+R7014:7014 STLC.Definitions <> :stlc::x_x not
+R7008:7008 STLC.Definitions <> :stlc::x_x not
+R7001:7007 STLC.PatternMatch <> CPS_fun:45 var
+R7009:7013 STLC.PatternMatch <> input:46 var
+R7015:7019 STLC.Definitions <> idNat syndef
+R7028:7033 STLC.PatternMatch <> output:47 var
+def 7090:7105 examples stlc_match_case2
+R7112:7115 STLC.Definitions <> tfix constr
+R7118:7120 STLC.Definitions <> abs constr
+R7129:7131 STLC.Definitions <> abs constr
+R7142:7146 STLC.Definitions <> tplus constr
+R7151:7156 STLC.Definitions <> tlcase constr
+R7177:7181 STLC.Definitions <> tplus constr
+R7187:7189 STLC.Definitions <> app constr
+R7193:7194 STLC.Definitions <> l1 def
+R7191:7191 STLC.Definitions <> F def
+R7183:7184 STLC.Definitions <> n1 def
+R7165:7166 STLC.Definitions <> l1 def
+R7162:7163 STLC.Definitions <> n1 def
+R7158:7158 STLC.Definitions <> l def
+R7133:7133 STLC.Definitions <> l def
+R7122:7122 STLC.Definitions <> F def
+R7213:7226 STLC.PatternMatch <> CPS_conversion def
+R7228:7243 STLC.PatternMatch examples stlc_match_case2 def
+prf 7256:7279 examples stlc_match_case2_correct
+R7303:7318 STLC.PatternMatch examples stlc_match_case2 def
+binder 7289:7298 <> origin_fun:48
+R7340:7353 STLC.PatternMatch <> CPS_conversion def
+R7355:7370 STLC.PatternMatch examples stlc_match_case2 def
+binder 7329:7335 <> CPS_fun:49
+R7390:7394 STLC.Definitions <> tcons constr
+R7399:7403 STLC.Definitions <> tcons constr
+R7408:7412 STLC.Definitions <> tcons constr
+R7417:7421 STLC.Definitions <> tcons constr
+R7425:7428 STLC.Definitions <> tnil constr
+binder 7381:7385 <> input:50
+binder 7442:7447 <> output:51
+R7460:7460 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R7493:7498 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R7534:7534 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R7481:7486 STLC.Definitions <> :::x_'-->*'_x not
+R7461:7462 STLC.Definitions <> :::'<{'_x_'}>' not
+R7479:7480 STLC.Definitions <> :::'<{'_x_'}>' not
+R7473:7473 STLC.Definitions <> :stlc::x_x not
+R7463:7472 STLC.PatternMatch <> origin_fun:48 var
+R7474:7478 STLC.PatternMatch <> input:50 var
+R7487:7492 STLC.PatternMatch <> output:51 var
+R7522:7527 STLC.Definitions <> :::x_'-->*'_x not
+R7499:7500 STLC.Definitions <> :::'<{'_x_'}>' not
+R7520:7521 STLC.Definitions <> :::'<{'_x_'}>' not
+R7514:7514 STLC.Definitions <> :stlc::x_x not
+R7508:7508 STLC.Definitions <> :stlc::x_x not
+R7501:7507 STLC.PatternMatch <> CPS_fun:49 var
+R7509:7513 STLC.PatternMatch <> input:50 var
+R7515:7519 STLC.Definitions <> idNat syndef
+R7528:7533 STLC.PatternMatch <> output:51 var
+def 7590:7605 examples stlc_match_case3
+R7612:7615 STLC.Definitions <> tfix constr
+R7618:7620 STLC.Definitions <> abs constr
+R7629:7631 STLC.Definitions <> abs constr
+R7642:7647 STLC.Definitions <> tlcase constr
+R7668:7671 STLC.Definitions <> tif0 constr
+R7688:7692 STLC.Definitions <> tmult constr
+R7696:7697 STLC.Definitions <> n1 def
+R7684:7685 STLC.Definitions <> n1 def
+R7674:7676 STLC.Definitions <> app constr
 R7680:7681 STLC.Definitions <> l1 def
-R7653:7654 STLC.Definitions <> l2 def
-R7638:7639 STLC.Definitions <> l1 def
-R7627:7627 STLC.Definitions <> F def
-R7830:7843 STLC.PatternMatch <> CPS_conversion def
-R7845:7860 STLC.PatternMatch examples stlc_match_case4 def
-prf 7873:7896 examples stlc_match_case4_correct
-R7920:7935 STLC.PatternMatch examples stlc_match_case4 def
-binder 7906:7915 <> origin_fun:52
-R7957:7970 STLC.PatternMatch <> CPS_conversion def
-R7972:7987 STLC.PatternMatch examples stlc_match_case4 def
-binder 7946:7952 <> CPS_fun:53
-R8008:8012 STLC.Definitions <> tcons constr
-R8017:8021 STLC.Definitions <> tcons constr
-R8026:8030 STLC.Definitions <> tcons constr
-R8034:8037 STLC.Definitions <> tnil constr
-binder 7998:8003 <> input1:54
-R8060:8064 STLC.Definitions <> tcons constr
-R8069:8073 STLC.Definitions <> tcons constr
-R8077:8080 STLC.Definitions <> tnil constr
-binder 8050:8055 <> input2:55
-binder 8092:8097 <> output:56
-R8111:8111 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R8152:8157 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R8201:8201 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R8140:8145 STLC.Definitions <> :::x_'-->*'_x not
-R8112:8113 STLC.Definitions <> :::'<{'_x_'}>' not
-R8138:8139 STLC.Definitions <> :::'<{'_x_'}>' not
-R8131:8131 STLC.Definitions <> :stlc::x_x not
-R8124:8124 STLC.Definitions <> :stlc::x_x not
-R8114:8123 STLC.PatternMatch <> origin_fun:52 var
-R8125:8130 STLC.PatternMatch <> input1:54 var
-R8132:8137 STLC.PatternMatch <> input2:55 var
-R8146:8151 STLC.PatternMatch <> output:56 var
-R8189:8194 STLC.Definitions <> :::x_'-->*'_x not
-R8158:8159 STLC.Definitions <> :::'<{'_x_'}>' not
-R8187:8188 STLC.Definitions <> :::'<{'_x_'}>' not
-R8181:8181 STLC.Definitions <> :stlc::x_x not
-R8174:8174 STLC.Definitions <> :stlc::x_x not
-R8167:8167 STLC.Definitions <> :stlc::x_x not
-R8160:8166 STLC.PatternMatch <> CPS_fun:53 var
-R8168:8173 STLC.PatternMatch <> input1:54 var
-R8175:8180 STLC.PatternMatch <> input2:55 var
-R8182:8186 STLC.Definitions <> idNat syndef
-R8195:8200 STLC.PatternMatch <> output:56 var
-def 8257:8272 examples stlc_match_case5
-R8279:8282 STLC.Definitions <> tfix constr
-R8285:8287 STLC.Definitions <> abs constr
-R8296:8298 STLC.Definitions <> abs constr
-R8309:8313 STLC.Definitions <> tplus constr
-R8318:8322 STLC.Definitions <> tmult constr
-R8325:8330 STLC.Definitions <> tlcase constr
-R8362:8366 STLC.Definitions <> tplus constr
-R8372:8376 STLC.Definitions <> tplus constr
-R8381:8385 STLC.Definitions <> tplus constr
-R8388:8390 STLC.Definitions <> app constr
-R8394:8395 STLC.Definitions <> l' def
-R8392:8392 STLC.Definitions <> F def
-R8368:8369 STLC.Definitions <> n1 def
-R8350:8351 STLC.Definitions <> l' def
-R8347:8348 STLC.Definitions <> n1 def
-R8335:8340 STLC.Definitions <> tminus constr
-R8332:8332 STLC.Definitions <> l def
-R8300:8300 STLC.Definitions <> l def
-R8289:8289 STLC.Definitions <> F def
-R8421:8434 STLC.PatternMatch <> CPS_conversion def
-R8436:8451 STLC.PatternMatch examples stlc_match_case5 def
-prf 8464:8487 examples stlc_match_case5_correct
-R8511:8526 STLC.PatternMatch examples stlc_match_case5 def
-binder 8497:8506 <> origin_fun:57
-R8548:8561 STLC.PatternMatch <> CPS_conversion def
-R8563:8578 STLC.PatternMatch examples stlc_match_case5 def
-binder 8537:8543 <> CPS_fun:58
-R8598:8602 STLC.Definitions <> tcons constr
-R8607:8611 STLC.Definitions <> tcons constr
-R8616:8620 STLC.Definitions <> tcons constr
-R8624:8627 STLC.Definitions <> tnil constr
-binder 8589:8593 <> input:59
-binder 8640:8645 <> output:60
-R8660:8660 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R8693:8698 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R8734:8734 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
-R8681:8686 STLC.Definitions <> :::x_'-->*'_x not
-R8661:8662 STLC.Definitions <> :::'<{'_x_'}>' not
-R8679:8680 STLC.Definitions <> :::'<{'_x_'}>' not
-R8673:8673 STLC.Definitions <> :stlc::x_x not
-R8663:8672 STLC.PatternMatch <> origin_fun:57 var
-R8674:8678 STLC.PatternMatch <> input:59 var
-R8687:8692 STLC.PatternMatch <> output:60 var
-R8722:8727 STLC.Definitions <> :::x_'-->*'_x not
-R8699:8700 STLC.Definitions <> :::'<{'_x_'}>' not
-R8720:8721 STLC.Definitions <> :::'<{'_x_'}>' not
-R8714:8714 STLC.Definitions <> :stlc::x_x not
-R8708:8708 STLC.Definitions <> :stlc::x_x not
-R8701:8707 STLC.PatternMatch <> CPS_fun:58 var
-R8709:8713 STLC.PatternMatch <> input:59 var
-R8715:8719 STLC.Definitions <> idNat syndef
-R8728:8733 STLC.PatternMatch <> output:60 var
-R8783:8790 STLC.PatternMatch examples <> mod
+R7678:7678 STLC.Definitions <> F def
+R7656:7657 STLC.Definitions <> l1 def
+R7653:7654 STLC.Definitions <> n1 def
+R7649:7649 STLC.Definitions <> l def
+R7633:7633 STLC.Definitions <> l def
+R7622:7622 STLC.Definitions <> F def
+R7715:7728 STLC.PatternMatch <> CPS_conversion def
+R7730:7745 STLC.PatternMatch examples stlc_match_case3 def
+prf 7758:7781 examples stlc_match_case3_correct
+R7805:7820 STLC.PatternMatch examples stlc_match_case3 def
+binder 7791:7800 <> origin_fun:52
+R7842:7855 STLC.PatternMatch <> CPS_conversion def
+R7857:7872 STLC.PatternMatch examples stlc_match_case3 def
+binder 7831:7837 <> CPS_fun:53
+R7892:7896 STLC.Definitions <> tcons constr
+R7901:7905 STLC.Definitions <> tcons constr
+R7909:7912 STLC.Definitions <> tnil constr
+binder 7883:7887 <> input:54
+binder 7924:7929 <> output:55
+R7941:7941 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R7974:7979 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R8015:8015 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R7962:7967 STLC.Definitions <> :::x_'-->*'_x not
+R7942:7943 STLC.Definitions <> :::'<{'_x_'}>' not
+R7960:7961 STLC.Definitions <> :::'<{'_x_'}>' not
+R7954:7954 STLC.Definitions <> :stlc::x_x not
+R7944:7953 STLC.PatternMatch <> origin_fun:52 var
+R7955:7959 STLC.PatternMatch <> input:54 var
+R7968:7973 STLC.PatternMatch <> output:55 var
+R8003:8008 STLC.Definitions <> :::x_'-->*'_x not
+R7980:7981 STLC.Definitions <> :::'<{'_x_'}>' not
+R8001:8002 STLC.Definitions <> :::'<{'_x_'}>' not
+R7995:7995 STLC.Definitions <> :stlc::x_x not
+R7989:7989 STLC.Definitions <> :stlc::x_x not
+R7982:7988 STLC.PatternMatch <> CPS_fun:53 var
+R7990:7994 STLC.PatternMatch <> input:54 var
+R7996:8000 STLC.Definitions <> idNat syndef
+R8009:8014 STLC.PatternMatch <> output:55 var
+def 8071:8086 examples stlc_match_case4
+R8093:8096 STLC.Definitions <> tfix constr
+R8099:8101 STLC.Definitions <> abs constr
+R8110:8112 STLC.Definitions <> abs constr
+R8125:8127 STLC.Definitions <> abs constr
+R8142:8146 STLC.Definitions <> tplus constr
+R8224:8229 STLC.Definitions <> tlcase constr
+R8259:8263 STLC.Definitions <> tplus constr
+R8269:8271 STLC.Definitions <> app constr
+R8284:8286 STLC.Definitions <> l'' def
+R8274:8276 STLC.Definitions <> app constr
+R8280:8281 STLC.Definitions <> l1 def
+R8278:8278 STLC.Definitions <> F def
+R8265:8266 STLC.Definitions <> n2 def
+R8239:8241 STLC.Definitions <> l'' def
+R8236:8237 STLC.Definitions <> n2 def
+R8231:8232 STLC.Definitions <> l2 def
+R8149:8154 STLC.Definitions <> tlcase constr
+R8179:8183 STLC.Definitions <> tplus constr
+R8189:8191 STLC.Definitions <> app constr
+R8204:8205 STLC.Definitions <> l2 def
+R8194:8196 STLC.Definitions <> app constr
+R8200:8201 STLC.Definitions <> l' def
+R8198:8198 STLC.Definitions <> F def
+R8185:8186 STLC.Definitions <> n1 def
+R8164:8165 STLC.Definitions <> l' def
+R8161:8162 STLC.Definitions <> n1 def
+R8156:8157 STLC.Definitions <> l1 def
+R8129:8130 STLC.Definitions <> l2 def
+R8114:8115 STLC.Definitions <> l1 def
+R8103:8103 STLC.Definitions <> F def
+R8306:8319 STLC.PatternMatch <> CPS_conversion def
+R8321:8336 STLC.PatternMatch examples stlc_match_case4 def
+prf 8349:8372 examples stlc_match_case4_correct
+R8396:8411 STLC.PatternMatch examples stlc_match_case4 def
+binder 8382:8391 <> origin_fun:56
+R8433:8446 STLC.PatternMatch <> CPS_conversion def
+R8448:8463 STLC.PatternMatch examples stlc_match_case4 def
+binder 8422:8428 <> CPS_fun:57
+R8484:8488 STLC.Definitions <> tcons constr
+R8493:8497 STLC.Definitions <> tcons constr
+R8502:8506 STLC.Definitions <> tcons constr
+R8510:8513 STLC.Definitions <> tnil constr
+binder 8474:8479 <> input1:58
+R8536:8540 STLC.Definitions <> tcons constr
+R8545:8549 STLC.Definitions <> tcons constr
+R8553:8556 STLC.Definitions <> tnil constr
+binder 8526:8531 <> input2:59
+binder 8568:8573 <> output:60
+R8587:8587 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R8628:8633 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R8677:8677 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R8616:8621 STLC.Definitions <> :::x_'-->*'_x not
+R8588:8589 STLC.Definitions <> :::'<{'_x_'}>' not
+R8614:8615 STLC.Definitions <> :::'<{'_x_'}>' not
+R8607:8607 STLC.Definitions <> :stlc::x_x not
+R8600:8600 STLC.Definitions <> :stlc::x_x not
+R8590:8599 STLC.PatternMatch <> origin_fun:56 var
+R8601:8606 STLC.PatternMatch <> input1:58 var
+R8608:8613 STLC.PatternMatch <> input2:59 var
+R8622:8627 STLC.PatternMatch <> output:60 var
+R8665:8670 STLC.Definitions <> :::x_'-->*'_x not
+R8634:8635 STLC.Definitions <> :::'<{'_x_'}>' not
+R8663:8664 STLC.Definitions <> :::'<{'_x_'}>' not
+R8657:8657 STLC.Definitions <> :stlc::x_x not
+R8650:8650 STLC.Definitions <> :stlc::x_x not
+R8643:8643 STLC.Definitions <> :stlc::x_x not
+R8636:8642 STLC.PatternMatch <> CPS_fun:57 var
+R8644:8649 STLC.PatternMatch <> input1:58 var
+R8651:8656 STLC.PatternMatch <> input2:59 var
+R8658:8662 STLC.Definitions <> idNat syndef
+R8671:8676 STLC.PatternMatch <> output:60 var
+def 8733:8748 examples stlc_match_case5
+R8755:8758 STLC.Definitions <> tfix constr
+R8761:8763 STLC.Definitions <> abs constr
+R8772:8774 STLC.Definitions <> abs constr
+R8785:8789 STLC.Definitions <> tplus constr
+R8794:8798 STLC.Definitions <> tmult constr
+R8801:8806 STLC.Definitions <> tlcase constr
+R8838:8842 STLC.Definitions <> tplus constr
+R8848:8852 STLC.Definitions <> tplus constr
+R8857:8861 STLC.Definitions <> tplus constr
+R8864:8866 STLC.Definitions <> app constr
+R8870:8871 STLC.Definitions <> l' def
+R8868:8868 STLC.Definitions <> F def
+R8844:8845 STLC.Definitions <> n1 def
+R8826:8827 STLC.Definitions <> l' def
+R8823:8824 STLC.Definitions <> n1 def
+R8811:8816 STLC.Definitions <> tminus constr
+R8808:8808 STLC.Definitions <> l def
+R8776:8776 STLC.Definitions <> l def
+R8765:8765 STLC.Definitions <> F def
+R8897:8910 STLC.PatternMatch <> CPS_conversion def
+R8912:8927 STLC.PatternMatch examples stlc_match_case5 def
+prf 8940:8963 examples stlc_match_case5_correct
+R8987:9002 STLC.PatternMatch examples stlc_match_case5 def
+binder 8973:8982 <> origin_fun:61
+R9024:9037 STLC.PatternMatch <> CPS_conversion def
+R9039:9054 STLC.PatternMatch examples stlc_match_case5 def
+binder 9013:9019 <> CPS_fun:62
+R9074:9078 STLC.Definitions <> tcons constr
+R9083:9087 STLC.Definitions <> tcons constr
+R9092:9096 STLC.Definitions <> tcons constr
+R9100:9103 STLC.Definitions <> tnil constr
+binder 9065:9069 <> input:63
+binder 9116:9121 <> output:64
+R9136:9136 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R9169:9174 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R9210:9210 Coq.Init.Logic <> ::type_scope:x_'/\'_x not
+R9157:9162 STLC.Definitions <> :::x_'-->*'_x not
+R9137:9138 STLC.Definitions <> :::'<{'_x_'}>' not
+R9155:9156 STLC.Definitions <> :::'<{'_x_'}>' not
+R9149:9149 STLC.Definitions <> :stlc::x_x not
+R9139:9148 STLC.PatternMatch <> origin_fun:61 var
+R9150:9154 STLC.PatternMatch <> input:63 var
+R9163:9168 STLC.PatternMatch <> output:64 var
+R9198:9203 STLC.Definitions <> :::x_'-->*'_x not
+R9175:9176 STLC.Definitions <> :::'<{'_x_'}>' not
+R9196:9197 STLC.Definitions <> :::'<{'_x_'}>' not
+R9190:9190 STLC.Definitions <> :stlc::x_x not
+R9184:9184 STLC.Definitions <> :stlc::x_x not
+R9177:9183 STLC.PatternMatch <> CPS_fun:62 var
+R9185:9189 STLC.PatternMatch <> input:63 var
+R9191:9195 STLC.Definitions <> idNat syndef
+R9204:9209 STLC.PatternMatch <> output:64 var
+R9259:9266 STLC.PatternMatch examples <> mod

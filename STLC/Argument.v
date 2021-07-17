@@ -26,106 +26,7 @@ From STLC Require Export PatternMatch.
         [M1 M2] = [M1] (fun hole1 => [M2] (fun hole2 => k (hole1 hole2)))
 *)
 
-Fixpoint depth (func_name : string) (func_body : tm) : nat :=
-  match func_body with
-  | var _ =>
-       1
-  | abs _ t1 =>
-       1 + depth func_name t1
-  | app t1 t2 =>
-       if is_recu func_name func_body then 1
-       else match find_func func_name t1, find_func func_name t2 with
-       | O, O =>
-            1
-       | S n1, O =>
-            1 + depth func_name t1
-       | O, S n2 =>
-            1 + depth func_name t2
-       | S n1, S n2 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t2) (1 + depth func_name t1)
-       end
-  
-  | tconst _ =>
-       1
-  | tplus t1 t2 =>
-       match find_func func_name t1, find_func func_name t2 with
-       | O, O =>
-            1
-       | S n1, O =>
-            1 + depth func_name t1
-       | O, S n2 =>
-            1 + depth func_name t2
-       | S n1, S n2 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (depth func_name t2)
-       end
-  | tminus t1 t2 =>
-       match find_func func_name t1, find_func func_name t2 with
-       | O, O =>
-            1
-       | S n1, O =>
-            1 + depth func_name t1
-       | O, S n2 =>
-            1 + depth func_name t2
-       | S n1, S n2 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (depth func_name t2)
-       end
-  | tmult t1 t2 =>
-       match find_func func_name t1, find_func func_name t2 with
-       | O, O =>
-            1
-       | S n1, O =>
-            1 + depth func_name t1
-       | O, S n2 =>
-            1 + depth func_name t2
-       | S n1, S n2 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (depth func_name t2)
-       end
-  | tif0 t1 t2 t3 =>
-       match find_func func_name t1 with
-       | O =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t2) (depth func_name t3)
-       | S n1 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (Coq.Arith.PeanoNat.Nat.max (depth func_name t2) (depth func_name t3))
-       end
-  
-  | tnil =>
-       1
-  | tcons t1 t2 =>
-       match find_func func_name t1, find_func func_name t2 with
-       | O, O =>
-            1
-       | S n1, O =>
-            1 + depth func_name t1
-       | O, S n2 =>
-            1 + depth func_name t2
-       | S n1, S n2 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (depth func_name t2)
-       end
-  | tlcase t1 t2 x1 x2 t3 =>
-       match find_func func_name t1 with
-       | O =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t2) (depth func_name t3)
-       | S n1 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (Coq.Arith.PeanoNat.Nat.max (depth func_name t2) (depth func_name t3))
-       end
-  
-  | tlet _ t1 t2 =>
-       match find_func func_name t1, find_func func_name t2 with
-       | O, O =>
-            1
-       | S n1, O =>
-            1 + depth func_name t1
-       | O, S n2 =>
-            1 + depth func_name t2
-       | S n1, S n2 =>
-            1 + Coq.Arith.PeanoNat.Nat.max (depth func_name t1) (depth func_name t2)
-       end
-  
-  | tfix t1 =>
-       1 + depth func_name t1
-  end.
-
-Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat) : tm * tm :=
+Fixpoint extract_and_subst_arg (func_name : string) (func_body : tm) (naming : nat) : tm * tm :=
   match func_body with
   | app t1 t2 =>
        if is_recu func_name func_body then (func_body, var (append "res" (nat2string naming)))
@@ -136,11 +37,11 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
                  | 0 =>
                       (var "invalid", var "invalid")
                  | S _ =>
-                      let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                      let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                       (para1, app t1 para2)
                  end
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t1 naming in
                  (para1, app para2 t2)
             end
        else match find_func func_name t1 with
@@ -149,11 +50,11 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
                  | 0 =>
                       (var "invalid", var "invalid")
                  | S _ =>
-                      let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                      let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                       (para1, app t1 para2)
                  end
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t1 naming in
                  (para1, app para2 t2)
             end
   
@@ -164,11 +65,11 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
             | 0 =>
                  (var "invalid", var "invalid")
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                  (para1, tplus t1 para2)
             end
        | S _ =>
-            let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+            let (para1, para2) := extract_and_subst_arg func_name t1 naming in
             (para1, tplus para2 t2)
        end
   
@@ -179,11 +80,11 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
             | 0 =>
                  (var "invalid", var "invalid")
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                  (para1, tminus t1 para2)
             end
        | S _ =>
-            let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+            let (para1, para2) := extract_and_subst_arg func_name t1 naming in
             (para1, tminus para2 t2)
        end
   
@@ -194,11 +95,11 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
             | 0 =>
                  (var "invalid", var "invalid")
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                  (para1, tmult t1 para2)
             end
        | S _ =>
-            let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+            let (para1, para2) := extract_and_subst_arg func_name t1 naming in
             (para1, tmult para2 t2)
        end
   
@@ -211,15 +112,15 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
                  | 0 =>
                       (var "invalid", var "invalid")
                  | S _ =>
-                      let (para1, para2) := exact_and_subst_arg func_name t3 naming in
+                      let (para1, para2) := extract_and_subst_arg func_name t3 naming in
                       (para1, tif0 t1 t2 para2)
                  end
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                  (para1, tif0 t1 para2 t3)
             end
        | S _ =>
-            let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+            let (para1, para2) := extract_and_subst_arg func_name t1 naming in
             (para1, tif0 para2 t2 t3)
        end
   
@@ -229,11 +130,11 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
             match find_func func_name t2 with
             | 0 => (var "invalid", var "invalid")
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                  (para1, tcons t1 para2)
             end
        | S _ =>
-            let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+            let (para1, para2) := extract_and_subst_arg func_name t1 naming in
             (para1, tcons para2 t2)
        end
   
@@ -246,53 +147,43 @@ Fixpoint exact_and_subst_arg (func_name : string) (func_body : tm) (naming : nat
                  | 0 =>
                       (var "invalid", var "invalid")
                  | S _ =>
-                      let (para1, para2) := exact_and_subst_arg func_name t3 naming in
+                      let (para1, para2) := extract_and_subst_arg func_name t3 naming in
                       (para1, tlcase t1 t2 x1 x2 para2)
                  end
             | S _ =>
-                 let (para1, para2) := exact_and_subst_arg func_name t2 naming in
+                 let (para1, para2) := extract_and_subst_arg func_name t2 naming in
                  (para1, tlcase t1 para2 x1 x2 t3)
             end
        | S _ =>
-            let (para1, para2) := exact_and_subst_arg func_name t1 naming in
+            let (para1, para2) := extract_and_subst_arg func_name t1 naming in
             (para1, tlcase para2 t2 x1 x2 t3)
        end
   | _ =>
        (var "invalid", var "invalid")
   end.
 
-Fixpoint CPS_app_F (k : tm) (func_name : string) (func_body : tm) (continuation1 continuation2 : tm -> tm) (naming : nat) (fuel : nat) : tm :=
-match fuel with | 0 => func_body | S fuel' =>
-  let continuation_name := (append "res" (nat2string naming)) in
-  match find_func func_name func_body - 1 with
-  | 0 =>
-       let result := continuation1 continuation_name in
-       match find_func func_name result with
-       | 0 =>
-            continuation2 (app func_body (abs continuation_name (app k result)))
-       | S _ =>
-            continuation2 (app func_body (abs continuation_name result))
-       end
-  | S _ =>
-       let (arg, new_body) := exact_and_subst_arg func_name func_body naming in
-       let new_continuation := fun res => continuation2 (app arg (abs continuation_name res)) in
-       CPS_app_F k func_name new_body continuation1 new_continuation (naming + 1) fuel'
-  end
-end.
+Fixpoint CPS_app_F (k : tm) (func_name : string) (func_body : tm) (continuation continuation2 : tm -> tm) (naming : nat) (fuel : nat) : tm :=
+  match fuel with | 0 => func_body | S fuel' =>
+    let continuation_name := (append "res" (nat2string naming)) in
+    match find_func func_name func_body - 1 with
+    | 0 =>
+         continuation2 (app func_body (abs continuation_name (app k (continuation continuation_name))))
+    | S _ =>
+         let (arg, new_body) := extract_and_subst_arg func_name func_body naming in
+         let new_continuation := (fun res => continuation2 (app arg (abs continuation_name res))) in
+         CPS_app_F k func_name new_body continuation new_continuation (naming + 1) fuel'
+    end
+  end.
 
 Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -> tm) (naming : nat) : tm :=
   match func_body with
   | var _ =>
-       let result := continuation func_body in
-       match find_func func_name result with
-       | O => app k result
-       | S n1 => result
-       end
+       app k (continuation func_body)
   | abs x1 t1 =>
        abs x1 (CPS k func_name t1 continuation naming)
   | app t1 t2 =>
        if is_app_F func_name func_body
-       then CPS_app_F k func_name func_body continuation (fun res : tm => res) naming 999
+       then CPS_app_F k func_name func_body continuation (fun res : tm => res) naming (find_func func_name func_body)
        else match find_func func_name t1, find_func func_name t2 with
        | O, O =>
             app k (continuation func_body)
@@ -301,17 +192,13 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        | O, S n2 =>
             CPS k func_name t2 (fun res : tm => continuation (app t1 res)) naming
        | S n1, S n2 =>
-            CPS k func_name t1
+            CPS (abs res res) func_name t1
             (fun res1 : tm => CPS k func_name t2
             (fun res2 : tm => continuation (app res1 res2)) (naming + (S n1))) naming
        end
   
   | tconst n =>
-       let result := continuation func_body in
-       match find_func func_name result with
-       | O => app k result
-       | S n1 => result
-       end
+       app k (continuation func_body)
   | tplus t1 t2 =>
        match find_func func_name t1, find_func func_name t2 with
        | O, O =>
@@ -321,7 +208,7 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        | O, S n2 =>
             CPS k func_name t2 (fun res : tm => continuation (tplus t1 res)) naming
        | S n1, S n2 =>
-            CPS k func_name t1
+            CPS (abs res res) func_name t1
             (fun res1 : tm => CPS k func_name t2
             (fun res2 : tm => continuation (tplus res1 res2)) (naming + (S n1))) naming
        end
@@ -334,7 +221,7 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        | O, S n2 =>
             CPS k func_name t2 (fun res : tm => continuation (tminus t1 res)) naming
        | S n1, S n2 =>
-            CPS k func_name t1
+            CPS (abs res res) func_name t1
             (fun res1 : tm => CPS k func_name t2
             (fun res2 : tm => continuation (tminus res1 res2)) (naming + (S n1))) naming
        end
@@ -347,7 +234,7 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        | O, S n2 =>
             CPS k func_name t2 (fun res : tm => continuation (tmult t1 res)) naming
        | S n1, S n2 =>
-            CPS k func_name t1
+            CPS (abs res res) func_name t1
             (fun res1 : tm => CPS k func_name t2
             (fun res2 : tm => continuation (tmult res1 res2)) (naming + (S n1))) naming
        end
@@ -362,11 +249,7 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        end
   
   | tnil =>
-       let result := continuation func_body in
-       match find_func func_name result with
-       | O => app k result
-       | S n1 => result
-       end
+       app k (continuation func_body)
   | tcons t1 t2 =>
        match find_func func_name t1, find_func func_name t2 with
        | O, O =>
@@ -376,7 +259,7 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        | O, S n2 =>
             CPS k func_name t2 (fun res : tm => continuation (tcons t1 res)) naming
        | S n1, S n2 =>
-            CPS k func_name t1
+            CPS (abs res res) func_name t1
             (fun res1 : tm => CPS k func_name t2
             (fun res2 : tm => continuation (tcons res1 res2)) (naming + (S n1))) naming
        end
@@ -395,7 +278,7 @@ Fixpoint CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -
        | O, O =>
             app k (continuation func_body)
        | S n1, O =>
-            CPS (abs res res) func_name t1 (fun res : tm => continuation (tlet x1 res (app k t2))) naming
+            CPS (abs res res) func_name t1 (fun res : tm => app k (continuation (tlet x1 res t2))) naming
        | O, S n2 =>
             CPS k func_name t2 (fun res : tm => continuation (tlet x1 t1 res)) naming
        | S n1, S n2 =>
@@ -416,92 +299,7 @@ Definition CPS_conversion (func : tm) : tm :=
   | _ => func
   end.
 
-Module examples.
-
-Definition stlc_match_case1 :=
-  tfix (abs F
-    (abs l
-      (tlcase l 0 n1 l1
-        (tlcase l1 n1 n2 l2
-          (tplus n1 (tplus n2 (app F l2))))))).
-
-Compute (CPS_conversion stlc_match_case1).
-
-Theorem stlc_match_case1_correct :
-  let origin_fun := stlc_match_case1 in
-  let CPS_fun := CPS_conversion stlc_match_case1 in
-  let input := tcons 4 (tcons 3 (tcons 1 (tcons 2 tnil))) in
-  let output := 10 in
-  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
-Proof. split. solve_CPS. solve_CPS. Qed.
-
-Definition stlc_match_case2 :=
-  tfix (abs F
-    (abs l
-      (tplus 1 (tlcase l 0 n1 l1
-        (tplus n1 (app F l1)))))).
-
-Compute (CPS_conversion stlc_match_case2).
-
-Theorem stlc_match_case2_correct :
-  let origin_fun := stlc_match_case2 in
-  let CPS_fun := CPS_conversion stlc_match_case2 in
-  let input := tcons 4 (tcons 3 (tcons 1 (tcons 2 tnil))) in
-  let output := 15 in
-  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
-Proof. split. solve_CPS. solve_CPS. Qed.
-
-Definition stlc_match_case3 :=
-  tfix (abs F
-    (abs l
-      (tlcase l 0 n1 l1
-        (tif0 (app F l1) n1 (tmult 2 n1))))).
-
-Compute (CPS_conversion stlc_match_case3).
-
-Theorem stlc_match_case3_correct :
-  let origin_fun := stlc_match_case3 in
-  let CPS_fun := CPS_conversion stlc_match_case3 in
-  let input := tcons 2 (tcons 2 tnil) in
-  let output := 4 in
-  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
-Proof. split. solve_CPS. solve_CPS. Qed.
-
-Definition stlc_match_case4 :=
-  tfix (abs F
-    (abs l1
-       (abs l2
-         (tplus (tlcase l1 0 n1 l'
-           (tplus n1 (app (app F l') l2)))
-             (tlcase l2 0 n2 l''
-               (tplus n2 (app (app F l1) l''))))))).
-
-Compute (CPS_conversion stlc_match_case4).
-
-Theorem stlc_match_case4_correct :
-  let origin_fun := stlc_match_case4 in
-  let CPS_fun := CPS_conversion stlc_match_case4 in
-  let input1 := tcons 2 (tcons 3 (tcons 5 tnil)) in
-  let input2 := tcons 4 (tcons 2 tnil) in
-  let output := 110 in
-  (<{origin_fun input1 input2}> -->* output) /\ (<{CPS_fun input1 input2 idNat}> -->* output).
-Proof. split. solve_CPS. solve_CPS. Qed.
-
-Definition stlc_match_case5 :=
-  tfix (abs F
-    (abs l
-      (tplus 3 (tmult (tlcase l (tminus 2 1) n1 l'
-        (tplus n1 (tplus 1 (tplus (app F l') 1)))) 5)))).
-
-Compute (CPS_conversion stlc_match_case5).
-
-Theorem stlc_match_case5_correct :
-  let origin_fun := stlc_match_case5 in
-  let CPS_fun := CPS_conversion stlc_match_case5 in
-  let input := tcons 2 (tcons 3 (tcons 5 tnil)) in
-  let output := 2113 in
-  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
-Proof. split. solve_CPS. solve_CPS. Qed.
+Module examples1.
 
 (*
   F n1 n2 :=
@@ -671,5 +469,127 @@ Theorem stlc_argument_case4_correct :
   (<{origin_fun input1 input2 input3}> -->* output) /\ (<{CPS_fun input1 input2 input3 idNat}> -->* output).
 Proof. split. solve_CPS. solve_CPS. Qed.
 
-End examples.
-*)
+End examples1.
+
+Module examples2.
+
+Definition stlc_match_case1 :=
+  tfix (abs F
+    (abs l
+      (tlcase l 0 n1 l1
+        (tlcase l1 n1 n2 l2
+          (tplus n1 (tplus n2 (app F l2))))))).
+
+Compute (CPS_conversion stlc_match_case1).
+
+Theorem stlc_match_case1_correct :
+  let origin_fun := stlc_match_case1 in
+  let CPS_fun := CPS_conversion stlc_match_case1 in
+  let input := tcons 4 (tcons 3 (tcons 1 (tcons 2 tnil))) in
+  let output := 10 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. split. solve_CPS. solve_CPS. Qed.
+
+Definition stlc_match_case2 :=
+  tfix (abs F
+    (abs l
+      (tplus 1 (tlcase l 0 n1 l1
+        (tplus n1 (app F l1)))))).
+
+Compute (CPS_conversion stlc_match_case2).
+
+Theorem stlc_match_case2_correct :
+  let origin_fun := stlc_match_case2 in
+  let CPS_fun := CPS_conversion stlc_match_case2 in
+  let input := tcons 4 (tcons 3 (tcons 1 (tcons 2 tnil))) in
+  let output := 15 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. split. solve_CPS. solve_CPS. Qed.
+
+Definition stlc_match_case3 :=
+  tfix (abs F
+    (abs l
+      (tlcase l 0 n1 l1
+        (tif0 (app F l1) n1 (tmult 2 n1))))).
+
+Compute (CPS_conversion stlc_match_case3).
+
+Theorem stlc_match_case3_correct :
+  let origin_fun := stlc_match_case3 in
+  let CPS_fun := CPS_conversion stlc_match_case3 in
+  let input := tcons 2 (tcons 2 tnil) in
+  let output := 4 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. split. solve_CPS. solve_CPS. Qed.
+
+Definition stlc_match_case4 :=
+  tfix (abs F
+    (abs l1
+       (abs l2
+         (tplus (tlcase l1 0 n1 l'
+           (tplus n1 (app (app F l') l2)))
+             (tlcase l2 0 n2 l''
+               (tplus n2 (app (app F l1) l''))))))).
+
+Compute (CPS_conversion stlc_match_case4).
+
+Theorem stlc_match_case4_correct :
+  let origin_fun := stlc_match_case4 in
+  let CPS_fun := CPS_conversion stlc_match_case4 in
+  let input1 := tcons 2 (tcons 3 tnil) in
+  let input2 := tcons 4 tnil in
+  let output := 25 in
+  (<{origin_fun input1 input2}> -->* output) /\ (<{CPS_fun input1 input2 idNat}> -->* output).
+Proof. split. solve_CPS. solve_CPS. Qed.
+
+Definition stlc_match_case5 :=
+  tfix (abs F
+    (abs l
+      (tplus 3 (tmult (tlcase l (tminus 2 1) n1 l'
+        (tplus n1 (tplus 1 (tplus (app F l') 1)))) 5)))).
+
+Compute (CPS_conversion stlc_match_case5).
+
+Theorem stlc_match_case5_correct :
+  let origin_fun := stlc_match_case5 in
+  let CPS_fun := CPS_conversion stlc_match_case5 in
+  let input := tcons 2 (tcons 3 (tcons 5 tnil)) in
+  let output := 2113 in
+  (<{origin_fun input}> -->* output) /\ (<{CPS_fun input idNat}> -->* output).
+Proof. split. solve_CPS. solve_CPS. Qed.
+
+End examples2.
+
+Module examples3.
+
+Print stlc_factorial.
+Compute (CPS_conversion stlc_factorial).
+
+Theorem stlc_factorial_correct :
+  let exfun := CPS_conversion stlc_factorial in
+  let input := 5 in
+  let output := 120 in
+  <{exfun input idNat}> -->* output.
+Proof. solve_CPS. Qed.
+
+Print stlc_power_of_four.
+Compute (CPS_conversion stlc_power_of_four).
+
+Theorem stlc_power_of_four_correct :
+  let exfun := CPS_conversion stlc_power_of_four in
+  let input := 2 in
+  let output := 16 in
+  <{exfun input idNat}> -->* output.
+Proof. solve_CPS. Qed.
+
+Print stlc_sum_of_list.
+Compute (CPS_conversion stlc_sum_of_list).
+
+Theorem stlc_sum_of_list_correct :
+  let exfun := CPS_conversion stlc_sum_of_list in
+  let input := tcons 1 (tcons 5 (tcons 8 tnil)) in
+  let output := 14 in
+  <{exfun input idNat}> -->* output.
+Proof. solve_CPS. Qed.
+
+End examples3.

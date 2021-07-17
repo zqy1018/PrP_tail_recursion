@@ -5,13 +5,12 @@ From Coq Require Import Logic.FunctionalExtensionality.
 Import ListNotations.*)
 
 Print tm.
-Print depth.
 Print CPS.
 
 Inductive stlc_expr (func_name : string) : tm -> Prop :=
   | E_Var : forall x1,
-        eqb func_name x1 = false ->
-        stlc_expr func_name (var x1)
+       eqb func_name x1 = false ->
+       stlc_expr func_name (var x1)
   | E_Abs : forall x1 t1 t2,
        eqb func_name x1 = false ->
        stlc_expr func_name t1 ->
@@ -19,7 +18,7 @@ Inductive stlc_expr (func_name : string) : tm -> Prop :=
        stlc_expr func_name (app (abs x1 t1) t2)
   | E_AppF : forall t1,
        stlc_expr func_name t1 ->
-       stlc_expr func_name (app (var func_name) t1)
+       stlc_expr func_name (app (var func_name) t1) 
   | E_App : forall t1 t2,
        stlc_expr func_name t1 ->
        stlc_expr func_name t2 ->
@@ -194,121 +193,12 @@ Inductive no_duplicate (s : string) : tm -> Prop :=
        no_duplicate s t1 ->
        no_duplicate s (tfix t1).
 
-Lemma depth_helper1 :
-  forall m, exists n, S m = S n.
-Proof.
-  intros m. exists m. reflexivity.
-Qed.
-
-Lemma depth_gt_1 :
-  forall F M, exists n, depth F M = S n.
-Proof.
-  intros. destruct M; simpl; try (apply depth_helper1); try (destruct (find_func F M1), (find_func F M2); apply depth_helper1).
-  - destruct ((find_func F M1 =? 1) && (find_func F M2 =? 0) && is_recu F M1)%bool. apply depth_helper1.
-  destruct (find_func F M1), (find_func F M2); apply depth_helper1.
-Qed.
-
-Lemma depth_helper2 :
-  forall n m, exists k, n + k = Nat.max n m.
-Proof.
-  Search "<=". intros. induction (Nat.le_max_l n m).
-  - exists 0. apply Nat.add_comm.
-  - destruct IHl. exists (S x). rewrite Nat.add_comm. simpl. f_equal. rewrite Nat.add_comm. apply H.
-Qed.
-
-Axiom stlc_functional_extensionality : forall (A : Type) (f g : A -> tm),
-  (forall x : A, f x =s g x) -> f = g.
-
-Theorem fuel_enough :
-  forall k F M continuation naming n,
-  CPS k F M continuation naming (depth F M) =s CPS k F M continuation naming (depth F M + n).
-Proof.
-  intros. generalize dependent naming. generalize dependent continuation. generalize dependent n. induction M.
-  - intros n H naming. destruct (depth_gt_1 F <{ s }>). rewrite H0. simpl. apply S_Refl.
-  - assert (Heq : forall n m, (S n =? S m) = (n =? m)). { intros n1 m1. simpl. reflexivity. }
-    intros n H naming. destruct (depth_gt_1 F <{ M1 M2 }>). rewrite H0. simpl in H0. destruct ((find_func F M1 =? 1) && (find_func F M2 =? 0) && is_recu F M1)%bool eqn:HE.
-    injection H0 as H0. rewrite <- H0. simpl. rewrite HE. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2); simpl. apply S_Refl. injection H0 as H0. destruct (is_app_F F M1). rewrite <- H0.
-    apply IHM2. rewrite <- H0. apply IHM2. apply Bool.andb_false_iff in HE. destruct HE. apply Bool.andb_false_iff in H1. destruct H1.
-    rewrite Heq in H1. rewrite H1. simpl. destruct (is_app_F F M1). destruct n0. discriminate H1. simpl. injection H0 as H0. rewrite <- H0. apply IHM1. injection H0 as H0. rewrite <- H0. apply IHM1. discriminate H1. rewrite H1.
-    rewrite Bool.andb_comm. simpl. destruct (is_app_F F M1). destruct n0. simpl. apply S_Refl. simpl. injection H0 as H0. rewrite <- H0. apply IHM1. injection H0 as H0. rewrite <- H0. apply IHM1. rewrite (Bool.andb_comm (n0 =? 0)). simpl.
-    destruct (is_app_F F M1). destruct n0. simpl. injection H0 as H0. apply eq_sym in H0. destruct (depth_helper2 (depth F M2) (S (depth F M1))). rewrite H0. rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM2.
-    rewrite Plus.plus_assoc_reverse. apply IHM2. simpl. assert ((fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 res2 }>) (naming + S n0) x) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 res2 }>) (naming + S n0) (x + n))). {
-    apply stlc_functional_extensionality. intros. injection H0 as H0. rewrite <- H0. destruct (depth_helper2 (depth F M2) (S (depth F M1))). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM2. rewrite Plus.plus_assoc_reverse. apply IHM2. }
-    rewrite H1. injection H0 as H0. rewrite <- H0. destruct (depth_helper2 (S (depth F M1)) (depth F M2)). rewrite Nat.max_comm in H2. rewrite <- H2. eapply S_Trans. apply S_Symm. Search (S _ + _). rewrite Nat.add_succ_comm. apply IHM1. assert (S (depth F M1) + x0 + n = depth F M1 + S (x0 + n)). {
-    rewrite Plus.plus_assoc_reverse. apply Nat.add_succ_comm. } rewrite H3. assert (depth F M1 + S x0 + n = depth F M1 + S (x0 + n)). { rewrite Plus.plus_assoc_reverse. simpl. reflexivity. } rewrite H4. apply IHM1.
-    assert ((fun res1 : tm => CPS k F M2 (fun _ : tm => H <{ res1 M2 }>) (naming + S n0) x) = (fun res1 : tm => CPS k F M2 (fun _ : tm => H <{ res1 M2 }>) (naming + S n0) (x + n))). { apply stlc_functional_extensionality. intros. injection H0 as H0. rewrite <- H0. destruct (depth_helper2 (depth F M2) (S (depth F M1))).
-    rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM2. rewrite Plus.plus_assoc_reverse. apply IHM2. } rewrite H1. injection H0 as H0. rewrite <- H0. destruct (depth_helper2 (S (depth F M1)) (depth F M2)). rewrite Nat.max_comm in H2. rewrite <- H2. eapply S_Trans. Search (S _ + _). rewrite Nat.add_succ_comm. apply S_Symm. apply IHM1.
-    rewrite Plus.plus_assoc_reverse. rewrite (Nat.add_succ_comm (depth F M1)). rewrite Plus.plus_assoc_reverse. apply IHM1.
-  - intros. simpl. apply S_Abs. apply IHM.
-  - intros. simpl. destruct (find_func F (continuation n)). apply S_Refl. apply S_Refl.
-  - intros n H naming. destruct (depth_gt_1 F <{ M1 + M2 }>). rewrite H0. simpl in H0. simpl. destruct (find_func F M1), (find_func F M2); injection H0 as H0; try (rewrite <- H0).
-    apply S_Refl. apply IHM2. apply IHM1. destruct (depth_helper2 (depth F M1) (depth F M2)). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM1. rewrite Plus.plus_assoc_reverse.
-    assert ((fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 + res2 }>) (naming + S n0) (depth F M1 + x0)) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 + res2 }>) (naming + S n0) (depth F M1 + (x0 + n)))). {
-    apply stlc_functional_extensionality. intros. rewrite <- Plus.plus_assoc_reverse. rewrite H1. destruct (depth_helper2 (depth F M2) (depth F M1)). rewrite Nat.max_comm in H2. rewrite <- H2. eapply S_Trans. apply S_Symm.
-    apply (IHM2 x2 (fun res2 : tm => H <{ x1 + res2 }>) (naming + S n0)). rewrite Plus.plus_assoc_reverse. apply IHM2. } rewrite H2. apply IHM1.
-  - intros n H naming. destruct (depth_gt_1 F <{ M1 - M2 }>). rewrite H0. simpl in H0. simpl. destruct (find_func F M1), (find_func F M2); injection H0 as H0; try (rewrite <- H0).
-    apply S_Refl. apply IHM2. apply IHM1. destruct (depth_helper2 (depth F M1) (depth F M2)). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM1. rewrite Plus.plus_assoc_reverse.
-    assert ((fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 - res2 }>) (naming + S n0) (depth F M1 + x0)) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 - res2 }>) (naming + S n0) (depth F M1 + (x0 + n)))). {
-    apply stlc_functional_extensionality. intros. rewrite <- Plus.plus_assoc_reverse. rewrite H1. destruct (depth_helper2 (depth F M2) (depth F M1)). rewrite Nat.max_comm in H2. rewrite <- H2. eapply S_Trans. apply S_Symm.
-    apply (IHM2 x2 (fun res2 : tm => H <{ x1 - res2 }>) (naming + S n0)). rewrite Plus.plus_assoc_reverse. apply IHM2. } rewrite H2. apply IHM1.
-  - intros n H naming. destruct (depth_gt_1 F <{ M1 * M2 }>). rewrite H0. simpl in H0. simpl. destruct (find_func F M1), (find_func F M2); injection H0 as H0; try (rewrite <- H0).
-    apply S_Refl. apply IHM2. apply IHM1. destruct (depth_helper2 (depth F M1) (depth F M2)). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM1. rewrite Plus.plus_assoc_reverse.
-    assert ((fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 * res2 }>) (naming + S n0) (depth F M1 + x0)) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 * res2 }>) (naming + S n0) (depth F M1 + (x0 + n)))). {
-    apply stlc_functional_extensionality. intros. rewrite <- Plus.plus_assoc_reverse. rewrite H1. destruct (depth_helper2 (depth F M2) (depth F M1)). rewrite Nat.max_comm in H2. rewrite <- H2. eapply S_Trans. apply S_Symm.
-    apply (IHM2 x2 (fun res2 : tm => H <{ x1 * res2 }>) (naming + S n0)). rewrite Plus.plus_assoc_reverse. apply IHM2. } rewrite H2. apply IHM1.
-  - intros n H naming. destruct (depth_gt_1 F <{ if0 M1 then M2 else M3 }>). rewrite H0. simpl in H0. simpl. destruct (find_func F M1). injection H0 as H0. apply S_If0. apply S_Refl. rewrite <- H0.
-    destruct (depth_helper2 (depth F M2) (depth F M3)). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM2. rewrite Plus.plus_assoc_reverse. apply IHM2. destruct (depth_helper2 (depth F M3) (depth F M2)). rewrite Nat.max_comm in H1.
-    rewrite <- H0. rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM3. rewrite Plus.plus_assoc_reverse. apply IHM3. injection H0 as H0. rewrite <- H0. apply IHM1.
-  - intros n H naming. simpl. apply S_Refl.
-  - intros n H naming. destruct (depth_gt_1 F <{ M1 :: M2 }>). rewrite H0. simpl in H0. simpl. destruct (find_func F M1), (find_func F M2); injection H0 as H0; try (rewrite <- H0).
-    apply S_Refl. apply IHM2. apply IHM1. destruct (depth_helper2 (depth F M1) (depth F M2)). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM1. rewrite Plus.plus_assoc_reverse.
-    assert ((fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 :: res2 }>) (naming + S n0) (depth F M1 + x0)) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => H <{ res1 :: res2 }>) (naming + S n0) (depth F M1 + (x0 + n)))). {
-    apply stlc_functional_extensionality. intros. rewrite <- Plus.plus_assoc_reverse. rewrite H1. destruct (depth_helper2 (depth F M2) (depth F M1)). rewrite Nat.max_comm in H2. rewrite <- H2. eapply S_Trans. apply S_Symm.
-    apply (IHM2 x2 (fun res2 : tm => H <{ x1 :: res2 }>) (naming + S n0)). rewrite Plus.plus_assoc_reverse. apply IHM2. } rewrite H2. apply IHM1.
-  - intros n H naming. destruct (depth_gt_1 F <{ case M1 of | nil => M2 | s :: s0 => M3 }>). rewrite H0. simpl in H0. simpl. destruct (find_func F M1). injection H0 as H0. apply S_LCase. apply S_Refl. rewrite <- H0.
-    destruct (depth_helper2 (depth F M2) (depth F M3)). rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM2. rewrite Plus.plus_assoc_reverse. apply IHM2. destruct (depth_helper2 (depth F M3) (depth F M2)). rewrite Nat.max_comm in H1.
-    rewrite <- H0. rewrite <- H1. eapply S_Trans. apply S_Symm. apply IHM3. rewrite Plus.plus_assoc_reverse. apply IHM3. injection H0 as H0. rewrite <- H0. apply IHM1.
-  - intros n H naming. simpl. apply S_Let. destruct (depth_helper2 (depth F M1) (depth F M2)). rewrite <- H0. eapply S_Trans. apply S_Symm. apply IHM1. rewrite Plus.plus_assoc_reverse. apply IHM1.
-    destruct (depth_helper2 (depth F M2) (depth F M1)). rewrite Nat.max_comm in H0. rewrite <- H0. eapply S_Trans. apply S_Symm. apply IHM2. rewrite Plus.plus_assoc_reverse. apply IHM2.
-  - intros n H naming. simpl. apply S_Fix. apply IHM.
-Qed.
-
-Theorem naming_arbitrarility :
-  forall k F M continuation fuel n,
-  CPS k F M continuation 1 fuel =s CPS k F M continuation (1 + n) fuel.
-Proof.
-  intros. generalize dependent n. generalize dependent continuation. generalize dependent fuel. induction M; intros.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F (continuation s)). apply S_Refl. apply S_Refl.
-  - destruct fuel. simpl. apply S_Refl. simpl. admit.
-  - destruct fuel. simpl. apply S_Refl. simpl. apply S_Abs. apply IHM.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F (continuation n)). apply S_Refl. apply S_Refl.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2). apply S_Refl. apply IHM2. apply IHM1.
-    assert (HF : (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 + res2 }>) (S (S n0)) fuel) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 + res2 }>) (S (n + S n0)) fuel)). {
-    apply stlc_functional_extensionality. intros. eapply S_Trans. apply S_Symm. apply IHM2. apply IHM2. } rewrite HF. apply IHM1.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2). apply S_Refl. apply IHM2. apply IHM1.
-    assert (HF : (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 - res2 }>) (S (S n0)) fuel) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 - res2 }>) (S (n + S n0)) fuel)). {
-    apply stlc_functional_extensionality. intros. eapply S_Trans. apply S_Symm. apply IHM2. apply IHM2. } rewrite HF. apply IHM1.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2). apply S_Refl. apply IHM2. apply IHM1.
-    assert (HF : (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 * res2 }>) (S (S n0)) fuel) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 * res2 }>) (S (n + S n0)) fuel)). {
-    apply stlc_functional_extensionality. intros. eapply S_Trans. apply S_Symm. apply IHM2. apply IHM2. } rewrite HF. apply IHM1.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2). apply S_If0. apply S_Refl. apply IHM2. apply IHM3. apply S_If0. apply S_Refl. apply IHM2. apply IHM3.
-    apply IHM1. apply IHM1.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F (continuation <{ nil }>)). apply S_Refl. apply S_Refl.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2). apply S_Refl. apply IHM2. apply IHM1.
-    assert (HF : (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 :: res2 }>) (S (S n0)) fuel) = (fun res1 : tm => CPS k F M2 (fun res2 : tm => continuation <{ res1 :: res2 }>) (S (n + S n0)) fuel)). {
-    apply stlc_functional_extensionality. intros. eapply S_Trans. apply S_Symm. apply IHM2. apply IHM2. } rewrite HF. apply IHM1.
-  - destruct fuel. simpl. apply S_Refl. simpl. destruct (find_func F M1), (find_func F M2). apply S_LCase. apply S_Refl. apply IHM2. apply IHM3. apply S_LCase. apply S_Refl. apply IHM2. apply IHM3.
-    apply IHM1. apply IHM1.
-  - destruct fuel. simpl. apply S_Refl. simpl. apply S_Let. apply IHM1. apply IHM2.
-  - destruct fuel. simpl. apply S_Refl. simpl. apply S_Fix. apply IHM.
-Admitted.
-
 Lemma eqbP : forall n m, Bool.reflect (n = m) (n =? m)%string.
 Proof.
   intros n m. apply Bool.iff_reflect. rewrite eqb_eq. reflexivity.
 Qed.
 
-Lemma in_distributive_by_app :
+Lemma in_distributive_for_app :
   forall (F : string) (l1 l2 : list string), List.In F (l1 ++ l2) <-> (List.In F l1 \/ List.In F l2).
 Proof.
   intros. split.
@@ -326,28 +216,28 @@ Proof.
   intros. induction M; simpl in *.
   - rewrite eqb_sym. destruct (eqbP s F). exfalso. apply H.
     left. apply e. apply S_Refl.
-  - rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
+  - rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
     apply S_App. apply IHM1. apply H1. apply IHM2. apply H2.
   - rewrite eqb_sym. destruct (eqbP s F). apply S_Refl. apply S_Abs. apply Decidable.not_or_iff in H.
     destruct H as [H1 H2]. apply (IHM H2).
   - apply S_Refl.
-  - rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
+  - rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
     apply S_Plus. apply IHM1. apply H1. apply IHM2. apply H2.
-  - rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
+  - rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
     apply S_Minus. apply IHM1. apply H1. apply IHM2. apply H2.
-  - rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
+  - rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
     apply S_Mult. apply IHM1. apply H1. apply IHM2. apply H2.
-  - rewrite in_distributive_by_app in H. rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H.
+  - rewrite in_distributive_for_app in H. rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H.
     destruct H as [H1 H23]. apply Decidable.not_or_iff in H23. destruct H23 as [H2 H3]. apply S_If0. apply (IHM1 H1).
     apply (IHM2 H2). apply (IHM3 H3).
   - apply S_Refl.
-  - rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
+  - rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H. destruct H as [H1 H2].
     apply S_Cons. apply IHM1. apply H1. apply IHM2. apply H2.
-  - rewrite in_distributive_by_app in H. rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H.
+  - rewrite in_distributive_for_app in H. rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H.
     destruct H as [H1 H23]. apply Decidable.not_or_iff in H23. destruct H23 as [H2 H3]. apply S_LCase. apply (IHM1 H1).
     apply (IHM2 H2). simpl in H3. rewrite eqb_sym. destruct (eqbP s F). apply S_Refl. rewrite eqb_sym. destruct (eqbP s0 F). apply S_Refl.
     apply IHM3. apply Decidable.not_or_iff in H3. destruct H3. apply Decidable.not_or_iff in H0. destruct H0. apply H3.
-  - rewrite eqb_sym. rewrite in_distributive_by_app in H. apply Decidable.not_or_iff in H. destruct H as [H H12].
+  - rewrite eqb_sym. rewrite in_distributive_for_app in H. apply Decidable.not_or_iff in H. destruct H as [H H12].
     apply Decidable.not_or_iff in H12. destruct H12 as [H1 H2]. destruct (eqbP s F). apply S_Let. apply (IHM1 H1). apply S_Refl.
     apply S_Let. apply (IHM1 H1). apply (IHM2 H2).
   - apply S_Fix. apply IHM. apply H.
@@ -358,52 +248,32 @@ Proof.
   intros. destruct (eqbP s1 s2). apply H in e. destruct e. reflexivity.
 Qed.
 
-Theorem subst_distribution :
-  forall F G f t1 t2, F <> G -> no_duplicate F t1 -> no_duplicate F t2 -> no_duplicate G t2 ->
-  subst F f (subst G t1 t2) =s subst G (subst F f t1) (subst F f t2).
+Theorem CPS_correct : forall (k : tm) (F : string) (M f f' : tm),
+  stlc_expr F M ->
+  (List.In F (list_name k) -> False) ->
+  subst F f' (CPS k F M (fun res => res) 1) =s app k (subst F f M).
 Proof.
-  intros F G f t1 t2. induction t2; intros HNeq HF1 HF2 HG2.
-  - simpl. destruct (eqbP F s), (eqbP G s). rewrite e in HNeq. rewrite e0 in HNeq. exfalso. apply HNeq. reflexivity.
-    simpl. rewrite e. rewrite eqb_refl. admit. simpl. rewrite e. rewrite eqb_refl. apply S_Refl. simpl.
-    rewrite (str_reflect F s n). rewrite (str_reflect G s n0). apply S_Refl. 
-  - simpl. apply S_App. apply IHt2_1. apply HNeq. apply HF1. inversion HF2. apply H1. inversion HG2. apply H1.
-    apply IHt2_2. apply HNeq. apply HF1. inversion HF2. apply H2. inversion HG2. apply H2.
-  - simpl. inversion HF2. inversion HG2. rewrite (str_reflect F s H1). rewrite (str_reflect G s H5). simpl.
-    rewrite (str_reflect F s H1). rewrite (str_reflect G s H5). apply S_Abs. apply IHt2. assumption. assumption.
-    assumption. assumption.
-  - simpl. apply S_Refl.
-  - simpl. apply S_Plus. apply IHt2_1. apply HNeq. apply HF1. inversion HF2. apply H1. inversion HG2. apply H1.
-    apply IHt2_2. apply HNeq. apply HF1. inversion HF2. apply H2. inversion HG2. apply H2.
-  - simpl. apply S_Minus. apply IHt2_1. apply HNeq. apply HF1. inversion HF2. apply H1. inversion HG2. apply H1.
-    apply IHt2_2. apply HNeq. apply HF1. inversion HF2. apply H2. inversion HG2. apply H2.
-  - simpl. apply S_Mult. apply IHt2_1. apply HNeq. apply HF1. inversion HF2. apply H1. inversion HG2. apply H1.
-    apply IHt2_2. apply HNeq. apply HF1. inversion HF2. apply H2. inversion HG2. apply H2.
-  - simpl. apply S_If0. apply IHt2_1. apply HNeq. apply HF1. inversion HF2. apply H2. inversion HG2. apply H2.
-    apply IHt2_2. apply HNeq. apply HF1. inversion HF2. apply H3. inversion HG2. apply H3. apply IHt2_3.
-    apply HNeq. apply HF1. inversion HF2. apply H4. inversion HG2. apply H4.
-  - simpl. apply S_Refl.
-  - simpl. apply S_Cons. apply IHt2_1. apply HNeq. apply HF1. inversion HF2. apply H1. inversion HG2. apply H1.
-    apply IHt2_2. apply HNeq. apply HF1. inversion HF2. apply H2. inversion HG2. apply H2.
-  - simpl. inversion HF2. inversion HG2. rewrite (str_reflect F s H4). rewrite (str_reflect G s H14). rewrite (str_reflect F s0 H5). rewrite (str_reflect G s0 H15).
-    apply S_LCase. apply IHt2_1. assumption. assumption. assumption. assumption. apply IHt2_2. assumption. assumption. assumption.
-    assumption. apply IHt2_3. assumption. assumption. assumption. assumption.
-  - simpl. inversion HF2. inversion HG2. rewrite (str_reflect F s H2). rewrite (str_reflect G s H8). apply S_Let. apply IHt2_1.
-    assumption. assumption. assumption. assumption. apply IHt2_2. assumption. assumption. assumption. assumption.
-  - simpl. apply S_Fix. apply IHt2. assumption. assumption. inversion HF2. assumption. inversion HG2. assumption.
-Admitted.
-(*
-  The definition of [stlc_eqb] :
+  intros k F M f f' HM HK.
+  assert (HKf : subst F f k =s k). { apply substution_invariance. apply HK. }
+  assert (HKf' : subst F f' k =s k). { apply substution_invariance. apply HK. }
+  induction HM.
+  - simpl. rewrite H. simpl. rewrite H. apply S_App. apply HKf'. apply S_Refl.
+  - simpl. rewrite H. Admitted.
 
-                    -----------------------------                       (S_Refl)
+
+(*
+  The definition of [stlc_eqb], whose notation is [ _ =s _ ] :
+
+                    ----------------------------                        (S_Refl)
                               x1 =s x1
 
                               x1 =s x2
-                    -----------------------------                       (S_Symm)
+                    ----------------------------                        (S_Symm)
                               x2 =s x1
 
                               x1 =s x2
                               x2 =s x3
-                    -----------------------------                       (S_Trans)
+                    ----------------------------                        (S_Trans)
                               x1 =s x3
 
                               t1 =s t1'
@@ -424,23 +294,23 @@ Admitted.
 
                               t1 =s t1'
                               t2 =s t2'
-                    ---------------------------------                   (S_Plus)
+                    --------------------------------                    (S_Plus)
                       tplus t1 t2 =s tplus t1' t2'
 
                               t1 =s t1'
                               t2 =s t2'
-                    ---------------------------------                   (S_Minus)
+                    --------------------------------                    (S_Minus)
                       tminus t1 t2 =s tminus t1' t2'
 
                               t1 =s t1'
                               t2 =s t2'
-                    ---------------------------------                   (S_Mult)
+                    --------------------------------                    (S_Mult)
                       tmult t1 t2 =s tmult t1' t2'
 
                               t1 =s t1'
                               t2 =s t2'
                               t3 =s t3'
-                    ---------------------------------                   (S_If0)
+                    --------------------------------                    (S_If0)
                       tif0 t1 t2 t3 =s t1' t2' t3'
 
             -----------------------------------------------------       (S_If0AppLeft)
@@ -451,34 +321,34 @@ Admitted.
 
                               t1 =s t1'
                               t2 =s t2'
-                    ---------------------------------                   (S_Cons)
+                    --------------------------------                    (S_Cons)
                       tcons t1 t2 =s tcons t1' t2'
 
                               t1 =s t1'
                               t2 =s t2'
                               t3 =s t3'
-                    ---------------------------------                   (S_LCase)
+              -------------------------------------------------         (S_LCase)
               tlcase t1 t2 x1 x2 t3 =s tlcase t1' t2' x1 x2 t3'
 
-            -----------------------------------------------------       (S_LCaseAppLeft)
+      ----------------------------------------------------------------- (S_LCaseAppLeft)
       app k (tlcase t1 t2 x1 x2 t3) =s tlcase t1 (app k t2) x1 x2 (app k t3)
 
-            -----------------------------------------------------       (S_LCaseAppRight)
+      ----------------------------------------------------------------- (S_LCaseAppRight)
       app (tlcase t1 t2 x1 x2 t3) k =s tlcase t1 (app t2 k) x1 x2 (app t3 k)
 
                               t1 =s t1'
                               t2 =s t2'
-                    ---------------------------------                   (S_Let)
+                    -------------------------------                     (S_Let)
                      tlet x t1 t2 =s tlet x t1' t2'
 
-                    ---------------------------------                   (S_LetSubst)
+                    -------------------------------                     (S_LetSubst)
                      tlet x t1 t2 =s subst x t1 t2
 
                               t1 =s t1'
-                    ---------------------------------                   (S_Fix)
+                    -----------------------------                       (S_Fix)
                          tfix t1 =s tfix t1'
 
-                    ---------------------------------                   (S_FixAbs)
+                 --------------------------------------------           (S_FixAbs)
                  tfix (abs f t) =s subst f (tfix (abs f t)) t
 
   The meanings of symbols:
@@ -486,289 +356,556 @@ Admitted.
     f is the syntax tree before the CPS conversion.
     f' is the syntax tree after the CPS conversion.
     M is the recursive stlc expression consist in f, that is to say M is the remain part of f after removing those outer [abs]s.
-    k is the continuation.
+    tm_no_F is any stlc term which does not contain recursive call, that is used in order to formally describe a proposition of a function typed [tm -> tm].
+    [find_func F (continuation tm_no_F) = 0] means there is no recursive call in the function body, which is typed [tm].
     Here, we suppose that there is no duplication of variable name.
 
   A property of f and f':
     forall k, app k (app f ...) = app (app f' ...) k,
-    where ... are the parameters of f.
+    where ... are the arguments of f.
 
   Properties of M:
-    1. M is not of the form [abs _ _],
-    2. M does not contain [tfix],
-    3. Those variables bound in M do not contain F (resursive function name).
+    1. M is not of the form [abs _ _].
+    2. M does not contain [tfix].
+    3. Those variables bound in M do not contain F (the resursive function).
+    Formally, M satisfies the property [stlc_expr F M], which is defined above.
 
   Properties of k:
     k does not contain recursive call because we do not consider free variables.
-    Consequently we can get two lemmas:
-    1. subst F f k =s k
-    2. subst F f' k =s k
-    ▲ If k contains recursive call (as a intermediate state of the process), the conversion function will not apply it with [k].
+    Consequently we can get two lemmas [subst F f k =s k] and [subst F f' k =s k].
 
   Our conversion function:
-    CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -> tm) (naming fuel : nat),
-    where the initial values of [continuation], [naming] and [fuel] are respectively [fun res => res] 1 and [depth M].
+    [CPS (k : tm) (func_name : string) (func_body : tm) (continuation : tm -> tm) (naming : nat)].
+  When we need to convert a function, initially we let [k] be plein [var k], [continuation] be [fun res : tm => res] and [naming] be [1].
 
-  The theorem to be informally proved:
-    subst F f' (CPS k F M (fun res => res) 1 (depth F M)) =s app k (subst F f M)
+  A property of the argument naming in function CPS:
+    Since naming will be used only to give names in the [abs _ _]s, according to the rule [S_AbsName: (List.In y (list_name t) -> False) -> abs x t =s abs y (subst x y t)], if we do not
+    employ the strings which may become an output of the function nat2string, we need not worry about the specific value of naming.
+    Formally, that is to say:
+        forall n, (In (nat2string n) (list_name M) -> False) -> (CPS k F M continuation naming =s CPS k F M continuation (S naming)).
+
+  Firstly we prove another theorem which is a branch of the main theorem: When [is_app_F F M = true], 
+    subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M)) =s (subst F f continuation2) (app k (subst F f (continuation M))) (when [find_func F (continuation tm_no_F) = 0] and [find_func F (continuation2 tm_no_F) = 0])
+                                                                                   =s (subst F f continuation2) (app k ((subst F f' continuation) (subst F f M))) (when [find_func F (continuation tm_no_F) = S _] and [find_func F (continuation2 tm_no_F) = 0])
+                                                                                   =s (subst F f' continuation2) (app k (subst F f (continuation M))) (when [find_func F (continuation tm_no_F) = 0] and [find_func F (continuation2 tm_no_F) = S _])
+                                                                                   =s (subst F f' continuation2) (app k ((subst F f' continuation) (subst F f M))) (when [find_func F (continuation tm_no_F) = S _] and [find_func F (continuation2 tm_no_F) = S _])
+
+    Actually there we have misused the function [subst] in [subst F f continuation] due to the type of [continuation] is [tm -> tm] instead of [tm], what we mean is to substitute those recursive calls in the
+    body of the fonction [continuation] by [f], which can be expressed formally: [subst tm_no_F (subst F f M) (subst F f' (continuation tm_no F))].
+
+  By induction on [find_func F M - 1].
+  1. find_func F M - 1 = 0.
+        CPS_app_F k F M continuation continuation2 naming (find_func F M)
+     =s CPS_app_F k F M continuation continuation2 naming 1
+     =s continuation2 (app M (abs continuation_name (app k (continuation continuation_name))))
+     where [continuation_name = append "res" (nat2string naming)].
+     We know that [is_app_F F M = true] and [find_func F M = 1], that is to say M ressemble [F M1 M2 ... Mn] where no recursive call is in the parameters,
+     consequently [subst F f M = f M1 M2 ... Mn] and [subst F f' M = f' M1 M2 ... Mn].
+
+     When [find_func F (continuation tm_no_F) = 0],
+     Consequently we know that [subst F f (continuation tm_no_F) = continuation tm_no_F] and [subst F f' (continuation tm_no_F) = continuation tm_no_F].
+
+       When [find_func F (continuation2 tm_no_F) = 0],
+       Consequently we know that [subst F f (continuation2 tm_no_F) = continuation2 tm_no_F] and [subst F f' (continuation2 tm_no_F) = continuation2 tm_no_F].
+
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (continuation2 (app M (abs continuation_name (app k (continuation continuation_name)))))
+       We know that [F <> continuation_name].
+       =s (subst F f' continuation2) (app (subst F f' M) (abs continuation_name (app (subst F f' k) ((subst F f' continuation) (subst F f' continuation_name)))))
+       =s continuation2 (app (subst F f' M) (abs continuation_name (app k (continuation continuation_name))))
+       =s continuation2 (app (abs continuation_name (app k (continuation continuation_name))) (subst F f M))
+       =s continuation2 (app k (continuation (subst F f M)))
+       =s (subst F f continuation2) (app k ((subst F f continuation) (subst F f M)))
+       =s (subst F f continuation2) (app k (subst F f (continuation M)))
+
+       When [find_func F (continuation2 tm_no_F) = S _],
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (continuation2 (app M (abs continuation_name (app k (continuation continuation_name)))))
+       We know that [F <> continuation_name].
+       =s (subst F f' continuation2) (app (subst F f' M) (abs continuation_name (app (subst F f' k) ((subst F f' continuation) (subst F f' continuation_name)))))
+       =s (subst F f' continuation2) (app (subst F f' M) (abs continuation_name (app k (continuation continuation_name))))
+       =s (subst F f' continuation2) (app (abs continuation_name (app k (continuation continuation_name))) (subst F f M))
+       =s (subst F f' continuation2) (app k (continuation (subst F f M)))
+       =s (subst F f' continuation2) (app k ((subst F f continuation) (subst F f M)))
+       =s (subst F f' continuation2) (app k (subst F f (continuation M)))
+
+     When [find_func F (continuation tm_no_F) = S _],
+       When [find_func F (continuation2 tm_no_F) = 0],
+       Consequently we know that [subst F f (continuation2 tm_no_F) = continuation2 tm_no_F] and [subst F f' (continuation2 tm_no_F) = continuation2 tm_no_F].
+
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (continuation2 (app M (abs continuation_name (app k (continuation continuation_name)))))
+       We know that [F <> continuation_name].
+       =s (subst F f' continuation2) (app (subst F f' M) (abs continuation_name (app (subst F f' k) ((subst F f' continuation) (subst F f' continuation_name)))))
+       =s continuation2 (app (subst F f' M) (abs continuation_name (app (subst F f' k) ((subst F f' continuation) (subst F f' continuation_name)))))
+       =s continuation2 (app (subst F f' M) (abs continuation_name (app k ((subst F f' continuation) continuation_name))))
+       =s continuation2 (app (abs continuation_name (app k ((subst F f' continuation) continuation_name))) (subst F f M))
+       =s continuation2 (app k ((subst F f' continuation) (subst F f M)))
+       =s (subst F f continuation2) (app k ((subst F f' continuation) (subst F f M)))
+
+       When [find_func F (continuation2 tm_no_F) = S _],
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (continuation2 (app M (abs continuation_name (app k (continuation continuation_name)))))
+       We know that [F <> continuation_name].
+       =s (subst F f' continuation2) (app (subst F f' M) (abs continuation_name (app (subst F f' k) ((subst F f' continuation) (subst F f' continuation_name)))))
+       =s (subst F f' continuation2) (app (subst F f' M) (abs continuation_name (app k ((subst F f' continuation) continuation_name))))
+       =s (subst F f' continuation2) (app (abs continuation_name (app k ((subst F f' continuation) continuation_name))) (subst F f M))
+       =s (subst F f' continuation2) (app k ((subst F f' continuation) (subst F f M)))
+
+  2. find_func F M - 1 = S n.
+     By the induction hypothesis, for all M which satisfy [find_func F M = n], we have
+     subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M)) =s (subst F f continuation2) (app k (subst F f (continuation M))) (when [find_func F (continuation tm_no_F) = 0] and [find_func F (continuation2 tm_no_F) = 0])
+                                                                                    =s (subst F f continuation2) (app k ((subst F f' continuation) (subst F f M))) (when [find_func F (continuation tm_no_F) = S _] and [find_func F (continuation2 tm_no_F) = 0])
+                                                                                    =s (subst F f' continuation2) (app k (subst F f (continuation M))) (when [find_func F (continuation tm_no_F) = 0] and [find_func F (continuation2 tm_no_F) = S _])
+                                                                                    =s (subst F f' continuation2) (app k ((subst F f' continuation) (subst F f M))) (when [find_func F (continuation tm_no_F) = S _] and [find_func F (continuation2 tm_no_F) = S _])
+
+        CPS_app_F k F M continuation continuation2 naming (find_func F M)
+     =s CPS_app_F k F M continuation continuation2 naming (S n)
+     =s CPS_app_F k F new_body continuation (fun res => continuation2 (app arg (abs continuation_name res))) (naming + 1) n
+     where [continuation_name = append "res" (nat2string naming)] and [(arg, new_body) = extract_and_subst_arg F M naming].
+
+        subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+     =s subst F f' (CPS_app_F k F new_body continuation (fun res => continuation2 (app arg (abs continuation_name res))) (naming + 1) n)
+
+     We know that [find_func F M = find_func F new_body + 1], consequently [find_func F new_body = n].
+     We also know that [is_recu F arg = true], that is to say arg ressemble [F M1 M2 ... Mn] where no recursive call is in the parameters,
+     consequently [subst F f arg = f M1 M2 ... Mn] and [subst F f' arg = f' M1 M2 ... Mn].
+
+     When [find_func F (continuation tm_no_F) = 0],
+     Consequently we know that [subst F f (continuation tm_no_F) = continuation tm_no_F] and [subst F f' (continuation tm_no_F) = continuation tm_no_F].
+
+       When [find_func F (continuation2 tm_no_F) = 0],
+       Consequently we know that [subst F f (continuation2 tm_no_F) = continuation2 tm_no_F] and [subst F f' (continuation2 tm_no_F) = continuation2 tm_no_F].
+
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (CPS_app_F k F new_body continuation (fun res => continuation2 (app arg (abs continuation_name res))) (naming + 1) n)
+       =s (subst F f' (fun res => continuation2 (app arg (abs continuation_name res)))) (app k (subst F f (continuation new_body))) [induction hypothesis]
+       We know that [F <> continuation_name] and that [F <> res].
+       =s (fun res => (subst F f' continuation2) (app (subst F f' arg) (abs (subst F f' continuation_name) (subst F f' res)))) (app k (subst F f (continuation new_body)))
+       =s (fun res => continuation2 (app (subst F f' arg) (abs continuation_name res))) (app k (subst F f (continuation new_body)))
+       =s continuation2 (app (subst F f' arg) (abs continuation_name (app k (subst F f (continuation new_body)))))
+       =s continuation2 (app (abs continuation_name (app k (subst F f (continuation new_body)))) (subst F f arg))
+       We know that [subst continuation_name arg new_body = M]
+       =s continuation2 (app k (subst F f (continuation M)))
+       =s (subst F f continuation2) (app k (subst F f (continuation M)))
+
+       When [find_func F (continuation2 tm_no_F) = S _],
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (CPS_app_F k F new_body continuation (fun res => continuation2 (app arg (abs continuation_name res))) (naming + 1) n)
+       =s (subst F f' (fun res => continuation2 (app arg (abs continuation_name res)))) (app k (subst F f (continuation new_body))) [induction hypothesis]
+       We know that [F <> continuation_name] and that [F <> res].
+       =s (fun res => (subst F f' continuation2) (app (subst F f' arg) (abs (subst F f' continuation_name) (subst F f' res)))) (app k (subst F f (continuation new_body)))
+       =s (fun res => (subst F f' continuation2) (app (subst F f' arg) (abs continuation_name res))) (app k (subst F f (continuation new_body)))
+       =s (subst F f' continuation2) (app (subst F f' arg) (abs continuation_name (app k (subst F f (continuation new_body)))))
+       =s (subst F f' continuation2) (app (abs continuation_name (app k (subst F f (continuation new_body)))) (subst F f arg))
+       We know that [subst continuation_name arg new_body = M]
+       =s (subst F f' continuation2) (app k (subst F f (continuation M)))
+
+     When [find_func F (continuation tm_no_F) = S _],
+       When [find_func F (continuation2 tm_no_F) = 0],
+       Consequently we know that [subst F f (continuation2 tm_no_F) = continuation2 tm_no_F] and [subst F f' (continuation2 tm_no_F) = continuation2 tm_no_F].
+
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (CPS_app_F k F new_body continuation (fun res => continuation2 (app arg (abs continuation_name res))) (naming + 1) n)
+       =s (subst F f' (fun res => continuation2 (app arg (abs continuation_name res)))) (app k (subst F f' continuation) (subst F f new_body)) [induction hypothesis]
+       We know that [F <> continuation_name] and that [F <> res].
+       =s (fun res => (subst F f' continuation2) (app (subst F f' arg) (abs (subst F f' continuation_name) (subst F f' res)))) (app k (subst F f' continuation) (subst F f new_body))
+       =s (fun res => continuation2 (app (subst F f' arg) (abs continuation_name res))) (app k (subst F f' continuation) (subst F f new_body))
+       =s continuation2 (app (subst F f' arg) (abs continuation_name (app k (subst F f' continuation) (subst F f new_body))))
+       =s continuation2 (app (abs continuation_name (app k (subst F f' continuation) (subst F f new_body))) (subst F f arg))
+       We know that [subst continuation_name arg new_body = M]
+       =s continuation2 (app k ((subst F f' continuation) (subst F f M)))
+       =s (subst F f continuation2) (app k ((subst F f' continuation) (subst F f M)))
+
+       When [find_func F (continuation2 tm_no_F) = S _],
+          subst F f' (CPS_app_F k F M continuation continuation2 naming (find_func F M))
+       =s subst F f' (CPS_app_F k F new_body continuation (fun res => continuation2 (app arg (abs continuation_name res))) (naming + 1) n)
+       =s (subst F f' (fun res => continuation2 (app arg (abs continuation_name res)))) (app k (subst F f' continuation) (subst F f new_body)) [induction hypothesis]
+       We know that [F <> continuation_name] and that [F <> res].
+       =s (fun res => (subst F f' continuation2) (app (subst F f' arg) (abs (subst F f' continuation_name) (subst F f' res)))) (app k (subst F f' continuation) (subst F f new_body))
+       =s (fun res => (subst F f' continuation2) (app (subst F f' arg) (abs continuation_name res))) (app k (subst F f' continuation) (subst F f new_body))
+       =s (subst F f' continuation2) (app (subst F f' arg) (abs continuation_name (app k (subst F f' continuation) (subst F f new_body))))
+       =s (subst F f' continuation2) (app (abs continuation_name (app k (subst F f' continuation) (subst F f new_body)))) (subst F f arg))
+       We know that [subst continuation_name arg new_body = M]
+       =s (subst F f' continuation2) (app k ((subst F f' continuation) (subst F f M)))
+
+  The theorem is proved.
+
+  The main theorem to be proved:
+    subst F f' (CPS k F M continuation naming) =s app k (subst F f (continuation M)) (when [find_func F (continuation tm_no_F) = 0])
+                                                  app k ((subst F f' continuation) (subst F f M)) (when [find_func F (continuation tm_no_F) = S _])
+    obviously, [find_func F tm_no_F = 0].
 
   Proof:
 
-  First, if we say a stlc term [t] is recursive, we mean that [find_func F t > 0].
-  Here we note [find_func F t1 = S n1] and [find_func F t2 = S n2] if [t1] or [t2] is recursive.
-
+  We prove: for a particular M, F, f and f', for all k, continuation and naming, the conclusion holds.
   By induction on M.
 
-  1. When M = var x1.
-     F is not equal to x1,
-          subst F f (var x1) = var x1
-          subst F f' (var x1) = var x1
-     We know that,
-          CPS k F (var x1) (fun res => res) 1 (depth F (var x1))
-       =s CPS k F (var x1) (fun res => res) 1 1
-       =s app k (var x1)
-     Finally,
-          subst F f' (CPS k F (var x1) (fun res => res) 1 (depth F (var x1)))
-       =s subst F f' (app k (var x1))
-       =s app (subst F f' k) (subst F f' (var x1))
-       =s app k (var x1)
-       =s app k (subst F f (var x1))
+  1. M = var x1.
+     We know that [eqb F x1 = false], so we have [subst F f M = M] and [subst F f' M = M].
+        CPS k F M continuation naming
+     =s CPS k F (var x1) continuation naming
 
-  2. When M = app t1 t2. (TODO)
+     When [find_func F (continuation tm_no_F) = 0],
+     Consequently we know that [subst F f (continuation tm_no_F) = continuation tm_no_F] and [subst F f' (continuation tm_no_F) = continuation tm_no_F].
+        CPS k F M continuation naming
+     =s app k (continuation (var x1))
 
-  3. When M = tconst n.
-     We know that,
-          CPS k F (tconst n) (fun res => res) 1 (depth F (tconst n))
-       =s CPS k F (tconst n) (fun res => res) 1 1
-       =s app k (tconst n)
-     Finally,
-          subst F f' (CPS k F (tconst n) (fun res => res) 1 (depth F (tconst n)))
-       =s subst F f' (app k (tconst n))
-       =s app (subst F f' k) (subst F f' (tconst n))
-       =s app k (tconst n)
-       =s app k (subst F f (tconst n))
+        subst F f' (CPS k F M continuation naming)
+     =s subst F f' (app k (continuation (var x1)))
+     =s app (subst F f' k) (subst F f' (continuation (var x1)))
+     =s app k (continuation (var x1))
+     =s app (subst F f k) (subst F f (continuation (var x1)))
+     =s subst F f (app k (continuation M))
 
-  4. When M = tplus t1 t2.
-     The induction hypothesis:
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-            forall k, subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-     ▲ If both t1 and t2 are not resursive,
-       We know that,
-            CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2))
-         =s CPS k F (tplus t1 t2) (fun res => res) 1 1
-         =s app k (tplus t1 t2)
-       Finally,
-            subst F f' (CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2)))
-         =s subst F f' (app k (tplus t1 t2))
-         =s app (subst F f' k) (tplus (subst F f' t1) (subst F f' t2))
-         =s app k (tplus t1 t2)
-         =s app k (tplus (subst F f t1) (subst F f t2))
-         =s app k (subst F f (tplus t1 t2))
-     ▲ If t1 is recursive and t2 not recursive,
-       We know that,
-            CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2))
-         =s CPS k F (tplus t1 t2) (fun res => res) 1 (1 + depth F t1)
-         =s CPS k F t1 (fun res => tplus res t2) 1 (depth F t1)
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-       We have,
-            subst F f' (CPS k F t1 (fun res => tplus res t2) 1 (depth F t1)) =s app k (tplus (subst F f t1) t2)
-       Finally,
-            subst F f' (CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2)))
-         =s subst F f' (CPS k F t1 (fun res => tplus res t2) 1 (depth F t1))
-         =s app k (tplus (subst F f t1) t2)
-         =s app k (subst F f (tplus t1 t2))
+     When [find_func F (continuation tm_no_F) = S _],
+        CPS k F M continuation naming
+     =s app k (continuation (var x1))
 
-     ▲ If t2 is recursive and t1 not recursive,
-       We know that,
-            CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2))
-         =s CPS k F (tplus t1 t2) (fun res => res) 1 (1 + depth F t2)
-         =s CPS k F t2 (fun res => tplus t1 res) 1 (depth F t2)
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-       We have,
-            subst F f' (CPS k F t2 (fun res => tplus t1 res) 1 (depth F t2)) =s app k (tplus t1 (subst F f t2))
-       Finally,
-            subst F f' (CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2)))
-         =s subst F f' CPS k F t2 (fun res => tplus t1 res) 1 (depth F t2)
-         =s app k (tplus t1 (subst F f t2))
-         =s app k (subst F f (tplus t1 t2))
+        subst F f' (CPS k F M continuation naming)
+     =s subst F f' (app k (continuation (var x1)))
+     =s app (subst F f' k) (subst F f' (continuation (var x1)))
+     =s app k ((subst F f' continuation) (subst F f' (var x1)))
+     =s app k ((subst F f' continuation) M)
+     =s app k ((subst F f' continuation) (subst F f M))
 
-     ▲ If both t1 and t2 are recursive,
-       We know that,
-            CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2))
-         =s CPS k F (tplus t1 t2) (fun res => res) 1 (1 + max (depth F t1) (depth F t2))
-         =s CPS k F t1 (fun res1 => CPS k F t2 (fun res2 => tplus res1 res2)
-            (1 + (S n1)) (max (depth F t1) (depth F t2))) 1 (max (depth F t1) (depth F t2))
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-            forall k, subst F f' (CPS k F t2 (fun res => res) (1 + (S n1)) (depth F t2))
-         =s subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-       We have,
-            subst F f' (CPS k F t1 (fun res1 => CPS k F t2 (fun res2 => tplus res1 res2)
-            (1 + (S n1)) (max (depth F t1) (depth F t2))) 1 (max (depth F t1) (depth F t2)))
-         =s subst F f' (CPS k F t1 (fun res1 => CPS k F t2 (fun res2 => tplus res1 res2)
-            (1 + (S n1)) (max (depth F t1) (depth F t2))) 1 (depth F t1))
-         =s subst F f' (CPS k F t2 (fun res2 => tplus t1 res2) (1 + (S n1)) (max (depth F t1) (depth F t2)))
-         =s subst F f' (CPS k F t2 (fun res2 => tplus t1 res2) (1 + (S n1)) (depth F t2))
-         =s app k (tplus (subst F f t1) (subst F f t2))
-      Finally,
-            subst F f' (CPS k F (tplus t1 t2) (fun res => res) 1 (depth F (tplus t1 t2)))
-         =s app k (tplus (subst F f t1) (subst F f t2))
-         =s app k (subst F f (tplus t1 t2))
+     those cases where [M = tconst n] and [M = tnil] are similar.
 
-  Cases where M = tminus t1 t2, tmult t1 t2 and tcons t1 t2 are similar.
+  2. M = app t1 t2. (This case almost cover the case M = app (abs x1 t1) t2 and M = app (var F) t1, so we need not repeat)
+     There we prove only the first case
+     By the induction hypothesis, we have
+     [subst F f' (CPS k F t1 continuation naming) =s app k (subst F f (continuation t1))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t1))] (when [find_func F (continuation tm_no_F) = S n]) and
+     [subst F f' (CPS k F t2 continuation naming) =s app k (subst F f (continuation t2))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t2))] (when [find_func F (continuation tm_no_F) = S n]).
 
-  5. When M = tif0 t1 t2 t3.
-     The induction hypothesis:
-          forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-          forall k, subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-          forall k, subst F f' (CPS k F t3 (fun res => res) 1 (depth F t3)) =s app k (subst F f t3)
-     ▲ If t1 is not recursive,
-       We know that,
-            CPS k F (tif0 t1 t2 t3) (fun res => res) 1 (depth F (tif0 t1 t2 t3))
-         =s CPS k F (tif0 t1 t2 t3) (fun res => res) 1 (1 + max (depth F t2) (depth F t3))
-         =s tif0 t1 (CPS k F t2 (fun res => res) 1 (max (depth F t2) (depth F t3)))
-            (CPS k F t3 (fun res => res) 1 (max (depth F t2) (depth F t3)))
-         =s tif0 t1 (CPS k F t2 (fun res => res) 1 (depth F t2))
-            (CPS k F t3 (fun res => res) 1 (depth F t3))
-       Finally,
-            subst F f' (CPS k F (tif0 t1 t2 t3) (fun res => res) 1 (depth F (tif0 t1 t2 t3)))
-         =s subst F f' (tif0 t1 (CPS k F t2 (fun res => res) 1 (depth F t2))
-            (CPS k F t3 (fun res => res) 1 (depth F t3)))
-         =s tif0 (subst F f' t1) (subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)))
-            (subst F f' (CPS k F t3 (fun res => res) 1 (depth F t3)))
-         =s tif0 t1 (app k (subst F f t2)) (app k (subst F f t3))
-         =s app k (tif0 t1 (subst F f t2) (subst F f t3))
-         =s app k (tif0 (subst F f t1) (subst F f t2) (subst F f t3))
-         =s app k (subst F f (tif0 t1 t2 t3))
-       
-     ▲ If t1 is recursive,
-       We know that,
-            CPS k F (tif0 t1 t2 t3) (fun res => res) 1 (depth F (tif0 t1 t2 t3))
-         =s CPS k F (tif0 t1 t2 t3) (fun res => res) 1 (1 + max (depth F t1) (max (depth F t2) (depth F t3)))
-         =s CPS k F t1 (fun res => tif0 res
-            (CPS k F t2 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))
-            (CPS k F t3 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))) 1 (max (depth F t1) (max (depth F t2) (depth F t3)))
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-            forall k, subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-            forall k, subst F f' (CPS k F t3 (fun res => res) 1 (depth F t3)) =s app k (subst F f t3)
-       We have,
-            subst F f' (CPS k F t2 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))
-         =s subst F f' (CPS k F t2 (fun res => res) (1 + (S n1)) (depth F t2))
-         =s subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2))
-         =s app k (subst F f t2)
-            subst F f' (CPS k F t3 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))
-         =s subst F f' (CPS k F t3 (fun res => res) (1 + (S n1)) (depth F t3))
-         =s subst F f' (CPS k F t3 (fun res => res) 1 (depth F t3))
-         =s app k (subst F f t3)
-            subst F f' (CPS k F t1 (fun res => tif0 res
-            (CPS k F t2 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))
-            (CPS k F t3 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))) 1 (max (depth F t1) (max (depth F t2) (depth F t3))))
-         =s subst F f' (CPS k F t1 (fun res => tif0 res
-            (CPS k F t2 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))
-            (CPS k F t3 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3))))) 1 (depth F t1))
-         =s tif0 (subst F f t1) (subst F f' (CPS k F t2 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3)))))
-            (subst F f' (CPS k F t3 (fun res => res) (1 + (S n1)) (max (depth F t1) (max (depth F t2) (depth F t3)))))
-         =s tif0 (subst F f t1) (subst F f' (CPS k F t2 (fun res => res) (1 + (S n1)) (depth F t2)))
-            (subst F f' (CPS k F t3 (fun res => res) (1 + (S n1)) (depth F t3)))
-         =s tif0 (subst F f t1) (app k (subst F f t2)) (app k (subst F f t3))
-        
-       Finally,
-            subst F f' (CPS k F (tif0 t1 t2 t3) (fun res => res) 1 (depth F (tif0 t1 t2 t3)))
-         =s tif0 (subst F f t1) (app k (subst F f t2)) (app k (subst F f t3))
-         =s app k (tif0 (subst F f t1) (subst F f t2) (subst F f t3))
-         =s app k (subst F f (tif0 t1 t2 t3))
+     When [is_app_F F M = false].
+       When [find_func F (continuation tm_no_F) = 0],
+        ①. When both t1 and t2 are not recursive, that is to say [find_func F t1 = 0] and [find_finc F t2 = 0],
+           consequently [subst F f t1 = t1], [subst F f t2 = t2], [subst F f' t1 = t1] and [subst F f' t2 = t2].
+              CPS k F M continuation naming
+           =s app k (continuation (app t1 t2))
 
-  The case where M = tlcase t1 t2 x1 x2 t3 is similar.
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (app k (continuation (app t1 t2)))
+           =s app (subst F f' k) (subst F f' (continuation (app t1 t2)))
+           =s app k (continuation (app t1 t2))
+           =s app (subst F f k) (subst F f (continuation M))
+           =s app k (subst F f (continuation M))
 
-  6. When M = tnil.
-     We know that,
-          CPS k F tnil (fun res => res) 1 (depth F tnil)
-       =s CPS k F nil (fun res => res) 1 1
-       =s app k nil
-     Finally,
-          subst F f' (CPS k F tnil (fun res => res) 1 (depth F tnil))
-       =s subst F f' (app k nil)
-       =s app k nil
-       =s app k (subst F f nil)
-   
-  7. When M = tlet x1 t1 t2.
-     The induction hypothesis:
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-            forall k, subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-     ▲ If both t1 and t2 are not resursive,
-       We know that,
-            CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2))
-         =s CPS k F (tlet x1 t1 t2) (fun res => res) 1 1
-         =s app k (tlet x1 t1 t2)
-       Finally,
-            subst F f' (CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2)))
-         =s subst F f' (app k (tlet x1 t1 t2))
-         =s app (subst F f' k) (tlet x1 (subst F f' t1) (subst F f' t2))
-         =s app k (tlet x1 t1 t2)
-         =s app k (tlet x1 (subst F f t1) (subst F f t2))
-         =s app k (subst F f (tlet x1 t1 t2))
-     ▲ If t1 is recursive and t2 not recursive,
-       We know that,
-            CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2))
-         =s CPS k F (tlet x1 t1 t2) (fun res => res) 1 (1 + depth F t1)
-         =s CPS (abs res res) F t1 (fun res : tm => tlet x1 res (app k t2)) 1 (depth F t1)
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-       We have,
-            subst F f' (CPS (abs res res) F t1 (fun res : tm => tlet x1 res (app k t2)) 1 (depth F t1))
-         =s app k (tlet x1 (subst F f t1) (app k t2))
-       Finally,
-            subst F f' (CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2)))
-         =s app (abs res res) (tlet x1 (subst F f t1) (app k t2))
-         =s tlet x1 (subst F f t1) (app k t2)
-         =s subst x1 (subst F f t1) (app k t2)
-         =s app (subst x1 (subst F f t1) k) (subst x1 (subst F f t1) t2)
-         =s app k (subst x1 (subst F f t1) t2)
-         =s app k (subst x1 (subst F f t1) (subst F f t2))
-         =s app k (subst F f (subst x1 t1 t2))
-         =s app k (subst F f (tlet x1 t1 t2))
+        ②. When t1 is recursive and t2 not, that is to say [find_func F t1 = S n1] and [find_finc F t2 = 0],
+           consequently [subst F f t2 = t2] and [subst F f' t2 = t2].
+              CPS k F M continuation naming
+           =s CPS k F t1 (fun res => continuation (app res t2)) naming
 
-     ▲ If t2 is recursive and t1 not recursive,
-       We know that,
-            CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2))
-         =s CPS k F (tlet x1 t1 t2) (fun res => res) 1 (1 + depth F t2)
-         =s CPS k F t2 (fun res : tm => tlet x1 t1 res) 1 (depth F t2)
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-       We have,
-            subst F f' (CPS k F t2 (fun res : tm => tlet x1 t1 res) 1 (depth F t2))
-         =s app k (tlet x1 t1 (subst F f t2))
-       Finally,
-            subst F f' (CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2)))
-         =s app k (tlet x1 t1 (subst F f t2))
-         =s app k (tlet x1 (subst F f t1) (subst F f t2))
-         =s app k (subst F f (tlet x1 t1 t2))
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (CPS k F t1 (fun res => continuation (app res t2)) naming)
+           =s app k (subst F f ((fun res => continuation (app res t2)) t1)) [induction hypothesis]
+           =s app k (subst F f (continuation (app t1 t2)))
+           =s app k (subst F f (continuation M))
 
-     ▲ If both t1 and t2 are recursive,
-       We know that,
-            CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2))
-         =s CPS k F (tlet x1 t1 t2) (fun res => res) 1 (1 + max (depth F t1) (depth F t2))
-         =s CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => tlet x1 res1 res2)
-            (1 + (S n1)) (max (depth F t1) (depth F t2))) 1 (max (depth F t1) (depth F t2))
-       According to the induction hypothesis,
-            forall k, subst F f' (CPS k F t1 (fun res => res) 1 (depth F t1)) =s app k (subst F f t1)
-            forall k, subst F f' (CPS k F t2 (fun res => res) (1 + (S n1)) (depth F t2))
-            =s subst F f' (CPS k F t2 (fun res => res) 1 (depth F t2)) =s app k (subst F f t2)
-       We have,
-            subst F f' (CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => tlet x1 res1 res2)
-            (1 + (S n1)) (max (depth F t1) (depth F t2))) 1 (max (depth F t1) (depth F t2)))
-         =s subst F f' (CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => tlet x1 res1 res2)
-            (1 + (S n1)) (max (depth F t1) (depth F t2))) 1 (depth F t1))
-         =s subst F f' (CPS k F t2 (fun res2 => tlet x1 t1 res2) (1 + (S n1)) (max (depth F t1) (depth F t2)))
-         =s subst F f' (CPS k F t2 (fun res2 => tlet x1 t1 res2) (1 + (S n1)) (depth F t2))
-         =s app k (tlet x1 (subst F f t1) (subst F f t2))
-       Finally,
-            CPS k F (tlet x1 t1 t2) (fun res => res) 1 (depth F (tlet x1 t1 t2))
-         =s app k (tlet x1 (subst F f t1) (subst F f t2))
-         =s app k (subst x1 (subst F f t1) (subst F f t2))
-         =s app k (subst F f (subst x1 t1 t2))
-         =s app k (subst F f (tlet x1 t1 t2))
+        ③. When t2 is recursive and t1 not, that is to say [find_func F t1 = 0] and [find_finc F t2 = S n2],
+           consequently [subst F f t1 = t1] and [subst F f' t1 = t1].
+              CPS k F M continuation naming
+           =s CPS k F t2 (fun res => continuation (app t1 res)) naming
+
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (CPS k F t2 (fun res => continuation (app t1 res)) naming)
+           =s app k (subst F f ((fun res => continuation (app t1 res)) t2)) [induction hypothesis]
+           =s app k (subst F f (continuation (app t1 t2)))
+           =s app k (subst F f (continuation M))
+
+        ④. When both t1 and t2 are recursive, that is to say [find_func F t1 = S n1] and [find_finc F t2 = S n2].
+              CPS k F M continuation naming
+           =s CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1))) naming
+
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1))) naming)
+           =s app (abs res res) ((subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1)))) (subst F f t1)) [induction hypothesis]
+           =s (subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1)))) (subst F f t1)
+           =s (fun res1 => subst F f' (CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1)))) (subst F f t1)
+           =s (fun res1 => app k (subst F f ((fun res2 => continuation (app res1 res2)) t2))) (subst F f t1) [induction hypothesis]
+           =s (fun res1 => app k (subst F f (continuation (app res1 t2)))) (subst F f t1)
+           =s (fun res1 => app k ((subst F f continuation) (subst F f (app res1 t2)))) (subst F f t1)
+           =s (fun res1 => app k (continuation (app res1 (subst F f t2)))) (subst F f t1)
+           =s app k (continuation (app (subst F f t1) (subst F f t2)))
+           =s app k ((subst F f continuation) (subst F f (app t1 t2)))
+           =s app k (subst F f (continuation (app t1 t2)))
+           =s app k (subst F f (continuation M))
+
+       When [find_func F (continuation tm_no_F) = S _],
+        ①. When both t1 and t2 are not recursive, that is to say [find_func F t1 = 0] and [find_finc F t2 = 0],
+           consequently [subst F f t1 = t1], [subst F f t2 = t2], [subst F f' t1 = t1] and [subst F f' t2 = t2].
+              CPS k F M continuation naming
+           =s app k (continuation (app t1 t2))
+
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (app k (continuation (app t1 t2)))
+           =s app (subst F f' k) ((subst F f' continuation) (subst F f' (app t1 t2)))
+           =s app k ((subst F f' continuation) (subst F f (app t1 t2)))
+           =s app k ((subst F f' continuation) (subst F f M))
+
+        ②. When t1 is recursive and t2 not, that is to say [find_func F t1 = S n1] and [find_finc F t2 = 0],
+           consequently [subst F f t2 = t2] and [subst F f' t2 = t2].
+              CPS k F M continuation naming
+           =s CPS k F t1 (fun res => continuation (app res t2)) naming
+
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (CPS k F t1 (fun res => continuation (app res t2)) naming)
+           =s app k ((subst F f' (fun res => continuation (app res t2))) (subst F f t1)) [induction hypothesis]
+           =s app k ((fun res => (subst F f' continuation) (subst F f' (app res t2))) (subst F f t1))
+           =s app k ((subst F f' continuation) (app (subst F f t1) t2))
+           =s app k ((subst F f' continuation) (app (subst F f t1) (subst F f t2)))
+           =s app k ((subst F f' continuation) (subst F f (app t1 t2)))
+           =s app k ((subst F f' continuation) (subst F f M))
+
+        ③. When t2 is recursive and t1 not, that is to say [find_func F t1 = 0] and [find_finc F t2 = S n2],
+           consequently [subst F f t1 = t1] and [subst F f' t1 = t1].
+              CPS k F M continuation naming
+           =s CPS k F t2 (fun res => continuation (app t1 res)) naming
+
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (CPS k F t2 (fun res => continuation (app t1 res)) naming)
+           =s app k ((subst F f' (fun res => continuation (app t1 res))) (subst F f t2)) [induction hypothesis]
+           =s app k ((fun res => (subst F f' continuation) (subst F f' (app t1 res))) (subst F f t2))
+           =s app k ((subst F f' continuation) (app t1 (subst F f t2)))
+           =s app k ((subst F f' continuation) (app (subst F f t1) (subst F f t2)))
+           =s app k ((subst F f' continuation) (subst F f (app t1 t2)))
+           =s app k ((subst F f' continuation) (subst F f M))
+
+        ④. When both t1 and t2 are recursive, that is to say [find_func F t1 = S n1] and [find_finc F t2 = S n2].
+              CPS k F M continuation naming
+           =s CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1))) naming
+
+              subst F f' (CPS k F M continuation naming)
+           =s subst F f' (CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1))) naming)
+           =s app (abs res res) ((subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1)))) (subst F f t1)) [induction hypothesis]
+           =s (subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1)))) (subst F f t1)
+           =s (fun res1 => subst F f' (CPS k F t2 (fun res2 => continuation (app res1 res2)) (naming + (S n1)))) (subst F f t1)
+           =s (fun res1 => app k ((subst F f' (fun res2 => continuation (app res1 res2))) (subst F f t2))) (subst F f t1) [induction hypothesis]
+           =s (fun res1 => app k (((fun res2 => (subst F f' continuation) (subst F f' (app res1 res2)))) (subst F f t2))) (subst F f t1)
+           =s (fun res1 => app k (((fun res2 => (subst F f' continuation) (app res1 res2))) (subst F f t2))) (subst F f t1)
+           =s (fun res1 => app k ((subst F f' continuation) (app res1 (subst F f t2)))) (subst F f t1)
+           =s app k ((subst F f' continuation) (app (subst F f t1) (subst F f t2)))
+           =s app k ((subst F f' continuation) (subst F f (app t1 t2)))
+           =s app k ((subst F f' continuation) (subst F f M))
+
+     those cases where [M = tplus t1 t2], [M = tminus t1 t2], [M = tmult t1 t2] and [M = tcons t1 t2] are similar.
+
+     When [is_app_F F M = true], which is exactly the theorem proved before.
+
+       When [find_func F (continuation tm_no_F) = 0],
+          subst F f' (CPS k F M continuation naming)
+       =s subst F f' (CPS_app_F k F M continuation (fun res => res) naming (find_func F M))
+       =s (subst F f (fun res => res)) (app k (subst F f (continuation M)))
+       =s (fun res => res) (app k (subst F f (continuation M)))
+       =s app k (subst F f (continuation M))
+
+       When [find_func F (continuation tm_no_F) = S _],
+          subst F f' (CPS k F M continuation naming)
+       =s subst F f' (CPS_app_F k F M continuation (fun res => res) naming (find_func F M))
+       =s (subst F f (fun res => res)) (app k ((subst F f' continuation) (subst F f M)))
+       =s (fun res => res) (app k ((subst F f' continuation) (subst F f M)))
+       =s app k ((subst F f' continuation) (subst F f M))
+
+  3. M = tif0 t1 t2 t3.
+     By the induction hypothesis, we have
+     [subst F f' (CPS k F t1 continuation naming) =s app k (subst F f (continuation t1))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t1))] (when [find_func F (continuation tm_no_F) = S n]) and
+     [subst F f' (CPS k F t2 continuation naming) =s app k (subst F f (continuation t2))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t2))] (when [find_func F (continuation tm_no_F) = S n]) and
+     [subst F f' (CPS k F t3 continuation naming) =s app k (subst F f (continuation t3))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t3))] (when [find_func F (continuation tm_no_F) = S n])
+
+     When [find_func F (continuation tm_no_F) = 0],
+      ①. When t1 is not recursive, that is to say [find_func F t1 = 0] ,
+         consequently [subst F f t1 = t1] and [subst F f' t1 = t1].
+            CPS k F M continuation naming
+         =s tif0 t1 (CPS k func_name t2 continuation naming) (CPS k func_name t3 continuation naming)
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (tif0 t1 (CPS k func_name t2 continuation naming) (CPS k func_name t3 continuation naming))
+         =s tif0 (subst F f' t1) (subst F f' (CPS k func_name t2 continuation naming)) (subst F f' (CPS k func_name t3 continuation naming))
+         =s tif0 t1 (app k (subst F f (continuation t2))) (app k (subst F f (continuation t3))) [induction hypothesis]
+         =s app k (tif0 (subst F f t1) (subst F f (continuation t2)) (subst F f (continuation t3)))
+         =s app k (subst F f (tif0 t1 (continuation t2) (continuation t3)))
+         =s app k (subst F f (continuation (tif0 t1 t2 t3)))
+         =s app k (subst F f (continuation M))
+
+      ②. When t1 is recursive, that is to say [find_func F t1 = S n1].
+            CPS k F M continuation naming
+         =s CPS (abs res res) F t1 (fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1)))) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS (abs res res) F t1 (fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1)))) naming)
+
+         To use the induction hypothesis, we need to make it clear whether t2 or t3 is recursive. If not recursive, the CPS fonction can be simplified directly.
+         If recursive, [subst F f'] will be applied to [fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1)))],
+         thus makes the induction hypothesis available.
+
+     When [find_func F (continuation tm_no_F) = S _],
+      ①. When t1 is not recursive, that is to say [find_func F t1 = 0] ,
+         consequently [subst F f t1 = t1] and [subst F f' t1 = t1].
+            CPS k F M continuation naming
+         =s tif0 t1 (CPS k func_name t2 continuation naming) (CPS k func_name t3 continuation naming)
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (tif0 t1 (CPS k func_name t2 continuation naming) (CPS k func_name t3 continuation naming))
+         =s tif0 (subst F f' t1) (subst F f' (CPS k func_name t2 continuation naming)) (subst F f' (CPS k func_name t3 continuation naming))
+         =s tif0 t1 (app k ((subst F f' continuation) (subst F f t2))) (app k ((subst F f' continuation) (subst F f t3)))
+         =s app k (tif0 t1 ((subst F f' continuation) (subst F f t2)) ((subst F f' continuation) (subst F f t3)))
+         =s app k ((subst F f' continuation) (tif0 (subst F f t1) (subst F f t2) (subst F f t3)))
+         =s app k ((subst F f' continuation) (subst F f (tif0 t1 t2 t3)))
+         =s app k ((subst F f' continuation) (subst F f M))
+
+      ②. When t1 is recursive, that is to say [find_func F t1 = S n1].
+            CPS k F M continuation naming
+         =s CPS (abs res res) F t1 (fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1)))) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS (abs res res) F t1 (fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1)))) naming)
+
+         (There we need not discuss whether t2 or t3 is recursive because continuation is already recursive)
+
+         =s app (abs res res) ((subst F f' (fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1))))) (subst F f t1)) [induction hypothesis]
+         =s (subst F f' (fun res => tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1))))) (subst F f t1) 
+         =s (fun res => subst F f' (tif0 res (CPS k F t2 continuation (naming + (S n1))) (CPS k F t3 continuation (naming + (S n1))))) (subst F f t1)
+         =s (fun res => tif0 res (subst F f' (CPS k F t2 continuation (naming + (S n1)))) (subst F f' (CPS k F t3 continuation (naming + (S n1))))) (subst F f t1)
+         =s (fun res => tif0 res (app k ((subst F f' continuation) (subst F f t2))) (app k ((subst F f' continuation) (subst F f t3)))) (subst F f t1) [induction hypothesis]
+         =s (fun res => app k ((subst F f' continuation) (tif0 res (subst F f t2) (subst F f t3)))) (subst F f t1)
+         =s app k ((subst F f' continuation) (tif0 (subst F f t1) (subst F f t2) (subst F f t3)))
+         =s app k ((subst F f' continuation) (subst F f (tif0 t1 t2 t3)))
+         =s app k ((subst F f' continuation) (subst F f M))
+
+  4. M = tlet x1 t1 t2.
+     By the induction hypothesis, we have
+     [subst F f' (CPS k F t1 continuation naming) =s app k (subst F f (continuation t1))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t1))] (when [find_func F (continuation tm_no_F) = S n]) and
+     [subst F f' (CPS k F t2 continuation naming) =s app k (subst F f (continuation t2))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t2))] (when [find_func F (continuation tm_no_F) = S n]) and
+     [subst F f' (CPS k F t3 continuation naming) =s app k (subst F f (continuation t3))] (when [find_func F (continuation tm_no_F) = 0])
+                                                     app k ((subst F f' continuation) (subst F f t3))] (when [find_func F (continuation tm_no_F) = S n]).
+
+     When [find_func F (continuation tm_no_F) = 0],
+      ①. When both t1 and t2 are not recursive, that is to say [find_func F t1 = 0] and [find_finc F t2 = 0],
+         consequently [subst F f t1 = t1], [subst F f t2 = t2], [subst F f' t1 = t1] and [subst F f' t2 = t2].
+            CPS k F M continuation naming
+         =s app k (continuation (tlet x1 t1 t2))
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (app k (continuation (tlet x1 t1 t2)))
+         =s app (subst F f' k) (subst F f' (continuation (tlet x1 t1 t2)))
+         =s app k (continuation M)
+         =s app k (subst F f (continuation M))
+
+      ②. When t1 is recursive and t2 not, that is to say [find_func F t1 = S n1] and [find_finc F t2 = 0],
+         consequently [subst F f t2 = t2] and [subst F f' t2 = t2].
+            CPS k F M continuation naming
+         =s CPS (abs res res) F t1 (fun res => app k (continuation (tlet x1 res t2))) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS (abs res res) F t1 (fun res => app k (continuation (tlet x1 res t2))) naming)
+         =s app (abs res res) (subst F f ((fun res => app k (continuation (tlet x1 res t2))) t1)) [induction hypothesis]
+         =s subst F f ((fun res => app k (continuation (tlet x1 res t2))) t1)
+         =s (fun res => subst F f (app k (continuation (tlet x1 res t2)))) (subst F f t1)
+         =s (fun res => app (subst F f k) (subst F f (continuation (tlet x1 res t2)))) (subst F f t1)
+         =s (fun res => app k ((subst F f continuation) (tlet x1 res (subst F f t2)))) (subst F f t1)
+         =s app k ((subst F f continuation) (tlet x1 (subst F f t1) (subst F f t2)))
+         =s app k (subst F f (continuation (tlet x1 t1 t2)))
+         =s app k (subst F f (continuation M))
+
+      ③. When t2 is recursive and t1 not, that is to say [find_func F t1 = 0] and [find_finc F t2 = S n2],
+         consequently [subst F f t1 = t1] and [subst F f' t1 = t1].
+            CPS k F M continuation naming
+         =s CPS k F t2 (fun res => continuation (tlet x1 t1 res)) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS k F t2 (fun res => continuation (tlet x1 t1 res)) naming) [induction hypothesis]
+         =s app k (subst F f ((fun res => continuation (tlet x1 t1 res)) t2))
+         =s app k ((fun res => subst F f (continuation (tlet x1 t1 res))) (subst F f t2))
+         =s app k ((fun res => (subst F f continuation) (tlet x1 (subst F f t1) res)) (subst F f t2))
+         =s app k ((subst F f continuation) (tlet x1 (subst F f t1) (subst F f t2)))
+         =s app k (subst F f (continuation (tlet x1 t1 t2)))
+         =s app k (subst F f (continuation M))
+
+      ④. When both t1 and t2 are recursive, that is to say [find_func F t1 = S n1] and [find_finc F t2 = S n2].
+            CPS k F M continuation naming
+         =s CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1))) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1))) naming)
+         =s app (abs res res) ((subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1)))) (subst F f t1)) [induction hypothesis]
+         =s (subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1)))) (subst F f t1)
+         =s (fun res1 => subst F f' (CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1)))) (subst F f t1)
+         =s (fun res1 => app k (subst F f ((fun res2 => continuation (tlet x1 res1 res2)) t2))) (subst F f t1) [induction hypothesis]
+         =s (fun res1 => app k ((fun res2 => (subst F f continuation) (subst F f (tlet x1 res1 res2))) (subst F f t2))) (subst F f t1)
+         =s (fun res1 => app k ((fun res2 => (subst F f continuation) (tlet x1 res1 res2)) (subst F f t2))) (subst F f t1)
+         =s (fun res1 => app k ((subst F f continuation) (tlet x1 res1 (subst F f t2)))) (subst F f t1)
+         =s app k ((subst F f continuation) (tlet x1 (subst F f t1) (subst F f t2)))
+         =s app k (subst F f (continuation (tlet x1 t1 t2)))
+         =s app k (subst F f (continuation M))
+
+     When [find_func F (continuation tm_no_F) = S _],
+      ①. When both t1 and t2 are not recursive, that is to say [find_func F t1 = 0] and [find_finc F t2 = 0],
+         consequently [subst F f t1 = t1], [subst F f t2 = t2], [subst F f' t1 = t1] and [subst F f' t2 = t2].
+            CPS k F M continuation naming
+         =s app k (continuation (tlet x1 t1 t2))
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (app k (continuation (tlet x1 t1 t2)))
+         =s app (subst F f' k) (subst F f' (continuation (tlet x1 t1 t2)))
+         =s app k ((subst F f' continuation) (subst F f' (tlet x1 t1 t2)))
+         =s app k ((subst F f' continuation) (tlet x1 t1 t2))
+         =s app k ((subst F f' continuation) (subst F f (tlet x1 t1 t2)))
+         =s app k ((subst F f' continuation) (subst F f M))
+
+      ②. When t1 is recursive and t2 not, that is to say [find_func F t1 = S n1] and [find_finc F t2 = 0],
+         consequently [subst F f t2 = t2] and [subst F f' t2 = t2].
+            CPS k F M continuation naming
+         =s CPS (abs res res) F t1 (fun res => app k (continuation (tlet x1 res t2))) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS (abs res res) F t1 (fun res => app k (continuation (tlet x1 res t2))) naming)
+         =s app (abs res res) ((subst F f' (fun res => app k (continuation (tlet x1 res t2)))) (subst F f t1)) [induction hypothesis]
+         =s (subst F f' (fun res => app k (continuation (tlet x1 res t2)))) (subst F f t1)
+         =s (fun res => subst F f' (app k (continuation (tlet x1 res t2)))) (subst F f t1)
+         =s (fun res => app (subst F f' k) ((subst F f' continuation) (subst F f' (tlet x1 res t2)))) (subst F f t1)
+         =s (fun res => app k ((subst F f' continuation) (tlet x1 res t2))) (subst F f t1)
+         =s app k ((subst F f' continuation) (tlet x1 (subst F f t1) (subst F f t2)))
+         =s app k ((subst F f' continuation) (subst F f (tlet x1 t1 t2)))
+         =s app k ((subst F f' continuation) (subst F f M))
+
+      ③. When t2 is recursive and t1 not, that is to say [find_func F t1 = 0] and [find_finc F t2 = S n2],
+         consequently [subst F f t1 = t1] and [subst F f' t1 = t1].
+            CPS k F M continuation naming
+         =s CPS k F t2 (fun res => continuation (tlet x1 t1 res)) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS k F t2 (fun res => continuation (tlet x1 t1 res)) naming)
+         =s app k ((subst F f' (fun res => continuation (tlet x1 t1 res))) (subst F f t2)) [induction hypothesis]
+         =s app k ((fun res => (subst F f' continuation) (subst F f' (tlet x1 t1 res))) (subst F f t2))
+         =s app k ((fun res => (subst F f' continuation) (tlet x1 t1 res)) (subst F f t2))
+         =s app k ((subst F f' continuation) (tlet x1 (subst F f t1) (subst F f t2)))
+         =s app k ((subst F f' continuation) (subst F f (tlet x1 t1 t2)))
+         =s app k ((subst F f' continuation) (subst F f M))
+
+      ④. When both t1 and t2 are recursive, that is to say [find_func F t1 = S n1] and [find_finc F t2 = S n2].
+            CPS k F M continuation naming
+         =s CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1))) naming
+
+            subst F f' (CPS k F M continuation naming)
+         =s subst F f' (CPS (abs res res) F t1 (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1))) naming)
+         =s app (abs res res) ((subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1)))) (subst F f t1)) [induction hypothesis]
+         =s (subst F f' (fun res1 => CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1)))) (subst F f t1)
+         =s (fun res1 => subst F f' (CPS k F t2 (fun res2 => continuation (tlet x1 res1 res2)) (naming + (S n1)))) (subst F f t1)
+         =s (fun res1 => app k ((subst F f' (fun res2 => continuation (tlet x1 res1 res2))) (subst F f t2))) (subst F f t1) [induction hypothesis]
+         =s (fun res1 => app k ((fun res2 => subst F f' (continuation (tlet x1 res1 res2))) (subst F f t2))) (subst F f t1)
+         =s (fun res1 => app k ((fun res2 => (subst F f' continuation) (subst F f' (tlet x1 res1 res2))) (subst F f t2))) (subst F f t1)
+         =s (fun res1 => app k ((fun res2 => (subst F f' continuation) (tlet x1 res1 res2)) (subst F f t2))) (subst F f t1)
+         =s (fun res1 => app k ((subst F f' continuation) (tlet x1 res1 (subst F f t2)))) (subst F f t1)
+         =s app k ((subst F f' continuation) (tlet x1 (subst F f t1) (subst F f t2)))
+         =s app k ((subst F f' continuation) (subst F f (tlet x1 t1 t2)))
+         =s app k ((subst F f' continuation) (subst F f M))
+
+  The theorem is proved.
 *)

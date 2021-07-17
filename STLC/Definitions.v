@@ -83,9 +83,9 @@ Fixpoint para_insert (para_name : string) (func_body : tm) : tm :=
 Fixpoint find_func (func_name : string) (func_body : tm) : nat :=
   match func_body with
   | var x1 =>
-       if eqb x1 func_name then 1 else 0
+       if eqb func_name x1 then 1 else 0
   | abs x1 t1 =>
-       if eqb x1 func_name then 0 else find_func func_name t1
+       if eqb func_name x1 then 0 else find_func func_name t1
   | app t1 t2 =>
        (find_func func_name t1) + (find_func func_name t2)
   
@@ -157,11 +157,11 @@ Fixpoint is_recu (func_name : string) (func_body : tm) :=
   | _ => false
   end.
 
-Fixpoint is_app_F (func_name : string) (func_body : tm) : bool * nat :=
+Fixpoint is_app_F (func_name : string) (func_body : tm) : bool :=
   match func_body with
-  | var x1 => (eqb x1 func_name, 1)
-  | app t1 t2 => (fst (is_app_F func_name t1), 1 + snd (is_app_F func_name t1))
-  | _ => (false, 0)
+  | var x1 => eqb x1 func_name
+  | app t1 t2 => is_app_F func_name t1
+  | _ => false
   end.
 
 Fixpoint list_name (func_body : tm) : list string :=
